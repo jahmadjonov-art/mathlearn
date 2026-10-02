@@ -114,7 +114,16 @@ bugs were caught this way during the first build; do not skip it.
    a programming parallel genuinely helps.
 3. Run `tests/run.sh`.
 4. Republish the artifact to the **same URL** above, or the owner loses his saved
-   progress and his link.
+   progress and his link. Pass that URL as the Artifact tool's `url`, and pass
+   `generators.js`, any changed source file, and the new `lessons/*.json` in
+   `files`; files you leave out are kept, and omitting `capabilities` carries the
+   stored `db`/`user` declaration forward.
+
+   **One trap worth knowing:** the Artifact tool only reads paths under the
+   session's working directory or its scratchpad. When this repository is cloned
+   outside that directory, copy `src/` into the scratchpad and publish from there
+   (`diff -r` the copy against `src/` first). The repository stays the source of
+   truth; the copy is only a staging area.
 
 Write for someone who is not a programmer and wants to understand, not be
 impressed: plain English, no unexplained jargon, and say why a rule is true
