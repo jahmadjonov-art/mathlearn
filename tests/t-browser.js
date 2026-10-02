@@ -152,6 +152,49 @@ let BASE = '';
       if (skills < 5) issues.push('level 0 shows ' + skills + ' skills');
       say('course map: ' + levels + ' levels, first level lists ' + skills + ' skills');
 
+      /* ---- a level-4 skill end to end: the algebra answer path ---- */
+      await page.click('[data-tab="map"]');
+      await page.waitForSelector('details.lvl');
+      const l4 = page.locator('details.lvl[data-level="L4"]');
+      await l4.locator('summary').click();
+      await page.waitForTimeout(150);
+      const openAnyway = l4.locator('[data-act="open-level:L4"]');
+      if (await openAnyway.count()) { await openAnyway.click(); await page.waitForTimeout(200); }
+      /* factoring is an expr question graded by equivalence — the newest path in the UI */
+      await page.evaluate(() => {
+        const b = [...document.querySelectorAll('[data-act]')]
+          .find(e => e.getAttribute('data-act') === 'teach:factor-trinomial-1');
+        if (b) b.click();
+      });
+      await page.waitForSelector('.steps li', { timeout: 5000 });
+      const l4prose = await page.evaluate(() =>
+        [...document.querySelectorAll('.prose')].map(e => e.innerText).join(' ').length);
+      if (l4prose < 120) issues.push('level 4 lesson prose did not load (' + l4prose + ' chars)');
+      else say('level 4 lesson loaded (' + l4prose + ' chars)');
+
+      await page.click('text=Your turn');
+      await page.waitForSelector('.qtext');
+      const exprInfo = await page.evaluate(() => window.__peek && window.__peek());
+      if (!exprInfo || exprInfo.kind !== 'expr') {
+        issues.push('expected an expression question, got ' + (exprInfo && exprInfo.kind));
+      } else {
+        /* type the answer the way a learner would, without the explicit * signs */
+        await page.fill('#ans0', exprInfo.answer.replace(/\*/g, ''));
+        await page.click('[data-act="check"]');
+        await page.waitForSelector('.verdict');
+        const cls = await page.locator('.verdict').first().getAttribute('class');
+        if (!cls.includes('ok')) issues.push('a correct factored answer was marked wrong: ' + exprInfo.answer);
+        else say('algebra answer accepted without explicit multiplication signs');
+      }
+
+      /* the About page must state the build status without a stale hardcoded range */
+      await page.click('[data-tab="about"]');
+      await page.waitForTimeout(150);
+      const about = await page.locator('#view').innerText();
+      if (!/Levels 0 to 4/.test(about)) issues.push('About page does not report levels 0 to 4 as built: ' +
+        (about.match(/Levels[^.]*\./) || ['(no match)'])[0]);
+      else say('About page reports the built range correctly');
+
       /* reload keeps progress */
       await page.reload();
       await page.waitForTimeout(900);

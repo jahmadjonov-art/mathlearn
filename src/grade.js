@@ -125,7 +125,7 @@
         /* "factored" means the whole expression is a product or a power at the top
            level: 7(2x+3), -7*(2x+3), (x+1)(x+2), (x+1)^2, x(x+3). */
         var looksFactored = /\)\s*\(/.test(input) || /\)\s*\^/.test(input) ||
-          /^\s*-?\s*\d*\.?\d*\s*\*?\s*[a-zA-Z]?\s*\*?\s*\(/.test(input);
+          /^\s*-?\s*\d*\.?\d*\s*\*?\s*(?:[a-zA-Z](?:\s*\^\s*\d+)?)?\s*\*?\s*\(/.test(input);
         if (same && q.requireFactored && !looksFactored) {
           return { correct: false, note: 'Right value, but the question asks for it in factored form.' };
         }

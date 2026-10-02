@@ -1,0 +1,55 @@
+{
+ "module": "M4.2",
+ "skills": {
+  "slope-from-points": {
+   "why": "Slope is the rate of change: how much the output moves per unit of input. It is the single most reused number in applied mathematics — speed, interest rate, cost per unit and the derivative are all slopes.",
+   "traps": [
+    "Subtract the coordinates in the *same order* top and bottom. Reversing one gives the wrong sign.",
+    "A vertical line has an *undefined* slope, not a zero one. Zero slope is horizontal."
+   ],
+   "code": {
+    "body": "def slope(p, q):\n    return (q[1] - p[1]) / (q[0] - p[0])   # ZeroDivisionError if vertical",
+    "note": "The *undefined* case is a real crash, not a theoretical nicety. Vertical lines are why slope-intercept form cannot describe every line."
+   }
+  },
+  "slope-intercept": {
+   "why": "~y = mx + b~ is the most useful form because both numbers you care about are visible: ~m~ is the rate and ~b~ is the starting value. Given it, you can sketch the line in seconds — plot ~b~ on the vertical axis, then step across and up by the slope.",
+   "traps": [
+    "The sign belongs to the number: in ~y = 3x - 7~ the intercept is ~-7~.",
+    "The slope is the coefficient only when ~y~ is alone on one side. Rearrange first."
+   ]
+  },
+  "point-slope": {
+   "why": "Point-slope form exists because you usually know a rate and one observation, not the intercept. ~y - y_1 = m(x - x_1)~ lets you write the line immediately and convert later if you need to.",
+   "traps": [
+    "Both minus signs are real: through ~(-2, 5)~ with slope 3 it is ~y - 5 = 3(x + 2)~."
+   ]
+  },
+  "standard-form": {
+   "why": "~Ax + By = C~ treats ~x~ and ~y~ symmetrically, which makes both intercepts trivial — set each variable to zero in turn. It also handles vertical lines, which slope-intercept form cannot, and it is the form that systems of equations and linear programming use.",
+   "traps": [
+    "Standard form hides the slope. If a question asks for the slope, rearrange rather than guessing from ~A~ and ~B~ — it is ~-A/B~."
+   ]
+  },
+  "parallel-perpendicular": {
+   "why": "Parallel lines share a slope. Perpendicular slopes multiply to ~-1~, which is the negative reciprocal: flip and change sign. The second fact is less obvious but it falls straight out of rotating a right triangle through ninety degrees.",
+   "traps": [
+    "The negative reciprocal of ~\\f{2}{3}~ is ~-\\f{3}{2}~, not ~-\\f{2}{3}~. Both operations are needed.",
+    "A horizontal line (slope 0) is perpendicular to a vertical one (*undefined* slope) — the product rule fails for that pair, which is the one exception."
+   ]
+  },
+  "linear-modelling": {
+   "why": "A linear model says a quantity starts somewhere and changes at a constant rate. Most real quantities are not exactly linear, but over a short enough stretch most of them are close enough — which is why this simple model earns its keep everywhere.",
+   "traps": [
+    "Extrapolating far beyond your data is where linear models embarrass people. A straight line through a few points will happily predict negative populations."
+   ]
+  },
+  "line-of-best-fit": {
+   "why": "Real data never sits exactly on a line, so a line of best fit is the straight line that misses by the least overall. It gives you a slope you can interpret and a way to predict — but it is a summary of a pattern, not a law.",
+   "traps": [
+    "A fitted slope shows association, not causation. The line cannot tell you which variable drives which, or whether a third thing drives both.",
+    "A high correlation can still hide a badly curved relationship. Look at the scatter, not only at ~r~."
+   ]
+  }
+ }
+}

@@ -2874,6 +2874,1744 @@
        'The **mean** is dragged by extremes. That is why skewed data such as house prices or incomes are usually reported by median.']);
   });
 
+  /* =====================================================================
+     LEVEL 4 — ALGEBRA I
+     ===================================================================== */
+
+  /* y = mx + b written tidily, e.g. "y = -2x + 5", "y = x", "y = -3" */
+  function lineEq(m, b) {
+    if (m === 0) return 'y = ' + b;
+    return 'y = ' + poly([[m, 'x'], [b, '']]);
+  }
+  /* a slope as a tidy string: integer or reduced fraction */
+  function slopeStr(rise, run) {
+    var f = F(rise, run);
+    if (f.d === 1) return String(f.n);
+    return (f.n < 0 ? '-' : '') + '\\f{' + Math.abs(f.n) + '}{' + f.d + '}';
+  }
+
+  g('function-definition', function (R, d) {
+    var mode = R.pick(['table', 'pairs', 'vertical']);
+    if (mode === 'table') {
+      var isFn = R.bool();
+      var xs = R.distinct(4, -5, 5);
+      if (!isFn) xs[3] = xs[1];                  /* repeat an input */
+      var ys = xs.map(function () { return R.int(-9, 9); });
+      if (!isFn && ys[3] === ys[1]) ys[3] = ys[1] + R.nonzero(1, 4);
+      var pairs = xs.map(function (x, i) { return '(' + x + ', ' + ys[i] + ')'; }).join(', ');
+      var sh = shuffleChoices(R, ['Yes, it is a function', 'No, it is not a function'], isFn ? 0 : 1);
+      return mc('Is this a function?\n\n' + pairs, sh.choices, sh.answer,
+        ['A function gives each input exactly one output.',
+         isFn ? 'Every ~x~ value here appears once, so each input has a single output. It is a function.'
+              : 'The input ~' + xs[1] + '~ appears twice with different outputs (' + ys[1] + ' and ' + ys[3] +
+                '), so one input has two outputs. It is not a function.',
+         'Repeated *outputs* are fine — only repeated inputs with different outputs break it.']);
+    }
+    if (mode === 'pairs') {
+      var same = R.bool();
+      var x0 = R.int(-6, 6), y1 = R.int(-8, 8), y2 = same ? y1 : y1 + R.nonzero(1, 5);
+      var sh2 = shuffleChoices(R, ['Yes', 'No'], same ? 0 : 1);
+      return mc('A relation contains both ~(' + x0 + ', ' + y1 + ')~ and ~(' + x0 + ', ' + y2 +
+        ')~. Can it be a function?', sh2.choices, sh2.answer,
+        [same ? 'These are the same ordered pair written twice, so nothing is broken — it can still be a function.'
+              : 'The same input ~' + x0 + '~ is paired with two different outputs, so no — it cannot be a function.',
+         'The test is always: does any single input get more than one output?']);
+    }
+    var shapes = [
+      { s: 'a straight line that is not vertical', fn: true, why: 'Any vertical line crosses it once.' },
+      { s: 'a vertical line', fn: false, why: 'A vertical line lies on top of it, meeting it at infinitely many points — one input, endless outputs.' },
+      { s: 'a parabola opening upward', fn: true, why: 'Every vertical line crosses it at most once.' },
+      { s: 'a circle', fn: false, why: 'A vertical line through the middle crosses it twice, so one input has two outputs.' },
+      { s: 'a horizontal line', fn: true, why: 'Every input gives the same single output, which is allowed.' },
+      { s: 'a parabola opening to the right', fn: false, why: 'A vertical line crosses it twice.' }
+    ];
+    var sp = R.pick(shapes);
+    var sh3 = shuffleChoices(R, ['It is a function', 'It is not a function'], sp.fn ? 0 : 1);
+    return mc('Using the vertical line test: is the graph of ' + sp.s + ' a function?', sh3.choices, sh3.answer,
+      ['The vertical line test asks whether any vertical line can cross the graph more than once.',
+       sp.why,
+       'So it **' + (sp.fn ? 'is' : 'is not') + '** a function.']);
+  });
+
+  g('function-notation', function (R, d) {
+    var a = R.nonzero(-6, 6), b = R.nonzero(-9, 9);
+    var mode = R.pick(d === 1 ? ['evaluate', 'solve'] : ['evaluate', 'solve', 'shifted', 'quadratic']);
+    if (mode === 'evaluate') {
+      var x = R.nonzero(-7, 7);
+      return num('If ~f(x) = ' + poly([[a, 'x'], [b, '']]) + '~, find ~f(' + x + ')~.', a * x + b,
+        ['~f(' + x + ')~ means substitute ' + x + ' for ~x~.',
+         a + '(' + x + ') ' + (b < 0 ? '- ' + Math.abs(b) : '+ ' + b) + ' = ' + (a * x) +
+           (b < 0 ? ' - ' + Math.abs(b) : ' + ' + b) + ' = **' + (a * x + b) + '**.',
+         '~f(' + x + ')~ is not ~f~ times ' + x + '. The brackets mean "the value of the function at", not multiplication.']);
+    }
+    if (mode === 'solve') {
+      var target = a * R.nonzero(-6, 6) + b;
+      return num('If ~f(x) = ' + poly([[a, 'x'], [b, '']]) + '~, for what ~x~ does ~f(x) = ' + target + '~?',
+        (target - b) / a,
+        ['Set the rule equal to ' + target + ': ~' + poly([[a, 'x'], [b, '']]) + ' = ' + target + '~.',
+         (b < 0 ? 'Add ' + Math.abs(b) : 'Subtract ' + b) + ': ~' + term(a, 'x') + ' = ' + (target - b) + '~.',
+         'Divide by ' + a + ': ~x = ~**' + ((target - b) / a) + '**.',
+         'Evaluating goes input to output; this question runs it backwards.'], { tol: 0.005 });
+    }
+    if (mode === 'shifted') {
+      var k = R.nonzero(1, 5);
+      return expr('If ~f(x) = ' + poly([[a, 'x'], [b, '']]) + '~, write ~f(x + ' + k + ')~ in simplest form.',
+        a + '*x+' + (a * k + b),
+        ['Replace every ~x~ with ~(x + ' + k + ')~: ~' + a + '(x + ' + k + ')' +
+          (b < 0 ? ' - ' + Math.abs(b) : ' + ' + b) + '~.',
+         'Distribute: ~' + term(a, 'x') + ' + ' + (a * k) + (b < 0 ? ' - ' + Math.abs(b) : ' + ' + b) + '~.',
+         'Collect: **' + poly([[a, 'x'], [a * k + b, '']]) + '**.',
+         'The input is whatever sits inside the brackets, however complicated it looks.']);
+    }
+    var c = R.nonzero(-5, 5), xq = R.nonzero(-5, 5);
+    return num('If ~g(x) = x^{2} ' + (c < 0 ? '- ' + Math.abs(c) : '+ ' + c) + '~, find ~g(' + xq + ')~.',
+      xq * xq + c,
+      ['Substitute, keeping brackets round the negative: ~(' + xq + ')^{2} ' +
+        (c < 0 ? '- ' + Math.abs(c) : '+ ' + c) + '~.',
+       '~(' + xq + ')^{2} = ' + (xq * xq) + '~, so the value is ' + (xq * xq) +
+         (c < 0 ? ' - ' + Math.abs(c) : ' + ' + c) + ' = **' + (xq * xq + c) + '**.',
+       xq < 0 ? 'Squaring a negative gives a positive. Without the brackets you would get the wrong sign.'
+              : 'Brackets round the substituted value are a habit worth keeping even when it is positive.']);
+  });
+
+  g('domain-range', function (R, d) {
+    var mode = R.pick(d === 1 ? ['listed', 'linear'] : ['listed', 'linear', 'sqrt', 'rational', 'quadratic']);
+    if (mode === 'listed') {
+      var xs = R.distinct(4, -8, 8).sort(function (a, b) { return a - b; });
+      var ys = xs.map(function () { return R.int(-6, 6); });
+      var want = R.bool();
+      var set = want ? xs : ys.slice().sort(function (a, b) { return a - b; });
+      var uniq = [];
+      set.forEach(function (v) { if (uniq.indexOf(v) === -1) uniq.push(v); });
+      return { prompt: 'A function is given by the pairs ' +
+          xs.map(function (x, i) { return '(' + x + ', ' + ys[i] + ')'; }).join(', ') +
+          '. List its ' + (want ? 'domain' : 'range') + ', smallest first, separated by commas.',
+        kind: 'text', answer: uniq.join(','), normaliseList: true,
+        solution: [want ? 'The domain is the set of inputs — the first number in each pair.'
+                        : 'The range is the set of outputs — the second number in each pair.',
+          'Collected and sorted: **' + uniq.join(', ') + '**.',
+          'A value repeated in the list is written once; a set does not count duplicates.'] };
+    }
+    if (mode === 'linear') {
+      var sh = choiceSet(R, 'All real numbers', ['Only positive numbers', 'All numbers except 0', 'Only whole numbers']);
+      return mc('What is the domain of ~f(x) = ' + poly([[R.nonzero(-5, 5), 'x'], [R.nonzero(-8, 8), '']]) + '~?',
+        sh.choices, sh.answer,
+        ['Ask what inputs would break the rule: a division by zero, or a square root of a negative.',
+         'This rule only multiplies and adds, which is safe for every number.',
+         'So the domain is **all real numbers**.']);
+    }
+    if (mode === 'sqrt') {
+      var k = R.int(1, 12);
+      return num('The function ~f(x) = sqrt{x - ' + k + '}~ is defined for ~x \\ge~ what number?', k,
+        ['A square root needs a non-negative inside.',
+         'So ~x - ' + k + ' \\ge 0~, giving ~x \\ge ' + k + '~.',
+         'The domain starts at **' + k + '**.']);
+    }
+    if (mode === 'rational') {
+      var e = R.nonzero(-9, 9);
+      return num('For ~f(x) = \\f{1}{x ' + (e < 0 ? '- ' + Math.abs(e) : '+ ' + e) + '}~, which single value of ~x~ ' +
+        'must be excluded from the domain?', -e,
+        ['Division by zero is *undefined*, so the bottom must not be zero.',
+         'Solve ~x ' + (e < 0 ? '- ' + Math.abs(e) : '+ ' + e) + ' = 0~: ~x = ' + (-e) + '~.',
+         'So exclude **' + (-e) + '**; every other number is allowed.']);
+    }
+    var vk = R.nonzero(-8, 8), up = R.bool();
+    return num('What is the smallest value ~f(x) = ' + (up ? '' : '-') + 'x^{2} ' +
+      (vk < 0 ? '- ' + Math.abs(vk) : '+ ' + vk) + '~ ' + (up ? 'can take' : 'can take, or if it has none, enter ' + vk) + '?',
+      vk,
+      [up ? '~x^{2}~ is never negative and is 0 at ~x = 0~, so the smallest the whole expression gets is ' + vk + '.'
+          : 'With the minus sign the parabola opens downward, so ' + vk + ' is actually its *largest* value.',
+       'The turning value is **' + vk + '**.',
+       'The range of an upward parabola runs from its minimum upward; a downward one runs from its maximum downward.']);
+  });
+
+  g('function-from-context', function (R, d) {
+    var base = R.int(10, 60), rate = R.int(2, 20);
+    var mode = R.pick(['value', 'intercept', 'slope-meaning', 'solve']);
+    var story = 'A plumber charges a ' + MC.money(base) + ' call-out fee plus ' + MC.money(rate) +
+      ' per hour, so the cost of a job lasting ~h~ hours is ~C(h) = ' + base + ' + ' + rate + 'h~.';
+    if (mode === 'value') {
+      var h = R.int(2, 9);
+      return num(story + ' What does a ' + h + '-hour job cost, in dollars?', base + rate * h,
+        ['Substitute ~h = ' + h + '~: ~' + base + ' + ' + rate + '(' + h + ')~.',
+         base + ' + ' + (rate * h) + ' = **' + MC.money(base + rate * h) + '**.'],
+        { unit: 'dollars', tol: 0.02 });
+    }
+    if (mode === 'intercept') {
+      return num(story + ' What does ~C(0) = ' + base + '~ represent, in dollars?', base,
+        ['~h = 0~ means no hours worked at all.',
+         'The cost is still ' + MC.money(base) + ' — the call-out fee.',
+         'So the intercept is **' + MC.money(base) + '**: the fixed charge before any work happens.']);
+    }
+    if (mode === 'slope-meaning') {
+      var sh = choiceSet(R, 'The cost of each extra hour',
+        ['The total cost of the job', 'The call-out fee', 'The number of hours worked']);
+      return mc(story + ' What does the ' + rate + ' represent?', sh.choices, sh.answer,
+        ['The number multiplying the variable is the rate of change.',
+         'Each extra hour adds ' + MC.money(rate) + ' to the bill.',
+         'So it is **the cost of each extra hour**, not the total.']);
+    }
+    var total = base + rate * R.int(2, 10);
+    return num(story + ' A bill came to ' + MC.money(total) + '. How many hours was the job?',
+      (total - base) / rate,
+      ['Set the rule equal to the bill: ~' + base + ' + ' + rate + 'h = ' + total + '~.',
+       'Subtract the fee: ~' + rate + 'h = ' + (total - base) + '~.',
+       'Divide: ~h = ~**' + ((total - base) / rate) + '** hours.'], { tol: 0.005 });
+  });
+
+  g('slope-from-points', function (R, d) {
+    var x1 = R.int(-8, 8), y1 = R.int(-9, 9);
+    var run = R.nonzero(1, d === 1 ? 4 : 6), rise = R.nonzero(-9, 9);
+    if (d === 1) { rise = R.nonzero(-5, 5) * run; }      /* keep early slopes whole */
+    var x2 = x1 + run, y2 = y1 + rise;
+    var mode = R.pick(['compute', 'describe', 'missing']);
+    if (mode === 'describe') {
+      var kind = rise === 0 ? 'zero' : (rise > 0) === (run > 0) ? 'positive' : 'negative';
+      var sh = choiceSet(R, kind.charAt(0).toUpperCase() + kind.slice(1),
+        ['Positive', 'Negative', 'Zero', 'Undefined'].filter(function (o) { return o.toLowerCase() !== kind; }));
+      return mc('A line passes through ~(' + x1 + ', ' + y1 + ')~ and ~(' + x2 + ', ' + y2 +
+        ')~. Is its slope positive, negative, zero or *undefined*?', sh.choices, sh.answer,
+        ['Slope is rise over run: ~\\f{' + y2 + ' - (' + y1 + ')}{' + x2 + ' - (' + x1 + ')} = \\f{' +
+          rise + '}{' + run + '}~.',
+         'That is **' + kind + '**.',
+         'An *undefined* slope means a vertical line, where the run is zero and you would be dividing by nothing.']);
+    }
+    if (mode === 'missing') {
+      var m = F(rise, run);
+      if (m.d !== 1) { run = 1; rise = R.nonzero(-6, 6); x2 = x1 + run; y2 = y1 + rise; m = F(rise, run); }
+      return num('A line through ~(' + x1 + ', ' + y1 + ')~ has slope ~' + Frac.str(m) +
+        '~. What is the ~y~ coordinate of the point on it where ~x = ' + x2 + '~?', y2,
+        ['Going from ~x = ' + x1 + '~ to ~x = ' + x2 + '~ is a run of ' + run + '.',
+         'Rise = slope \\times run = ' + Frac.str(m) + ' \\times ' + run + ' = ' + rise + '.',
+         y1 + ' + (' + rise + ') = **' + y2 + '**.']);
+    }
+    return num('Find the slope of the line through ~(' + x1 + ', ' + y1 + ')~ and ~(' + x2 + ', ' + y2 + ')~. ' +
+      'Enter it as a decimal or a fraction.', rise / run,
+      ['Slope ~= \\f{y_{2} - y_{1}}{x_{2} - x_{1}} = \\f{' + y2 + ' - (' + y1 + ')}{' + x2 + ' - (' + x1 + ')}~.',
+       '~= \\f{' + rise + '}{' + run + '}~ = **' + (F(rise, run).d === 1 ? String(F(rise, run).n) : Frac.str(F(rise, run))) + '**.',
+       'Subtract the coordinates in the *same order* on top and bottom. Swapping one gives the wrong sign.'],
+      { tol: 0.005 });
+  });
+
+  g('slope-intercept', function (R, d) {
+    var m = R.nonzero(-6, 6), b = R.nonzero(-9, 9);
+    var mode = R.pick(['readOff', 'evaluate', 'fromGraph', 'rearrange']);
+    if (mode === 'readOff') {
+      return multi('For the line ~' + lineEq(m, b) + '~, give the slope and the ~y~-intercept.',
+        [{ label: 'Slope', answer: m }, { label: 'y-intercept', answer: b }],
+        ['In ~y = mx + b~, the number multiplying ~x~ is the slope and the lone number is the ~y~-intercept.',
+         'Slope **' + m + '**, ~y~-intercept **' + b + '**.',
+         'The sign travels with the number: in ~' + lineEq(m, b) + '~ the intercept is ' + b + '.']);
+    }
+    if (mode === 'evaluate') {
+      var x = R.nonzero(-6, 6);
+      return num('The line ~' + lineEq(m, b) + '~ passes through the point where ~x = ' + x +
+        '~. What is ~y~ there?', m * x + b,
+        ['Substitute ~x = ' + x + '~: ~y = ' + m + '(' + x + ')' + (b < 0 ? ' - ' + Math.abs(b) : ' + ' + b) + '~.',
+         '~y = ' + (m * x) + (b < 0 ? ' - ' + Math.abs(b) : ' + ' + b) + ' = ~**' + (m * x + b) + '**.']);
+    }
+    if (mode === 'fromGraph') {
+      var x1 = 0, y1 = b, run = R.nonzero(1, 4), x2 = run, y2 = b + m * run;
+      return expr('A line crosses the ~y~-axis at ~' + b + '~ and also passes through ~(' + x2 + ', ' + y2 +
+        ')~. Write its equation in the form ~y = mx + b~ (enter the right-hand side only).',
+        m + '*x+' + b,
+        ['The ~y~-intercept is given: ~b = ' + b + '~.',
+         'Slope from the two points: ~\\f{' + y2 + ' - ' + b + '}{' + x2 + ' - 0} = \\f{' + (m * run) + '}{' + run +
+           '} = ' + m + '~.',
+         'So the rule is **' + poly([[m, 'x'], [b, '']]) + '**.']);
+    }
+    var A = R.nonzero(1, 6), B = R.nonzero(1, 6), Cc = R.nonzero(-12, 12);
+    return expr('Rearrange ~' + poly([[A, 'x'], [B, 'y']]) + ' = ' + Cc +
+      '~ into the form ~y = mx + b~ (enter the right-hand side only).',
+      '(' + Cc + '-' + A + '*x)/' + B,
+      ['Isolate the ~y~ term: ~' + term(B, 'y') + ' = ' + poly([[-A, 'x'], [Cc, '']]) + '~.',
+       'Divide every term by ' + B + ': ~y = \\f{' + (-A) + '}{' + B + '}x + \\f{' + Cc + '}{' + B + '}~.',
+       'So the slope is ~' + slopeStr(-A, B) + '~ and the intercept is ~' + Frac.str(F(Cc, B)) + '~.']);
+  });
+
+  g('point-slope', function (R, d) {
+    var m = R.nonzero(-6, 6), x1 = R.nonzero(-7, 7), y1 = R.nonzero(-9, 9);
+    var mode = R.pick(['build', 'toSlopeIntercept', 'twoPoints']);
+    if (mode === 'build') {
+      return num('A line has slope ~' + m + '~ and passes through ~(' + x1 + ', ' + y1 +
+        ')~. Written as ~y = mx + b~, what is ~b~?', y1 - m * x1,
+        ['Start from point-slope form: ~y - (' + y1 + ') = ' + m + '(x - (' + x1 + '))~.',
+         'Expand: ~y = ' + term(m, 'x') + ' - ' + (m * x1) + ' + ' + y1 + '~ — careful with both minus signs.',
+         'So ~b = ' + y1 + ' - ' + m + '(' + x1 + ') = ~**' + (y1 - m * x1) + '**.'],
+        { tol: 0.005 });
+    }
+    if (mode === 'toSlopeIntercept') {
+      return expr('Write ~y - ' + y1 + ' = ' + m + '(x - ' + x1 + ')~ in the form ~y = mx + b~ ' +
+        '(enter the right-hand side only).', m + '*x+' + (y1 - m * x1),
+        ['Distribute the slope: ~y - ' + y1 + ' = ' + term(m, 'x') + ' - ' + (m * x1) + '~.',
+         'Add ' + y1 + ' to both sides: ~y = ' + poly([[m, 'x'], [y1 - m * x1, '']]) + '~.',
+         'Answer: **' + poly([[m, 'x'], [y1 - m * x1, '']]) + '**.']);
+    }
+    var run = R.nonzero(1, 4), x2 = x1 + run, y2 = y1 + m * run;
+    return expr('Write the equation of the line through ~(' + x1 + ', ' + y1 + ')~ and ~(' + x2 + ', ' + y2 +
+      ')~ in the form ~y = mx + b~ (enter the right-hand side only).', m + '*x+' + (y1 - m * x1),
+      ['Slope first: ~\\f{' + y2 + ' - (' + y1 + ')}{' + x2 + ' - (' + x1 + ')} = ' + m + '~.',
+       'Use either point in point-slope form: ~y - (' + y1 + ') = ' + m + '(x - (' + x1 + '))~.',
+       'Simplify: **' + poly([[m, 'x'], [y1 - m * x1, '']]) + '**.',
+       'Both points give the same line, so use whichever has the friendlier numbers.']);
+  });
+
+  g('standard-form', function (R, d) {
+    var A = R.nonzero(1, 7), B = R.nonzero(1, 7), Cc = A * R.nonzero(-5, 5) + B * R.nonzero(-5, 5);
+    var mode = R.pick(['intercepts', 'xIntercept', 'toStandard']);
+    if (mode === 'intercepts') {
+      return multi('For ~' + poly([[A, 'x'], [B, 'y']]) + ' = ' + Cc + '~, find both intercepts.',
+        [{ label: 'x-intercept (where y = 0)', answer: Cc / A, tol: 0.005 },
+         { label: 'y-intercept (where x = 0)', answer: Cc / B, tol: 0.005 }],
+        ['Standard form makes intercepts quick: set the other variable to zero.',
+         'Set ~y = 0~: ~' + term(A, 'x') + ' = ' + Cc + '~, so ~x = ' + MC.fmt(Cc / A, 4) + '~.',
+         'Set ~x = 0~: ~' + term(B, 'y') + ' = ' + Cc + '~, so ~y = ' + MC.fmt(Cc / B, 4) + '~.',
+         'This is why standard form is the convenient one for sketching a line from two points.']);
+    }
+    if (mode === 'xIntercept') {
+      return num('Where does ~' + poly([[A, 'x'], [B, 'y']]) + ' = ' + Cc + '~ cross the ~x~-axis?',
+        Cc / A,
+        ['On the ~x~-axis, ~y = 0~.',
+         'That leaves ~' + term(A, 'x') + ' = ' + Cc + '~, so ~x = ~**' + MC.fmt(Cc / A, 4) + '**.'],
+        { tol: 0.005 });
+    }
+    var m = R.nonzero(-5, 5), b = R.nonzero(-9, 9);
+    return multi('Write ~' + lineEq(m, b) + '~ in standard form ~Ax + By = C~ with ~A~ positive and ' +
+      'as small as possible. Give ~A~, ~B~ and ~C~.',
+      [{ label: 'A', answer: -m > 0 ? -m : m }, { label: 'B', answer: -m > 0 ? 1 : -1 },
+       { label: 'C', answer: -m > 0 ? b : -b }],
+      ['Move the ~x~ term across: ~' + term(-m, 'x') + ' + y = ' + b + '~.',
+       -m > 0 ? 'The coefficient of ~x~ is already positive, so this is it.'
+              : 'The coefficient of ~x~ is negative, so multiply the whole equation by -1: ~' +
+                term(m, 'x') + ' - y = ' + (-b) + '~.',
+       'So ~A = ' + (-m > 0 ? -m : m) + '~, ~B = ' + (-m > 0 ? 1 : -1) + '~, ~C = ' + (-m > 0 ? b : -b) + '~.']);
+  });
+
+  g('parallel-perpendicular', function (R, d) {
+    var m = R.nonzero(-6, 6), b = R.nonzero(-9, 9);
+    var mode = R.pick(['identify', 'parallelThrough', 'perpSlope', 'perpThrough']);
+    if (mode === 'identify') {
+      var m2 = R.pick([m, -1 / m, m + R.nonzero(1, 3)]);
+      var rel = m2 === m ? 'Parallel' : (Math.abs(m2 * m + 1) < 1e-9 ? 'Perpendicular' : 'Neither');
+      var sh = choiceSet(R, rel, ['Parallel', 'Perpendicular', 'Neither'].filter(function (o) { return o !== rel; }));
+      return mc('One line has slope ~' + m + '~ and another has slope ~' + MC.fmt(m2, 4) +
+        '~. How are they related?', sh.choices, sh.answer,
+        ['Equal slopes mean parallel. Slopes multiplying to -1 mean perpendicular.',
+         'Here ' + m + ' \\times ' + MC.fmt(m2, 4) + ' = ' + MC.fmt(m * m2, 4) +
+           (rel === 'Perpendicular' ? ', which is -1.' : (rel === 'Parallel' ? ', and the slopes are equal.' : ', which is neither -1 nor are the slopes equal.')),
+         'So they are **' + rel.toLowerCase() + '**.']);
+    }
+    if (mode === 'parallelThrough') {
+      var px = R.nonzero(-6, 6), py = R.nonzero(-9, 9);
+      return expr('Write the line parallel to ~' + lineEq(m, b) + '~ through ~(' + px + ', ' + py +
+        ')~, in the form ~y = mx + b~ (right-hand side only).', m + '*x+' + (py - m * px),
+        ['Parallel means the same slope, ~' + m + '~.',
+         'Through ~(' + px + ', ' + py + ')~: ~b = ' + py + ' - ' + m + '(' + px + ') = ' + (py - m * px) + '~.',
+         'Answer: **' + poly([[m, 'x'], [py - m * px, '']]) + '**.']);
+    }
+    if (mode === 'perpSlope') {
+      var num_ = R.nonzero(1, 6), den = R.nonzero(1, 6);
+      var f = F(num_, den), pf = F(-den, num_);
+      return num('A line has slope ~' + Frac.str(f) + '~. What is the slope of any line perpendicular to it? ' +
+        'Enter a decimal or a fraction.', Frac.val(pf),
+        ['Perpendicular slopes are negative reciprocals: flip the fraction and change the sign.',
+         '~' + Frac.str(f) + ' \\to ' + Frac.str(pf) + '~.',
+         'Check: ~' + Frac.str(f) + ' \\times ' + Frac.str(pf) + ' = -1~. Answer **' + Frac.str(pf) + '**.'],
+        { tol: 0.005 });
+    }
+    var qx = R.nonzero(-6, 6), qy = R.nonzero(-9, 9);
+    var pm = -1 / m;
+    return num('A line perpendicular to ~' + lineEq(m, b) + '~ passes through ~(' + qx + ', ' + qy +
+      ')~. In ~y = mx + b~ form, what is ~b~? Enter a decimal or a fraction.', qy - pm * qx,
+      ['Perpendicular slope is the negative reciprocal of ' + m + ': ~' + Frac.str(F(-1, m)) + '~.',
+       '~b = y - mx = ' + qy + ' - (' + Frac.str(F(-1, m)) + ')(' + qx + ')~.',
+       '~b = ~**' + MC.fmt(qy - pm * qx, 4) + '**.'], { tol: 0.005 });
+  });
+
+  g('linear-modelling', function (R, d) {
+    var start = R.int(20, 500), rate = R.nonzero(-25, 25);
+    var noun = R.pick(['litres of water in a tank', 'pages left to read', 'dollars in a savings jar',
+                       'members of a club', 'kilometres from home']);
+    var up = rate > 0;
+    var mode = R.pick(['value', 'whenZero', 'interpret', 'build']);
+    var story = 'A quantity starts at ' + start + ' ' + noun + ' and changes by ' +
+      (up ? '+' : '') + rate + ' each week.';
+    if (mode === 'value') {
+      var w = R.int(2, 12);
+      return num(story + ' How much after ' + w + ' weeks?', start + rate * w,
+        ['The model is ~y = ' + start + ' + ' + rate + 'w~ — a starting amount plus a rate times time.',
+         'At ~w = ' + w + '~: ' + start + ' + (' + rate + ')(' + w + ') = **' + (start + rate * w) + '**.']);
+    }
+    if (mode === 'whenZero') {
+      if (rate > 0) rate = -rate;
+      var weeks = start / Math.abs(rate);
+      return num(story.replace('+' + Math.abs(rate), String(rate)) +
+        ' After how many weeks does it reach zero? Round to 2 decimal places if needed.', weeks,
+        ['Set the model to zero: ~' + start + ' + (' + rate + ')w = 0~.',
+         'So ~w = \\f{' + start + '}{' + Math.abs(rate) + '} = ~**' + MC.fmt(weeks, 2) + '** weeks.',
+         'This is the ~x~-intercept of the model, and in context it is when the quantity runs out.'],
+        { tol: 0.011 });
+    }
+    if (mode === 'interpret') {
+      var sh = choiceSet(R, 'The amount at the start, before any weeks passed',
+        ['The weekly change', 'The total after one week', 'The number of weeks']);
+      return mc(story + ' In the model ~y = ' + start + ' + ' + rate + 'w~, what does the ' + start +
+        ' mean?', sh.choices, sh.answer,
+        ['Put ~w = 0~ into the model: the rate term vanishes.',
+         'What is left is ' + start + ', the value before any time has passed.',
+         'So it is **the amount at the start**. The ' + rate + ' is the weekly change.']);
+    }
+    return num(story + ' Write the model as ~y = ' + start + ' + mw~. What is ~m~?', rate,
+      ['The rate of change per week is the number multiplying ~w~.',
+       'It changes by ' + rate + ' each week, so ~m = ~**' + rate + '**.',
+       up ? 'A positive rate means growth.' : 'A negative rate means decline — the sign carries that information.']);
+  });
+
+  g('line-of-best-fit', function (R, d) {
+    var m = R.nonzero(1, 8) * (R.bool() ? 1 : -1), b = R.int(5, 60);
+    var mode = R.pick(['predict', 'slopeMeaning', 'strength']);
+    if (mode === 'predict') {
+      var x = R.int(2, 20);
+      return num('A scatterplot of study hours against test score has line of best fit ~y = ' +
+        poly([[m, 'x'], [b, '']]) + '~. What score does it predict for ' + x + ' hours?', m * x + b,
+        ['A line of best fit is used exactly like any other line: substitute.',
+         '~y = ' + m + '(' + x + ')' + (b < 0 ? ' - ' + Math.abs(b) : ' + ' + b) + ' = ~**' + (m * x + b) + '**.',
+         'It is a prediction, not a measurement. Real points sit above and below the line.']);
+    }
+    if (mode === 'slopeMeaning') {
+      var sh = choiceSet(R, 'Each extra hour is associated with ' + (m > 0 ? 'a rise' : 'a fall') +
+        ' of about ' + Math.abs(m) + ' marks',
+        ['The test is out of ' + Math.abs(m) + ' marks', 'Studying causes a gain of ' + Math.abs(m) + ' marks every time',
+         'About ' + Math.abs(m) + ' students were surveyed']);
+      return mc('For the fit ~y = ' + poly([[m, 'x'], [b, '']]) + '~ of score against study hours, what does ' +
+        'the slope ' + m + ' tell you?', sh.choices, sh.answer,
+        ['The slope is the change in the predicted output per one unit of input.',
+         'So each extra hour is associated with about ' + Math.abs(m) + ' marks ' + (m > 0 ? 'more' : 'fewer') + '.',
+         '**Associated with**, not *causes*. A line through data describes a pattern; it does not establish that one thing produces the other.']);
+    }
+    var rs = R.pick([0.05, 0.2, 0.45, 0.7, 0.9, 0.98]);
+    var word = rs >= 0.8 ? 'Strong' : rs >= 0.4 ? 'Moderate' : 'Weak';
+    var sh2 = choiceSet(R, word, ['Strong', 'Moderate', 'Weak'].filter(function (o) { return o !== word; }));
+    return mc('Two variables have correlation coefficient ~r = ' + rs + '~. How strong is the linear relationship?',
+      sh2.choices, sh2.answer,
+      ['~r~ runs from -1 to 1; the closer to either end, the tighter the points hug a straight line.',
+       '~r = ' + rs + '~ counts as a **' + word.toLowerCase() + '** linear relationship.',
+       'A high ~r~ still says nothing about cause, and it can be high for data that is not really straight at all.']);
+  });
+
+  g('system-graphing', function (R, d) {
+    var x = R.nonzero(-6, 6), y = R.nonzero(-6, 6);
+    var m1 = R.nonzero(-4, 4), m2 = R.nonzero(-4, 4);
+    while (m2 === m1) m2 = R.nonzero(-4, 4);
+    var b1 = y - m1 * x, b2 = y - m2 * x;
+    var mode = R.pick(['solve', 'count']);
+    if (mode === 'count') {
+      var kind = R.pick(['one', 'none', 'infinite']);
+      var eq2;
+      if (kind === 'one') eq2 = lineEq(m2, b2);
+      else if (kind === 'none') eq2 = lineEq(m1, b1 + R.nonzero(1, 6));
+      else eq2 = lineEq(m1, b1);
+      var right = kind === 'one' ? 'Exactly one' : kind === 'none' ? 'None' : 'Infinitely many';
+      var sh = choiceSet(R, right, ['Exactly one', 'None', 'Infinitely many'].filter(function (o) { return o !== right; }));
+      return mc('How many solutions does this system have?\n\n~' + lineEq(m1, b1) + '~\n\n~' + eq2 + '~',
+        sh.choices, sh.answer,
+        ['Compare slopes and intercepts.',
+         kind === 'one' ? 'Different slopes (' + m1 + ' and ' + m2 + '), so the lines cross once.'
+           : kind === 'none' ? 'Same slope ' + m1 + ' but different intercepts, so they are parallel and never meet.'
+           : 'Same slope and same intercept — it is the same line twice, so every point on it is a solution.',
+         'Answer: **' + right.toLowerCase() + '**.']);
+    }
+    return multi('Solve by finding where the lines cross:\n\n~' + lineEq(m1, b1) + '~\n\n~' + lineEq(m2, b2) + '~',
+      [{ label: 'x', answer: x }, { label: 'y', answer: y }],
+      ['At the crossing point both rules give the same ~y~, so set them equal: ~' +
+        poly([[m1, 'x'], [b1, '']]) + ' = ' + poly([[m2, 'x'], [b2, '']]) + '~.',
+       'Collect: ~' + term(m1 - m2, 'x') + ' = ' + (b2 - b1) + '~, so ~x = ' + x + '~.',
+       'Substitute back into either equation: ~y = ' + y + '~.',
+       'Solution **(' + x + ', ' + y + ')**. Check it in *both* equations — a point on only one line is not a solution.']);
+  });
+
+  g('system-substitution', function (R, d) {
+    var x = R.nonzero(-7, 7), y = R.nonzero(-7, 7);
+    var m = R.nonzero(-5, 5), b = y - m * x;
+    var A = R.nonzero(1, 5), B = R.nonzero(1, 5), Cc = A * x + B * y;
+    return multi('Solve by substitution:\n\n~y = ' + poly([[m, 'x'], [b, '']]) + '~\n\n~' +
+      poly([[A, 'x'], [B, 'y']]) + ' = ' + Cc + '~',
+      [{ label: 'x', answer: x }, { label: 'y', answer: y }],
+      ['The first equation already gives ~y~, so put that expression into the second in place of ~y~.',
+       '~' + term(A, 'x') + ' + ' + B + '(' + poly([[m, 'x'], [b, '']]) + ') = ' + Cc + '~.',
+       'Expand and collect: ~' + term(A + B * m, 'x') + ' = ' + (Cc - B * b) + '~, so ~x = ' + x + '~.',
+       'Back-substitute: ~y = ' + m + '(' + x + ')' + (b < 0 ? ' - ' + Math.abs(b) : ' + ' + b) + ' = ' + y + '~.',
+       'Solution **(' + x + ', ' + y + ')**. Substitution is cheapest when one variable is already alone.']);
+  });
+
+  g('system-elimination', function (R, d) {
+    var x = R.nonzero(-7, 7), y = R.nonzero(-7, 7);
+    var a1 = R.nonzero(1, 6), b1 = R.nonzero(1, 6);
+    var a2 = R.nonzero(1, 6), b2 = R.nonzero(1, 6);
+    while (a1 * b2 - a2 * b1 === 0) { a2 = R.nonzero(1, 6); b2 = R.nonzero(1, 6); }
+    var c1 = a1 * x + b1 * y, c2 = a2 * x + b2 * y;
+    var L = MC.lcm(Math.abs(b1), Math.abs(b2));
+    return multi('Solve by elimination:\n\n~' + poly([[a1, 'x'], [b1, 'y']]) + ' = ' + c1 + '~\n\n~' +
+      poly([[a2, 'x'], [b2, 'y']]) + ' = ' + c2 + '~',
+      [{ label: 'x', answer: x }, { label: 'y', answer: y }],
+      ['To cancel ~y~, scale each equation so the ~y~ coefficients match in size: use ' + L + '.',
+       'Multiply the first by ' + (L / Math.abs(b1)) + ' and the second by ' + (L / Math.abs(b2)) +
+         ', then ' + ((b1 > 0) === (b2 > 0) ? 'subtract' : 'add') + ' to remove ~y~.',
+       'That leaves one equation in ~x~ alone, giving ~x = ' + x + '~.',
+       'Substitute back: ~y = ' + y + '~.',
+       'Solution **(' + x + ', ' + y + ')**. Elimination is cheapest when neither variable is already isolated.']);
+  });
+
+  g('system-special', function (R, d) {
+    var a = R.nonzero(1, 5), b = R.nonzero(1, 5), c = R.nonzero(-10, 10);
+    var k = R.int(2, 4);
+    var kind = R.pick(['none', 'infinite', 'one']);
+    var eq1 = poly([[a, 'x'], [b, 'y']]) + ' = ' + c;
+    var eq2, right, why;
+    if (kind === 'none') {
+      eq2 = poly([[a * k, 'x'], [b * k, 'y']]) + ' = ' + (c * k + R.nonzero(1, 5));
+      right = 'No solution';
+      why = ['Multiply the first equation by ' + k + ' and the left sides match exactly, but the right sides do not.',
+        'That is a contradiction: the same quantity cannot equal two different numbers.',
+        'Graphically the lines are **parallel** — same slope, different intercept — so there is **no solution**.'];
+    } else if (kind === 'infinite') {
+      eq2 = poly([[a * k, 'x'], [b * k, 'y']]) + ' = ' + (c * k);
+      right = 'Infinitely many solutions';
+      why = ['The second equation is exactly ' + k + ' times the first, so they carry the same information.',
+        'It is one line written twice, and every point on it satisfies both.',
+        'So there are **infinitely many solutions**.'];
+    } else {
+      eq2 = poly([[a * k + R.nonzero(1, 3), 'x'], [b * k, 'y']]) + ' = ' + (c * k);
+      right = 'Exactly one solution';
+      why = ['Try to scale one equation into the other: the ~x~ and ~y~ coefficients do not scale by the same factor.',
+        'So the lines have different slopes and must cross exactly once.',
+        'Answer: **exactly one solution**.'];
+    }
+    var sh = choiceSet(R, right, ['No solution', 'Infinitely many solutions', 'Exactly one solution']
+      .filter(function (o) { return o !== right; }));
+    return mc('How many solutions does this system have?\n\n~' + eq1 + '~\n\n~' + eq2 + '~', sh.choices, sh.answer, why);
+  });
+
+  g('system-word-problems', function (R, d) {
+    var kind = R.pick(['tickets', 'coins', 'twoItems']);
+    if (kind === 'tickets') {
+      var adultP = R.int(8, 20), childP = R.int(3, adultP - 2);
+      var adults = R.int(5, 60), children = R.int(5, 60);
+      var people = adults + children, money = adults * adultP + children * childP;
+      return multi('Adult tickets cost ' + MC.money(adultP) + ' and child tickets ' + MC.money(childP) +
+        '. ' + people + ' tickets were sold for ' + MC.money(money) +
+        ' in total. How many of each were sold?',
+        [{ label: 'Adult tickets', answer: adults }, { label: 'Child tickets', answer: children }],
+        ['Two unknowns need two equations. Let ~a~ be adult tickets and ~c~ child tickets.',
+         'Count: ~a + c = ' + people + '~. Money: ~' + adultP + 'a + ' + childP + 'c = ' + money + '~.',
+         'Substitute ~c = ' + people + ' - a~ into the money equation and solve: ~a = ' + adults + '~.',
+         'Then ~c = ' + people + ' - ' + adults + ' = ' + children + '~.',
+         '**' + adults + ' adult and ' + children + ' child tickets.** Check both equations, not just one.']);
+    }
+    if (kind === 'coins') {
+      var nickels = R.int(4, 40), dimes = R.int(4, 40);
+      var count = nickels + dimes, value = nickels * 5 + dimes * 10;
+      return multi('A jar holds only nickels (5 cents) and dimes (10 cents). There are ' + count +
+        ' coins worth ' + MC.money(value / 100) + ' in total. How many of each?',
+        [{ label: 'Nickels', answer: nickels }, { label: 'Dimes', answer: dimes }],
+        ['Let ~n~ be nickels and ~d~ dimes.',
+         'Count: ~n + d = ' + count + '~. Value in cents: ~5n + 10d = ' + value + '~.',
+         'From the first, ~n = ' + count + ' - d~. Substituting gives ~d = ' + dimes + '~.',
+         'So ~n = ' + nickels + '~. **' + nickels + ' nickels and ' + dimes + ' dimes.**',
+         'Keep every term in the same unit. Mixing dollars and cents in one equation is the usual error here.']);
+    }
+    var pA = R.int(2, 9), pB = R.int(2, 9);
+    while (pB === pA) pB = R.int(2, 9);
+    var nA = R.int(2, 12), nB = R.int(2, 12);
+    var tot1 = nA * pA + nB * pB;
+    var mA = nA + R.int(1, 5), mB = nB + R.int(1, 5);
+    var tot2 = mA * pA + mB * pB;
+    return multi('Buying ' + nA + ' pens and ' + nB + ' pencils costs ' + MC.money(tot1) + '. Buying ' +
+      mA + ' pens and ' + mB + ' pencils costs ' + MC.money(tot2) +
+      '. Find the price of each, in dollars.',
+      [{ label: 'Price of a pen', answer: pA, tol: 0.02 }, { label: 'Price of a pencil', answer: pB, tol: 0.02 }],
+      ['Let ~p~ be the pen price and ~q~ the pencil price.',
+       '~' + nA + 'p + ' + nB + 'q = ' + tot1 + '~ and ~' + mA + 'p + ' + mB + 'q = ' + tot2 + '~.',
+       'Eliminate one variable by scaling both equations, then solve.',
+       'Pen **' + MC.money(pA) + '**, pencil **' + MC.money(pB) + '**.']);
+  });
+
+  g('system-inequalities', function (R, d) {
+    var m1 = R.nonzero(-4, 4), b1 = R.nonzero(-8, 8);
+    var m2 = R.nonzero(-4, 4), b2 = R.nonzero(-8, 8);
+    var px = R.nonzero(-6, 6), py = R.nonzero(-9, 9);
+    var op1 = R.pick(['<', '>', '<=', '>=']);
+    var op2 = R.pick(['<', '>', '<=', '>=']);
+    function holds(op, lhs, rhs) {
+      if (op === '<') return lhs < rhs;
+      if (op === '>') return lhs > rhs;
+      if (op === '<=') return lhs <= rhs;
+      return lhs >= rhs;
+    }
+    var v1 = m1 * px + b1, v2 = m2 * px + b2;
+    var ok1 = holds(op1, py, v1), ok2 = holds(op2, py, v2);
+    var both = ok1 && ok2;
+    var sh = shuffleChoices(R, ['Yes, it satisfies both', 'No, it fails at least one'], both ? 0 : 1);
+    return mc('Is ~(' + px + ', ' + py + ')~ a solution of this system?\n\n~y ' + op1 + ' ' +
+      poly([[m1, 'x'], [b1, '']]) + '~\n\n~y ' + op2 + ' ' + poly([[m2, 'x'], [b2, '']]) + '~',
+      sh.choices, sh.answer,
+      ['Test the point in each inequality separately — a solution must satisfy every one.',
+       'First: ~' + py + ' ' + op1 + ' ' + MC.fmt(v1, 4) + '~ is ' + (ok1 ? 'true' : 'false') + '.',
+       'Second: ~' + py + ' ' + op2 + ' ' + MC.fmt(v2, 4) + '~ is ' + (ok2 ? 'true' : 'false') + '.',
+       'So the point **' + (both ? 'is' : 'is not') + '** a solution.',
+       'Graphically the solution set is where the two shaded regions overlap; a point in only one region does not count.']);
+  });
+
+  g('abs-equations', function (R, d) {
+    var inner_m = R.nonzero(1, 4), inner_b = R.nonzero(-8, 8);
+    var k = R.int(1, 12);
+    var mode = R.pick(d === 1 ? ['simple', 'nosol'] : ['simple', 'nosol', 'shifted', 'count']);
+    if (mode === 'simple') {
+      var sols = [k, -k];
+      return multi('Solve ~|x| = ' + k + '~. Give both solutions, smaller first.',
+        [{ label: 'Smaller solution', answer: -k }, { label: 'Larger solution', answer: k }],
+        ['Absolute value is distance from zero, so two numbers sit ' + k + ' away.',
+         'Those are ~-' + k + '~ and ~' + k + '~.',
+         'Solutions **-' + k + '** and **' + k + '**.']);
+    }
+    if (mode === 'nosol') {
+      var neg = -R.int(1, 9);
+      var sh = choiceSet(R, 'No solution', ['Two solutions', 'One solution', 'Infinitely many solutions']);
+      return mc('How many solutions does ~|x ' + (inner_b < 0 ? '- ' + Math.abs(inner_b) : '+ ' + inner_b) +
+        '| = ' + neg + '~ have?', sh.choices, sh.answer,
+        ['Absolute value measures distance, and distance is never negative.',
+         'Nothing can have absolute value ' + neg + '.',
+         'So there is **no solution** — and you can see that before doing any algebra.']);
+    }
+    if (mode === 'shifted') {
+      var s1 = (k - inner_b) / inner_m, s2 = (-k - inner_b) / inner_m;
+      var lo = Math.min(s1, s2), hi = Math.max(s1, s2);
+      return multi('Solve ~|' + poly([[inner_m, 'x'], [inner_b, '']]) + '| = ' + k +
+        '~. Give both solutions, smaller first.',
+        [{ label: 'Smaller solution', answer: lo, tol: 0.005 }, { label: 'Larger solution', answer: hi, tol: 0.005 }],
+        ['Split into two cases: the inside equals ' + k + ', or the inside equals ~-' + k + '~.',
+         'Case 1: ~' + poly([[inner_m, 'x'], [inner_b, '']]) + ' = ' + k + '~ gives ~x = ' + MC.fmt(s1, 4) + '~.',
+         'Case 2: ~' + poly([[inner_m, 'x'], [inner_b, '']]) + ' = ' + (-k) + '~ gives ~x = ' + MC.fmt(s2, 4) + '~.',
+         'Solutions **' + MC.fmt(lo, 4) + '** and **' + MC.fmt(hi, 4) + '**. Always put both back in to check.']);
+    }
+    var rhs = R.pick([0, R.int(1, 9)]);
+    var right = rhs === 0 ? 'One solution' : 'Two solutions';
+    var sh2 = choiceSet(R, right, ['One solution', 'Two solutions', 'No solution']
+      .filter(function (o) { return o !== right; }));
+    return mc('How many solutions does ~|' + poly([[inner_m, 'x'], [inner_b, '']]) + '| = ' + rhs + '~ have?',
+      sh2.choices, sh2.answer,
+      [rhs === 0 ? 'Only zero has absolute value zero, so the inside must be exactly 0 — a single equation, a single answer.'
+                 : 'A positive right-hand side gives two cases, inside ~= ' + rhs + '~ and inside ~= -' + rhs + '~.',
+       'Answer: **' + right.toLowerCase() + '**.',
+       'Three cases worth knowing on sight: positive gives two, zero gives one, negative gives none.']);
+  });
+
+  g('abs-inequalities', function (R, d) {
+    var k = R.int(2, 12), c = R.nonzero(-8, 8);
+    var less = R.bool();
+    if (less) {
+      return multi('Solve ~|x ' + (c < 0 ? '- ' + Math.abs(c) : '+ ' + c) + '| < ' + k +
+        '~. Give the lower and upper bounds for ~x~.',
+        [{ label: 'Lower bound', answer: -k - c }, { label: 'Upper bound', answer: k - c }],
+        ['"Less than" means the inside is within ' + k + ' of zero, so it is trapped between ~-' + k +
+          '~ and ~' + k + '~.',
+         'Write it as one chain: ~-' + k + ' < x ' + (c < 0 ? '- ' + Math.abs(c) : '+ ' + c) + ' < ' + k + '~.',
+         (c < 0 ? 'Add ' + Math.abs(c) : 'Subtract ' + c) + ' throughout: ~' + (-k - c) + ' < x < ' + (k - c) + '~.',
+         'So ~x~ runs from **' + (-k - c) + '** to **' + (k - c) + '**. Less-than gives one interval, an "and".']);
+    }
+    return multi('Solve ~|x ' + (c < 0 ? '- ' + Math.abs(c) : '+ ' + c) + '| > ' + k +
+      '~. Give the two boundary values, smaller first.',
+      [{ label: 'x is less than', answer: -k - c }, { label: 'or x is greater than', answer: k - c }],
+      ['"Greater than" means the inside is further than ' + k + ' from zero — in either direction.',
+       'Two separate cases: ~x ' + (c < 0 ? '- ' + Math.abs(c) : '+ ' + c) + ' > ' + k + '~ or ~x ' +
+         (c < 0 ? '- ' + Math.abs(c) : '+ ' + c) + ' < -' + k + '~.',
+       'Solving each: ~x > ' + (k - c) + '~ or ~x < ' + (-k - c) + '~.',
+       'So **x < ' + (-k - c) + ' or x > ' + (k - c) + '**. Greater-than gives two pieces, an "or" — never one interval.']);
+  });
+
+  g('abs-graphs', function (R, d) {
+    var a = R.pick([1, -1, 2, -2, 3, -3]), h = R.nonzero(-6, 6), k = R.nonzero(-8, 8);
+    var mode = R.pick(['vertex', 'direction', 'value']);
+    var eqn = 'y = ' + (a === 1 ? '' : a === -1 ? '-' : a) + '|x ' + (h < 0 ? '+ ' + Math.abs(h) : '- ' + h) +
+      '| ' + (k < 0 ? '- ' + Math.abs(k) : '+ ' + k);
+    if (mode === 'vertex') {
+      return multi('Find the vertex of ~' + eqn + '~.',
+        [{ label: 'x', answer: h }, { label: 'y', answer: k }],
+        ['In ~y = a|x - h| + k~ the corner sits at ~(h, k)~.',
+         'Here the bracket reads ~x ' + (h < 0 ? '+ ' + Math.abs(h) : '- ' + h) + '~, which is ~x - (' + h +
+           ')~, so ~h = ' + h + '~. And ~k = ' + k + '~.',
+         'Vertex **(' + h + ', ' + k + ')**.',
+         'The sign inside the bars flips: ~|x + 3|~ has its corner at ~x = -3~.']);
+    }
+    if (mode === 'direction') {
+      var sh = shuffleChoices(R, ['Opens upward (the vertex is a minimum)', 'Opens downward (the vertex is a maximum)'],
+        a > 0 ? 0 : 1);
+      return mc('Does the graph of ~' + eqn + '~ open upward or downward?', sh.choices, sh.answer,
+        ['The sign of the number in front of the bars decides it.',
+         'Here it is ' + a + ', which is ' + (a > 0 ? 'positive, so the V opens upward' : 'negative, so the V is flipped and opens downward') + '.',
+         'So it **opens ' + (a > 0 ? 'upward' : 'downward') + '**, and the vertex is a ' + (a > 0 ? 'minimum' : 'maximum') + '.']);
+    }
+    var x = R.nonzero(-8, 8);
+    return num('For ~' + eqn + '~, find ~y~ when ~x = ' + x + '~.', a * Math.abs(x - h) + k,
+      ['Work inside the bars first: ~' + x + ' - (' + h + ') = ' + (x - h) + '~.',
+       'Take the absolute value: ~|' + (x - h) + '| = ' + Math.abs(x - h) + '~.',
+       'Then ~y = ' + a + '(' + Math.abs(x - h) + ')' + (k < 0 ? ' - ' + Math.abs(k) : ' + ' + k) + ' = ~**' +
+         (a * Math.abs(x - h) + k) + '**.']);
+  });
+
+  /* quadratic ax^2+bx+c as tidy display text */
+  function quad(a, b, c) { return poly([[a, 'x^{2}'], [b, 'x'], [c, '']]); }
+  /* an expression string the grader can parse */
+  function quadSrc(a, b, c) { return a + '*x^2+' + b + '*x+' + c; }
+
+  g('poly-vocabulary', function (R, d) {
+    var a = R.nonzero(-7, 7), b = R.nonzero(-7, 7), c = R.nonzero(-7, 7);
+    var deg = R.pick([2, 3, 4]);
+    var shown = poly([[a, 'x^{' + deg + '}'], [b, 'x'], [c, '']]);
+    var mode = R.pick(['degree', 'leading', 'classify', 'standard']);
+    if (mode === 'degree') {
+      return num('What is the degree of ~' + shown + '~?', deg,
+        ['The degree is the highest power of the variable.',
+         'The powers here are ' + deg + ', 1 and 0, so the degree is **' + deg + '**.',
+         'The degree controls the shape: it caps how many times the graph can cross the ~x~-axis.']);
+    }
+    if (mode === 'leading') {
+      return num('What is the leading coefficient of ~' + shown + '~?', a,
+        ['The leading coefficient is the number on the highest-power term, with its sign.',
+         'The highest power is ~x^{' + deg + '}~ and its coefficient is **' + a + '**.',
+         'It is "leading" because standard form puts that term first — not because it is the biggest number.']);
+    }
+    if (mode === 'classify') {
+      var names = { 1: 'Linear', 2: 'Quadratic', 3: 'Cubic', 4: 'Quartic' };
+      var sh = choiceSet(R, names[deg], ['Linear', 'Quadratic', 'Cubic', 'Quartic']
+        .filter(function (o) { return o !== names[deg]; }));
+      return mc('What kind of polynomial is ~' + shown + '~?', sh.choices, sh.answer,
+        ['Polynomials are named by their degree.',
+         'The degree is ' + deg + ', so it is **' + names[deg].toLowerCase() + '**.',
+         'Degree 1 linear, 2 quadratic, 3 cubic, 4 quartic.']);
+    }
+    var scrambled = poly([[c, ''], [a, 'x^{' + deg + '}'], [b, 'x']]);
+    var sh2 = choiceSet(R, '~' + shown + '~',
+      ['~' + poly([[b, 'x'], [a, 'x^{' + deg + '}'], [c, '']]) + '~',
+       '~' + poly([[c, ''], [b, 'x'], [a, 'x^{' + deg + '}']]) + '~']);
+    return mc('Which of these is ~' + scrambled + '~ written in standard form?', sh2.choices, sh2.answer,
+      ['Standard form orders the terms from the highest power down to the constant.',
+       'Highest power first: ~' + shown + '~.',
+       'The order does not change the value — it is a convention that makes degree and leading coefficient readable at a glance.']);
+  });
+
+  g('poly-add-sub', function (R, d) {
+    var a1 = R.nonzero(-8, 8), b1 = R.nonzero(-8, 8), c1 = R.nonzero(-8, 8);
+    var a2 = R.nonzero(-8, 8), b2 = R.nonzero(-8, 8), c2 = R.nonzero(-8, 8);
+    var sub = R.bool(0.5);
+    var sign = sub ? -1 : 1;
+    var ra = a1 + sign * a2, rb = b1 + sign * b2, rc = c1 + sign * c2;
+    return expr('Simplify: ~(' + quad(a1, b1, c1) + ') ' + (sub ? '-' : '+') + ' (' + quad(a2, b2, c2) + ')~',
+      quadSrc(ra, rb, rc),
+      [sub ? 'Subtracting a bracket flips the sign of every term inside it: ~' + quad(-a2, -b2, -c2) + '~.'
+           : 'Adding brackets changes nothing, so drop them and collect.',
+       'Collect ~x^{2}~: ' + a1 + ' ' + (sign < 0 ? '-' : '+') + ' ' + Math.abs(a2) * (a2 < 0 ? -1 : 1) + ' = ' + ra + '.',
+       'Collect ~x~: ' + rb + '. Collect constants: ' + rc + '.',
+       'Answer: **' + quad(ra, rb, rc) + '**.',
+       sub ? 'Distributing the minus over *every* term is where nearly all the marks are lost.'
+           : 'Only terms with the same power combine.']);
+  });
+
+  g('poly-multiply', function (R, d) {
+    var mode = R.pick(d === 1 ? ['monomial', 'binomials'] : ['monomial', 'binomials', 'trinomial']);
+    if (mode === 'monomial') {
+      var k = R.nonzero(-7, 7), p = R.int(1, 3);
+      var b = R.nonzero(-8, 8), c = R.nonzero(-8, 8);
+      return expr('Expand: ~' + term(k, 'x^{' + p + '}') + '(' + poly([[b, 'x'], [c, '']]) + ')~',
+        k + '*x^' + p + '*(' + b + '*x+' + c + ')',
+        ['Multiply the outside term by each term inside.',
+         term(k, 'x^{' + p + '}') + ' \\times ' + term(b, 'x') + ' = ' + term(k * b, 'x^{' + (p + 1) + '}') +
+           ' — multiply the numbers, add the powers.',
+         term(k, 'x^{' + p + '}') + ' \\times (' + c + ') = ' + term(k * c, 'x^{' + p + '}') + '.',
+         'Answer: **' + poly([[k * b, 'x^{' + (p + 1) + '}'], [k * c, 'x^{' + p + '}']]) + '**.']);
+    }
+    if (mode === 'binomials') {
+      var p1 = R.nonzero(1, 5), q1 = R.nonzero(-9, 9), p2 = R.nonzero(1, 5), q2 = R.nonzero(-9, 9);
+      var A = p1 * p2, B = p1 * q2 + q1 * p2, C = q1 * q2;
+      return expr('Expand and simplify: ~(' + poly([[p1, 'x'], [q1, '']]) + ')(' + poly([[p2, 'x'], [q2, '']]) + ')~',
+        quadSrc(A, B, C),
+        ['Every term in the first bracket multiplies every term in the second — four products.',
+         term(p1, 'x') + ' \\times ' + term(p2, 'x') + ' = ' + term(A, 'x^{2}') + ';  ' +
+           term(p1, 'x') + ' \\times (' + q2 + ') = ' + term(p1 * q2, 'x') + '.',
+         '(' + q1 + ') \\times ' + term(p2, 'x') + ' = ' + term(q1 * p2, 'x') + ';  (' + q1 + ')(' + q2 + ') = ' + C + '.',
+         'The two middle terms combine: ' + (p1 * q2) + ' + ' + (q1 * p2) + ' = ' + B + '.',
+         'Answer: **' + quad(A, B, C) + '**.']);
+    }
+    var m = R.nonzero(1, 4), n = R.nonzero(-7, 7);
+    var ta = R.nonzero(1, 4), tb = R.nonzero(-7, 7), tc = R.nonzero(-7, 7);
+    var c3 = m * ta, c2 = m * tb + n * ta, c1 = m * tc + n * tb, c0 = n * tc;
+    return expr('Expand and simplify: ~(' + poly([[m, 'x'], [n, '']]) + ')(' + quad(ta, tb, tc) + ')~',
+      c3 + '*x^3+' + c2 + '*x^2+' + c1 + '*x+' + c0,
+      ['Multiply each term of the binomial through the trinomial — six products in all.',
+       term(m, 'x') + ' across: ' + poly([[m * ta, 'x^{3}'], [m * tb, 'x^{2}'], [m * tc, 'x']]) + '.',
+       '(' + n + ') across: ' + poly([[n * ta, 'x^{2}'], [n * tb, 'x'], [n * tc, '']]) + '.',
+       'Add and collect like powers: **' + poly([[c3, 'x^{3}'], [c2, 'x^{2}'], [c1, 'x'], [c0, '']]) + '**.',
+       'Lining the partial products up by power makes the collecting step hard to get wrong.']);
+  });
+
+  g('special-products', function (R, d) {
+    var k = R.nonzero(1, 6), c = R.int(1, 9);
+    var kind = R.pick(['square-plus', 'square-minus', 'difference', 'recognise']);
+    if (kind === 'square-plus' || kind === 'square-minus') {
+      var sgn = kind === 'square-plus' ? 1 : -1;
+      return expr('Expand using the square rule: ~(' + poly([[k, 'x'], [sgn * c, '']]) + ')^{2}~',
+        quadSrc(k * k, 2 * k * sgn * c, c * c),
+        ['~(a ' + (sgn > 0 ? '+' : '-') + ' b)^{2} = a^{2} ' + (sgn > 0 ? '+' : '-') + ' 2ab + b^{2}~.',
+         'Here ~a = ' + term(k, 'x') + '~ and ~b = ' + c + '~.',
+         '~a^{2} = ' + (k * k) + 'x^{2}~, ~2ab = ' + Math.abs(2 * k * c) + 'x~ (with sign ' +
+           (sgn > 0 ? '+' : '-') + '), ~b^{2} = ' + (c * c) + '~.',
+         'Answer: **' + quad(k * k, 2 * k * sgn * c, c * c) + '**.',
+         'The middle term is the one people forget: ~(x ' + (sgn > 0 ? '+' : '-') + ' ' + c +
+           ')^{2}~ is *not* ~x^{2} ' + (sgn > 0 ? '+' : '-') + ' ' + (c * c) + '~.']);
+    }
+    if (kind === 'difference') {
+      return expr('Expand: ~(' + poly([[k, 'x'], [c, '']]) + ')(' + poly([[k, 'x'], [-c, '']]) + ')~',
+        (k * k) + '*x^2-' + (c * c),
+        ['This is ~(a + b)(a - b)~, which collapses to ~a^{2} - b^{2}~.',
+         'The two middle terms cancel: ~' + term(-k * c, 'x') + '~ and ~' + term(k * c, 'x') + '~.',
+         'Left with ~(' + term(k, 'x') + ')^{2} - (' + c + ')^{2} = ~**' +
+           poly([[k * k, 'x^{2}'], [-c * c, '']]) + '**.',
+         'Spotting this pattern backwards is what makes difference-of-squares factoring quick.']);
+    }
+    var right = '~' + poly([[k * k, 'x^{2}'], [-c * c, '']]) + '~';
+    var sh = choiceSet(R, right, ['~' + quad(k * k, 2 * k * c, c * c) + '~',
+      '~' + quad(k * k, -2 * k * c, c * c) + '~', '~' + poly([[k * k, 'x^{2}'], [c * c, '']]) + '~']);
+    return mc('Which expansion belongs to ~(' + poly([[k, 'x'], [c, '']]) + ')(' +
+      poly([[k, 'x'], [-c, '']]) + ')~?', sh.choices, sh.answer,
+      ['Opposite signs in otherwise identical brackets is the difference of squares.',
+       'The middle terms cancel, leaving ~a^{2} - b^{2}~.',
+       'Answer: **' + poly([[k * k, 'x^{2}'], [-c * c, '']]) + '**. No middle term survives.']);
+  });
+
+  g('poly-divide', function (R, d) {
+    var mode = R.pick(d === 1 ? ['monomial'] : ['monomial', 'binomial']);
+    if (mode === 'monomial') {
+      var k = R.nonzero(2, 6), p = R.int(1, 2);
+      var a = k * R.nonzero(1, 6), b = k * R.nonzero(1, 6);
+      return expr('Divide: ~\\f{' + poly([[a, 'x^{' + (p + 2) + '}'], [b, 'x^{' + (p + 1) + '}']]) + '}{' +
+        term(k, 'x^{' + p + '}') + '}~',
+        (a / k) + '*x^2+' + (b / k) + '*x',
+        ['Divide each term on top by the bottom separately.',
+         term(a, 'x^{' + (p + 2) + '}') + ' \\div ' + term(k, 'x^{' + p + '}') + ' = ' +
+           term(a / k, 'x^{2}') + ' — divide the numbers, subtract the powers.',
+         term(b, 'x^{' + (p + 1) + '}') + ' \\div ' + term(k, 'x^{' + p + '}') + ' = ' + term(b / k, 'x') + '.',
+         'Answer: **' + poly([[a / k, 'x^{2}'], [b / k, 'x']]) + '**.']);
+    }
+    /* build (x + r)(ax + b) so the division is exact */
+    var r = R.nonzero(-7, 7), aa = R.nonzero(1, 5), bb = R.nonzero(-8, 8);
+    var A = aa, B = aa * r + bb, C = bb * r;
+    return expr('Divide: ~\\f{' + quad(A, B, C) + '}{x ' + (r < 0 ? '- ' + Math.abs(r) : '+ ' + r) + '}~',
+      aa + '*x+' + bb,
+      ['Ask what the first term of the answer must be: ~' + term(A, 'x^{2}') + ' \\div x = ' +
+        term(aa, 'x') + '~.',
+       'Multiply back and subtract: ~' + term(aa, 'x') + '(x ' + (r < 0 ? '- ' + Math.abs(r) : '+ ' + r) + ') = ' +
+         poly([[A, 'x^{2}'], [aa * r, 'x']]) + '~, leaving ~' + poly([[bb, 'x'], [C, '']]) + '~.',
+       'Repeat: ~' + term(bb, 'x') + ' \\div x = ' + bb + '~, and ' + bb + '(x ' +
+         (r < 0 ? '- ' + Math.abs(r) : '+ ' + r) + ') takes the rest exactly, remainder 0.',
+       'Answer: **' + poly([[aa, 'x'], [bb, '']]) + '**.',
+       'A remainder of zero means the divisor was a factor — which is the factor theorem in action.']);
+  });
+
+  g('factor-gcf', function (R, d) {
+    var k = R.int(2, 9), p = R.int(0, 2);
+    var a = R.nonzero(1, 7), b = R.nonzero(-9, 9), c = R.nonzero(-9, 9);
+    while (MC.gcd(MC.gcd(a, Math.abs(b)), Math.abs(c)) !== 1) { a = R.nonzero(1, 7); b = R.nonzero(-9, 9); c = R.nonzero(-9, 9); }
+    var inner = poly([[a, 'x^{2}'], [b, 'x'], [c, '']]);
+    var shown = poly([[k * a, 'x^{' + (p + 2) + '}'], [k * b, p + 1 === 1 ? 'x' : 'x^{' + (p + 1) + '}'],
+                      [k * c, p === 0 ? '' : (p === 1 ? 'x' : 'x^{' + p + '}')]]);
+    var pw = p === 1 ? 'x' : 'x^{' + p + '}';
+    var outside = p === 0 ? String(k) : term(k, pw);
+    var srcOut = p === 0 ? String(k) : k + '*x' + (p === 1 ? '' : '^' + p);
+    return expr('Factor out the greatest common factor: ~' + shown + '~',
+      srcOut + '*(' + a + '*x^2+' + b + '*x+' + c + ')',
+      ['Look for the largest number dividing every coefficient: ' + MC.gcd(MC.gcd(k * a, Math.abs(k * b)), Math.abs(k * c)) + '.',
+       p > 0 ? 'Every term also carries at least ~x^{' + p + '}~, so that comes out too.'
+             : 'No power of ~x~ is common to all three terms, so only the number comes out.',
+       'Outside: ~' + outside + '~. Inside: ~' + inner + '~.',
+       'Answer: **' + outside + '(' + inner + ')**. Expand it back to check nothing was dropped.'],
+      { requireFactored: true });
+  });
+
+  g('factor-trinomial-1', function (R, d) {
+    var p = R.nonzero(-9, 9), q = R.nonzero(-9, 9);
+    var b = p + q, c = p * q;
+    return expr('Factor: ~' + quad(1, b, c) + '~',
+      '(x+' + p + ')*(x+' + q + ')',
+      ['You need two numbers that multiply to ' + c + ' and add to ' + b + '.',
+       'Those are ' + p + ' and ' + q + ': ' + p + ' \\times ' + q + ' = ' + c + ' and ' + p + ' + ' + q + ' = ' + b + '.',
+       'So it factors as **(x ' + (p < 0 ? '- ' + Math.abs(p) : '+ ' + p) + ')(x ' +
+         (q < 0 ? '- ' + Math.abs(q) : '+ ' + q) + ')**.',
+       c > 0 ? 'A positive constant means both numbers share a sign — the sign of the middle term.'
+             : 'A negative constant means the two numbers have opposite signs.'],
+      { requireFactored: true });
+  });
+
+  g('factor-trinomial-a', function (R, d) {
+    var m = R.nonzero(2, 5), n = R.nonzero(-7, 7), p = R.nonzero(1, 4), q = R.nonzero(-7, 7);
+    while (MC.gcd(MC.gcd(m * p, Math.abs(m * q + n * p)), Math.abs(n * q)) !== 1) {
+      m = R.nonzero(2, 5); n = R.nonzero(-7, 7); p = R.nonzero(1, 4); q = R.nonzero(-7, 7);
+    }
+    var A = m * p, B = m * q + n * p, C = n * q;
+    return expr('Factor: ~' + quad(A, B, C) + '~',
+      '(' + m + '*x+' + n + ')*(' + p + '*x+' + q + ')',
+      ['With a leading coefficient, use the AC method: multiply ~a \\times c = ' + A + ' \\times ' + C +
+        ' = ' + (A * C) + '~.',
+       'Find two numbers multiplying to ' + (A * C) + ' and adding to ' + B + ': they are ' + (m * q) +
+         ' and ' + (n * p) + '.',
+       'Split the middle term and group: ~' + poly([[A, 'x^{2}'], [m * q, 'x']]) + '~ and ~' +
+         poly([[n * p, 'x'], [C, '']]) + '~.',
+       'Factor each pair and the common bracket appears.',
+       'Answer: **(' + poly([[m, 'x'], [n, '']]) + ')(' + poly([[p, 'x'], [q, '']]) + ')**.'],
+      { requireFactored: true });
+  });
+
+  g('factor-difference-squares', function (R, d) {
+    var k = R.pick([1, 2, 3, 4, 5, 6, 7, 9, 10]), c = R.int(1, 12);
+    var mode = R.pick(d === 1 ? ['plain'] : ['plain', 'notDiff']);
+    if (mode === 'notDiff') {
+      var sh = choiceSet(R, 'It does not factor over the integers',
+        ['~(' + poly([[k, 'x'], [c, '']]) + ')^{2}~', '~(' + poly([[k, 'x'], [c, '']]) + ')(' +
+          poly([[k, 'x'], [-c, '']]) + ')~', '~(' + poly([[k, 'x'], [c, '']]) + ')(' +
+          poly([[k, 'x'], [c, '']]) + ')~']);
+      return mc('How does ~' + poly([[k * k, 'x^{2}'], [c * c, '']]) + '~ factor over the integers?',
+        sh.choices, sh.answer,
+        ['This is a *sum* of squares, not a difference.',
+         'The difference-of-squares rule needs a minus sign: ~a^{2} - b^{2} = (a+b)(a-b)~. There is no matching rule for ~a^{2} + b^{2}~.',
+         'So **it does not factor over the integers**. Only the difference version factors.']);
+    }
+    return expr('Factor: ~' + poly([[k * k, 'x^{2}'], [-c * c, '']]) + '~',
+      '(' + k + '*x+' + c + ')*(' + k + '*x-' + c + ')',
+      ['Both terms are perfect squares and they are subtracted: ~(' + term(k, 'x') + ')^{2} - (' + c + ')^{2}~.',
+       'Apply ~a^{2} - b^{2} = (a + b)(a - b)~ with ~a = ' + term(k, 'x') + '~ and ~b = ' + c + '~.',
+       'Answer: **(' + poly([[k, 'x'], [c, '']]) + ')(' + poly([[k, 'x'], [-c, '']]) + ')**.',
+       'Check by expanding: the middle terms cancel, which is the signature of this pattern.'],
+      { requireFactored: true });
+  });
+
+  g('factor-grouping', function (R, d) {
+    var a = R.nonzero(1, 5), b = R.nonzero(-7, 7), c = R.nonzero(1, 5), e = R.nonzero(-7, 7);
+    /* (ax + b)(cx^2 + e) expanded has four terms that group cleanly */
+    var t3 = a * c, t2 = b * c, t1 = a * e, t0 = b * e;
+    return expr('Factor by grouping: ~' + poly([[t3, 'x^{3}'], [t2, 'x^{2}'], [t1, 'x'], [t0, '']]) + '~',
+      '(' + a + '*x+' + b + ')*(' + c + '*x^2+' + e + ')',
+      ['Split into two pairs: ~(' + poly([[t3, 'x^{3}'], [t2, 'x^{2}']]) + ')~ and ~(' +
+        poly([[t1, 'x'], [t0, '']]) + ')~.',
+       'Factor each pair: ~' + term(c, 'x^{2}') + '(' + poly([[a, 'x'], [b, '']]) + ')~ and ~' +
+         e + '(' + poly([[a, 'x'], [b, '']]) + ')~.',
+       'Both now share the bracket ~(' + poly([[a, 'x'], [b, '']]) + ')~, so take it out.',
+       'Answer: **(' + poly([[a, 'x'], [b, '']]) + ')(' + poly([[c, 'x^{2}'], [e, '']]) + ')**.',
+       'If the two brackets do not come out identical, try pairing the terms differently before giving up.'],
+      { requireFactored: true });
+  });
+
+  g('factor-strategy', function (R, d) {
+    var kinds = [
+      { q: function () { var k = R.int(2, 8), a = R.nonzero(1, 5), b = R.nonzero(-7, 7);
+          return { e: poly([[k * a, 'x^{2}'], [k * b, 'x']]), ans: 'Common factor first' }; } },
+      { q: function () { var k = R.int(1, 8), c = R.int(1, 9);
+          return { e: poly([[k * k, 'x^{2}'], [-c * c, '']]), ans: 'Difference of squares' }; } },
+      { q: function () { var p = R.nonzero(-8, 8), r = R.nonzero(-8, 8);
+          return { e: quad(1, p + r, p * r), ans: 'Trinomial with leading coefficient 1' }; } },
+      { q: function () { var a = R.nonzero(2, 5), b = R.nonzero(-6, 6), c = R.nonzero(1, 4), e = R.nonzero(-6, 6);
+          return { e: poly([[a * c, 'x^{3}'], [b * c, 'x^{2}'], [a * e, 'x'], [b * e, '']]), ans: 'Grouping (four terms)' }; } }
+    ];
+    var pick = R.pick(kinds).q();
+    var all = ['Common factor first', 'Difference of squares', 'Trinomial with leading coefficient 1', 'Grouping (four terms)'];
+    var sh = choiceSet(R, pick.ans, all.filter(function (o) { return o !== pick.ans; }));
+    return mc('Which method would you reach for first to factor ~' + pick.e + '~?', sh.choices, sh.answer,
+      ['Look at the number of terms and whether anything is common to all of them.',
+       'Here the right first move is **' + pick.ans.toLowerCase() + '**.',
+       'The order is always: common factor first, then count the terms — two suggests a difference of squares, three a trinomial, four grouping.']);
+  });
+
+  g('quad-zero-product', function (R, d) {
+    var p = R.nonzero(-9, 9), q = R.nonzero(-9, 9);
+    var lo = Math.min(-p, -q), hi = Math.max(-p, -q);
+    var mode = R.pick(['factored', 'toFactor']);
+    if (mode === 'factored') {
+      return multi('Solve ~(x ' + (p < 0 ? '- ' + Math.abs(p) : '+ ' + p) + ')(x ' +
+        (q < 0 ? '- ' + Math.abs(q) : '+ ' + q) + ') = 0~. Give both roots, smaller first.',
+        [{ label: 'Smaller root', answer: lo }, { label: 'Larger root', answer: hi }],
+        ['If a product is zero, at least one factor must be zero. That is the zero product property.',
+         'So ~x ' + (p < 0 ? '- ' + Math.abs(p) : '+ ' + p) + ' = 0~ giving ~x = ' + (-p) +
+           '~, or ~x ' + (q < 0 ? '- ' + Math.abs(q) : '+ ' + q) + ' = 0~ giving ~x = ' + (-q) + '~.',
+         'Roots **' + lo + '** and **' + hi + '**.',
+         'The property only works against zero. If the product equalled 6 you could not split it like this.']);
+    }
+    var b = -(p + q) * -1, c = p * q;
+    return multi('Solve ~' + quad(1, p + q, p * q) + ' = 0~ by factoring. Give both roots, smaller first.',
+      [{ label: 'Smaller root', answer: lo }, { label: 'Larger root', answer: hi }],
+      ['Factor first: two numbers multiplying to ' + (p * q) + ' and adding to ' + (p + q) +
+        ' are ' + p + ' and ' + q + '.',
+       'So ~(x ' + (p < 0 ? '- ' + Math.abs(p) : '+ ' + p) + ')(x ' +
+         (q < 0 ? '- ' + Math.abs(q) : '+ ' + q) + ') = 0~.',
+       'Set each factor to zero: ~x = ' + (-p) + '~ or ~x = ' + (-q) + '~.',
+       'Roots **' + lo + '** and **' + hi + '**.',
+       'Get everything onto one side equal to zero *before* factoring — that step is not optional.']);
+  });
+
+  g('quad-square-root', function (R, d) {
+    var mode = R.pick(['plain', 'shifted', 'noReal']);
+    if (mode === 'plain') {
+      var a = R.pick([1, 2, 3, 4, 5]), r = R.int(1, 12);
+      var c = a * r * r;
+      return multi('Solve ~' + a + 'x^{2} - ' + c + ' = 0~. Give both solutions, smaller first.',
+        [{ label: 'Smaller solution', answer: -r }, { label: 'Larger solution', answer: r }],
+        ['Isolate the square: ~' + a + 'x^{2} = ' + c + '~, so ~x^{2} = ' + (c / a) + '~.',
+         'Take the square root of both sides — and keep **both** signs: ~x = \\pm' + r + '~.',
+         'Solutions **-' + r + '** and **' + r + '**.',
+         'Writing only the positive root loses half the answer. The ~\\pm~ is the whole point of this method.']);
+    }
+    if (mode === 'shifted') {
+      var h = R.nonzero(-7, 7), k = R.int(1, 10);
+      var sq = k * k;
+      return multi('Solve ~(x ' + (h < 0 ? '- ' + Math.abs(h) : '+ ' + h) + ')^{2} = ' + sq +
+        '~. Give both solutions, smaller first.',
+        [{ label: 'Smaller solution', answer: Math.min(-h - k, -h + k) },
+         { label: 'Larger solution', answer: Math.max(-h - k, -h + k) }],
+        ['Take the root of both sides, keeping both signs: ~x ' + (h < 0 ? '- ' + Math.abs(h) : '+ ' + h) +
+          ' = \\pm' + k + '~.',
+         'Two equations follow: ~x = ' + (-h) + ' + ' + k + '~ and ~x = ' + (-h) + ' - ' + k + '~.',
+         'Solutions **' + Math.min(-h - k, -h + k) + '** and **' + Math.max(-h - k, -h + k) + '**.',
+         'This is exactly how completing the square finishes, so it is worth being fluent here.']);
+    }
+    var cc = R.int(1, 20);
+    var sh = choiceSet(R, 'No real solutions', ['Two real solutions', 'One real solution', 'Infinitely many']);
+    return mc('How many real solutions does ~x^{2} + ' + cc + ' = 0~ have?', sh.choices, sh.answer,
+      ['Rearranged, this says ~x^{2} = -' + cc + '~.',
+       'A square of a real number is never negative, so nothing real works.',
+       '**No real solutions.** There are two complex ones, which come later.']);
+  });
+
+  g('quad-complete-square', function (R, d) {
+    var b = R.nonzero(-8, 8) * 2;          /* even, so the halving stays whole */
+    var k = R.nonzero(-9, 9);
+    var half = b / 2;
+    var c = half * half + k;
+    var mode = R.pick(['vertexForm', 'solve']);
+    if (mode === 'vertexForm') {
+      return multi('Write ~' + quad(1, b, c) + '~ in the form ~(x + p)^{2} + q~. Give ~p~ and ~q~.',
+        [{ label: 'p', answer: half }, { label: 'q', answer: k }],
+        ['Halve the coefficient of ~x~: ' + b + ' \\div 2 = ' + half + '. That is ~p~.',
+         '~(x ' + (half < 0 ? '- ' + Math.abs(half) : '+ ' + half) + ')^{2}~ expands to ~' +
+           quad(1, b, half * half) + '~, which overshoots the constant by ' + (half * half - c) + '.',
+         'Correct it: ~q = ' + c + ' - ' + (half * half) + ' = ' + k + '~.',
+         'So it is **(x ' + (half < 0 ? '- ' + Math.abs(half) : '+ ' + half) + ')^{2} ' +
+           (k < 0 ? '- ' + Math.abs(k) : '+ ' + k) + '**.',
+         'This form hands you the vertex directly, at ~(' + (-half) + ', ' + k + ')~.']);
+    }
+    /* make the solve case come out exactly */
+    var kk = -R.int(1, 10);
+    var sq = -kk;
+    var root = Math.sqrt(sq);
+    if (!Number.isInteger(root)) { kk = -(R.int(1, 6) ** 2); sq = -kk; root = Math.sqrt(sq); }
+    var cc2 = half * half + kk;
+    return multi('Solve ~' + quad(1, b, cc2) + ' = 0~ by completing the square. Give both roots, smaller first.',
+      [{ label: 'Smaller root', answer: Math.min(-half - root, -half + root), tol: 0.005 },
+       { label: 'Larger root', answer: Math.max(-half - root, -half + root), tol: 0.005 }],
+      ['Half of ' + b + ' is ' + half + ', and ~' + half + '^{2} = ' + (half * half) + '~.',
+       'Rewrite: ~(x ' + (half < 0 ? '- ' + Math.abs(half) : '+ ' + half) + ')^{2} ' +
+         (kk < 0 ? '- ' + Math.abs(kk) : '+ ' + kk) + ' = 0~.',
+       'So ~(x ' + (half < 0 ? '- ' + Math.abs(half) : '+ ' + half) + ')^{2} = ' + sq +
+         '~, giving ~x ' + (half < 0 ? '- ' + Math.abs(half) : '+ ' + half) + ' = \\pm' + root + '~.',
+       'Roots **' + Math.min(-half - root, -half + root) + '** and **' +
+         Math.max(-half - root, -half + root) + '**.',
+       'Completing the square always works, even when factoring does not — which is how the quadratic formula is derived.']);
+  });
+
+  g('quad-formula', function (R, d) {
+    var a = R.nonzero(1, 4), p = R.nonzero(-7, 7), q = R.nonzero(-7, 7);
+    var A = a, B = a * (p + q) * -1, C = a * p * q;
+    /* a(x-p)(x-q) = a x^2 - a(p+q) x + a p q */
+    var lo = Math.min(p, q), hi = Math.max(p, q);
+    var disc = B * B - 4 * A * C;
+    return multi('Solve ~' + quad(A, B, C) + ' = 0~ using the quadratic formula. Give both roots, smaller first.',
+      [{ label: 'Smaller root', answer: lo, tol: 0.005 }, { label: 'Larger root', answer: hi, tol: 0.005 }],
+      ['Identify ~a = ' + A + '~, ~b = ' + B + '~, ~c = ' + C + '~.',
+       'Discriminant: ~b^{2} - 4ac = ' + (B * B) + ' - 4(' + A + ')(' + C + ') = ' + disc + '~.',
+       '~sqrt{' + disc + '} = ' + Math.sqrt(disc) + '~, so ~x = \\f{' + (-B) + ' \\pm ' + Math.sqrt(disc) +
+         '}{' + (2 * A) + '}~.',
+       'Roots **' + lo + '** and **' + hi + '**.',
+       'Note ~-b~, not ~b~: if ~b~ is negative, ~-b~ is positive. That sign is the most common slip in the whole formula.']);
+  });
+
+  g('discriminant', function (R, d) {
+    var a = R.nonzero(1, 4);
+    var kind = R.pick(['two', 'one', 'none']);
+    var b, c, disc;
+    if (kind === 'two') { b = R.nonzero(-9, 9); c = -R.int(1, 9); disc = b * b - 4 * a * c; }
+    else if (kind === 'one') { var h = R.nonzero(1, 5); b = 2 * a * h; c = a * h * h; disc = 0; }
+    else { b = R.nonzero(-4, 4); c = R.int(1, 9) + Math.ceil(b * b / (4 * a)); disc = b * b - 4 * a * c; }
+    var right = disc > 0 ? 'Two different real roots' : disc === 0 ? 'Exactly one real root' : 'No real roots';
+    var sh = choiceSet(R, right, ['Two different real roots', 'Exactly one real root', 'No real roots']
+      .filter(function (o) { return o !== right; }));
+    return mc('Without solving, how many real roots does ~' + quad(a, b, c) + ' = 0~ have?',
+      sh.choices, sh.answer,
+      ['The discriminant ~b^{2} - 4ac~ decides it.',
+       '~' + (b * b) + ' - 4(' + a + ')(' + c + ') = ' + disc + '~.',
+       disc > 0 ? 'Positive, so the square root is a real non-zero number and the ~\\pm~ gives two distinct roots.'
+         : disc === 0 ? 'Zero, so the ~\\pm~ adds nothing and both roots coincide — the graph just touches the axis.'
+         : 'Negative, so the square root is not real and the parabola never reaches the ~x~-axis.',
+       'Answer: **' + right.toLowerCase() + '**.']);
+  });
+
+  g('quad-word-problems', function (R, d) {
+    var kind = R.pick(['projectile', 'area', 'consecutive']);
+    if (kind === 'projectile') {
+      var v = R.pick([16, 32, 48, 64, 80]), h0 = R.pick([0, 16, 32, 48]);
+      /* h = -16t^2 + vt + h0; ask for time to hit the ground */
+      var disc = v * v + 64 * h0;
+      var t = (v + Math.sqrt(disc)) / 32;
+      return num('A ball is thrown upward from a height of ' + h0 + ' feet at ' + v +
+        ' feet per second, so its height is ~h = -16t^{2} + ' + v + 't + ' + h0 +
+        '~. After how many seconds does it hit the ground? Round to 2 decimal places.',
+        Math.round(t * 100) / 100,
+        ['Hitting the ground means ~h = 0~: ~-16t^{2} + ' + v + 't + ' + h0 + ' = 0~.',
+         'Quadratic formula with ~a = -16~, ~b = ' + v + '~, ~c = ' + h0 + '~: discriminant ' + disc + '.',
+         'The two roots are ' + MC.fmt((v + Math.sqrt(disc)) / 32, 3) + ' and ' +
+           MC.fmt((v - Math.sqrt(disc)) / 32, 3) + '.',
+         '**' + MC.fmt(t, 2) + ' seconds.** The other root is ' +
+           (h0 > 0 ? 'negative, which would be before the throw' : 'zero, the moment it left the ground') +
+           ' — discard it, because a quadratic model can produce roots the situation does not allow.'],
+        { tol: 0.015 });
+    }
+    if (kind === 'area') {
+      var w = R.int(3, 25), extra = R.int(1, 12);
+      var area = w * (w + extra);
+      return num('A rectangle is ' + extra + ' cm longer than it is wide and has area ' + area +
+        ' cm². How wide is it, in cm?', w,
+        ['Let the width be ~x~, so the length is ~x + ' + extra + '~.',
+         'Area: ~x(x + ' + extra + ') = ' + area + '~, which expands to ~x^{2} + ' + extra + 'x - ' + area + ' = 0~.',
+         'Factoring gives roots ' + w + ' and ' + (-(w + extra)) + '.',
+         'A width cannot be negative, so the answer is **' + w + ' cm**.',
+         'Checking which root the situation allows is part of the problem, not an afterthought.']);
+    }
+    var n = R.int(2, 20);
+    var prod = n * (n + 1);
+    return num('Two consecutive positive whole numbers multiply to ' + prod +
+      '. What is the smaller one?', n,
+      ['Let them be ~x~ and ~x + 1~: ~x(x + 1) = ' + prod + '~.',
+       'So ~x^{2} + x - ' + prod + ' = 0~, which factors to ~(x - ' + n + ')(x + ' + (n + 1) + ') = 0~.',
+       'Roots ' + n + ' and ' + (-(n + 1)) + '; only the positive one fits "positive whole numbers".',
+       'Smaller number: **' + n + '**.']);
+  });
+
+  g('parabola-vertex', function (R, d) {
+    var a = R.nonzero(-4, 4), h = R.nonzero(-7, 7), k = R.nonzero(-9, 9);
+    var mode = R.pick(['fromVertexForm', 'fromStandard', 'axis']);
+    if (mode === 'fromVertexForm') {
+      return multi('Find the vertex of ~y = ' + (a === 1 ? '' : a === -1 ? '-' : a) + '(x ' +
+        (h < 0 ? '+ ' + Math.abs(h) : '- ' + h) + ')^{2} ' + (k < 0 ? '- ' + Math.abs(k) : '+ ' + k) + '~.',
+        [{ label: 'x', answer: h }, { label: 'y', answer: k }],
+        ['Vertex form is ~y = a(x - h)^{2} + k~ with the vertex at ~(h, k)~.',
+         'The bracket reads ~x ' + (h < 0 ? '+ ' + Math.abs(h) : '- ' + h) + '~, which is ~x - (' + h +
+           ')~, so ~h = ' + h + '~.',
+         'Vertex **(' + h + ', ' + k + ')**.',
+         'The sign inside the bracket flips — that catch is worth checking every single time.']);
+    }
+    if (mode === 'fromStandard') {
+      var B = -2 * a * h, C = a * h * h + k;
+      return multi('Find the vertex of ~y = ' + quad(a, B, C) + '~.',
+        [{ label: 'x', answer: h, tol: 0.005 }, { label: 'y', answer: k, tol: 0.005 }],
+        ['The vertex sits on the axis of symmetry, at ~x = -\\f{b}{2a}~.',
+         '~x = -\\f{' + B + '}{2(' + a + ')} = ' + h + '~.',
+         'Substitute back for ~y~: ~y = ' + k + '~.',
+         'Vertex **(' + h + ', ' + k + ')**.']);
+    }
+    var B2 = -2 * a * h, C2 = a * h * h + k;
+    return num('What is the axis of symmetry of ~y = ' + quad(a, B2, C2) + '~? Give the value of ~x~.', h,
+      ['The axis of symmetry is the vertical line through the vertex: ~x = -\\f{b}{2a}~.',
+       '~x = -\\f{' + B2 + '}{2(' + a + ')} = ~**' + h + '**.',
+       'The two roots, when they exist, sit at equal distances either side of this line.'], { tol: 0.005 });
+  });
+
+  g('parabola-graph', function (R, d) {
+    var p = R.nonzero(-7, 7), q = R.nonzero(-7, 7);
+    while (q === p) q = R.nonzero(-7, 7);
+    var a = R.pick([1, -1, 2, -2]);
+    var B = -a * (p + q), C = a * p * q;
+    var mode = R.pick(['roots', 'yIntercept', 'direction']);
+    if (mode === 'roots') {
+      var lo = Math.min(p, q), hi = Math.max(p, q);
+      return multi('Where does ~y = ' + quad(a, B, C) + '~ cross the ~x~-axis? Give both values, smaller first.',
+        [{ label: 'Smaller x', answer: lo }, { label: 'Larger x', answer: hi }],
+        ['Crossing the ~x~-axis means ~y = 0~, so solve ~' + quad(a, B, C) + ' = 0~.',
+         'Taking out ' + a + ' and factoring gives ~(x ' + (-p < 0 ? '- ' + Math.abs(p) : '+ ' + (-p)) +
+           ')(x ' + (-q < 0 ? '- ' + Math.abs(q) : '+ ' + (-q)) + ') = 0~.',
+         'Crossings at **' + lo + '** and **' + hi + '**.',
+         'The vertex sits halfway between them, at ~x = ' + MC.fmt((p + q) / 2, 4) + '~ — a free extra point for the sketch.']);
+    }
+    if (mode === 'yIntercept') {
+      return num('Where does ~y = ' + quad(a, B, C) + '~ cross the ~y~-axis? Give the value of ~y~.', C,
+        ['On the ~y~-axis, ~x = 0~.',
+         'Every term with an ~x~ vanishes, leaving the constant: **' + C + '**.',
+         'The ~y~-intercept of any polynomial in standard form is just its constant term.']);
+    }
+    var sh = shuffleChoices(R, ['Upward, so the vertex is the lowest point',
+      'Downward, so the vertex is the highest point'], a > 0 ? 0 : 1);
+    return mc('Does ~y = ' + quad(a, B, C) + '~ open upward or downward?', sh.choices, sh.answer,
+      ['The sign of the ~x^{2}~ coefficient decides it.',
+       'Here it is ' + a + ', which is ' + (a > 0 ? 'positive' : 'negative') + '.',
+       'So it opens **' + (a > 0 ? 'upward' : 'downward') + '**, and the vertex is the ' +
+         (a > 0 ? 'minimum' : 'maximum') + '.']);
+  });
+
+  g('parabola-transformations', function (R, d) {
+    var a = R.pick([1, -1, 2, -2, 3]), h = R.nonzero(-6, 6), k = R.nonzero(-8, 8);
+    var mode = R.pick(['describe', 'build', 'width']);
+    if (mode === 'describe') {
+      var right = (h > 0 ? 'right ' + h : 'left ' + Math.abs(h)) + ', ' +
+        (k > 0 ? 'up ' + k : 'down ' + Math.abs(k));
+      var wrong = [(h > 0 ? 'left ' + h : 'right ' + Math.abs(h)) + ', ' + (k > 0 ? 'up ' + k : 'down ' + Math.abs(k)),
+        (h > 0 ? 'right ' + h : 'left ' + Math.abs(h)) + ', ' + (k > 0 ? 'down ' + k : 'up ' + Math.abs(k)),
+        (h > 0 ? 'left ' + h : 'right ' + Math.abs(h)) + ', ' + (k > 0 ? 'down ' + k : 'up ' + Math.abs(k))];
+      var sh = choiceSet(R, right, wrong);
+      return mc('How has ~y = x^{2}~ been moved to give ~y = (x ' +
+        (h < 0 ? '+ ' + Math.abs(h) : '- ' + h) + ')^{2} ' + (k < 0 ? '- ' + Math.abs(k) : '+ ' + k) + '~?',
+        sh.choices, sh.answer,
+        ['Inside the bracket moves the graph horizontally, and *against* the sign you see: ~(x - 3)^{2}~ goes right 3.',
+         'Outside, added at the end, moves it vertically and with the sign you see.',
+         'So: **' + right + '**.',
+         'Horizontal shifts feeling backwards is normal — the bracket asks what input makes it zero.']);
+    }
+    if (mode === 'build') {
+      return expr('Starting from ~y = x^{2}~, shift ' + (h > 0 ? 'right ' + h : 'left ' + Math.abs(h)) +
+        ' and ' + (k > 0 ? 'up ' + k : 'down ' + Math.abs(k)) +
+        '. Write the result (enter the right-hand side only).',
+        '(x-' + h + ')^2+' + k,
+        ['A shift of ' + h + ' horizontally means ~(x - ' + h + ')~ inside the bracket.',
+         'A shift of ' + k + ' vertically means ~+ (' + k + ')~ on the end.',
+         'Answer: **(x ' + (h < 0 ? '+ ' + Math.abs(h) : '- ' + h) + ')^{2} ' +
+           (k < 0 ? '- ' + Math.abs(k) : '+ ' + k) + '**.']);
+    }
+    var sh2 = shuffleChoices(R, [Math.abs(a) > 1 ? 'Narrower than ~y = x^{2}~' : 'The same width as ~y = x^{2}~',
+      Math.abs(a) > 1 ? 'Wider than ~y = x^{2}~' : 'Narrower than ~y = x^{2}~'], 0);
+    return mc('Compared with ~y = x^{2}~, is the graph of ~y = ' + (a === 1 ? '' : a === -1 ? '-' : a) +
+      'x^{2}~ narrower, wider, or the same?', sh2.choices, sh2.answer,
+      ['The size of the coefficient controls the stretch; its sign only flips the graph over.',
+       '~|' + a + '| = ' + Math.abs(a) + '~, which is ' + (Math.abs(a) > 1 ? 'greater than 1, so the graph is stretched vertically and looks narrower' : 'equal to 1, so the width is unchanged') + '.',
+       'Answer: **' + (Math.abs(a) > 1 ? 'narrower' : 'the same width') + '**.',
+       'A coefficient between 0 and 1 would make it wider.']);
+  });
+
+  g('max-min-quadratic', function (R, d) {
+    var kind = R.pick(['revenue', 'fence', 'height']);
+    if (kind === 'revenue') {
+      var p0 = R.int(10, 40), drop = R.int(1, 5), q0 = R.int(40, 200);
+      /* quantity = q0 - drop*(p - p0); revenue = p * quantity, maximise */
+      var bestP = (q0 + drop * p0) / (2 * drop);
+      var bestPr = Math.round(bestP * 100) / 100;
+      return num('At ' + MC.money(p0) + ' a shop sells ' + q0 + ' units a week, and every ' +
+        MC.money(1) + ' price rise loses ' + drop + ' sales. What price maximises revenue, in dollars? ' +
+        'Round to 2 decimal places.', bestPr,
+        ['Let ~p~ be the price. Sales are ~' + q0 + ' - ' + drop + '(p - ' + p0 + ')~, so revenue is ~R = p(' +
+          (q0 + drop * p0) + ' - ' + drop + 'p)~.',
+         'Expanded: ~R = -' + drop + 'p^{2} + ' + (q0 + drop * p0) + 'p~ — a downward parabola, so its vertex is the maximum.',
+         'Vertex at ~p = -\\f{b}{2a} = \\f{' + (q0 + drop * p0) + '}{' + (2 * drop) + '} = ' + MC.fmt(bestP, 4) + '~.',
+         'Best price **' + MC.money(bestPr) + '**.',
+         'Revenue problems are quadratic because price multiplies quantity and quantity itself falls with price.'],
+        { unit: 'dollars', tol: 0.02 });
+    }
+    if (kind === 'fence') {
+      var perim = R.int(5, 60) * 4;
+      var side = perim / 4, area = side * side;
+      return num('You have ' + perim + ' m of fencing for a rectangular pen. What is the largest area ' +
+        'you can enclose, in square metres?', area,
+        ['With perimeter ' + perim + ', if one side is ~x~ the other is ~' + (perim / 2) + ' - x~.',
+         'Area ~A = x(' + (perim / 2) + ' - x) = -x^{2} + ' + (perim / 2) + 'x~, a downward parabola.',
+         'Vertex at ~x = \\f{' + (perim / 2) + '}{2} = ' + side + '~, so both sides are ' + side + ' — a square.',
+         'Largest area **' + MC.commas(area) + ' m²**.',
+         'For a fixed perimeter the square always wins. The algebra confirms what the symmetry suggests.']);
+    }
+    var v = R.pick([32, 48, 64, 80, 96]), h0 = R.pick([0, 8, 16, 32]);
+    var tTop = v / 32, hTop = -16 * tTop * tTop + v * tTop + h0;
+    return num('A ball thrown upward from ' + h0 + ' feet has height ~h = -16t^{2} + ' + v + 't + ' + h0 +
+      '~. What is its greatest height, in feet?', hTop,
+      ['The maximum is at the vertex: ~t = -\\f{b}{2a} = \\f{' + v + '}{32} = ' + MC.fmt(tTop, 4) + '~ seconds.',
+       'Substitute that time back into the height rule.',
+       'Greatest height **' + MC.fmt(hTop, 4) + ' feet**.',
+       'The vertex gives *when* and *how high* — the question asks which, so read it carefully.'],
+      { tol: 0.02 });
+  });
+
+  g('rational-simplify', function (R, d) {
+    var p = R.nonzero(-8, 8), q = R.nonzero(-8, 8);
+    while (q === p) q = R.nonzero(-8, 8);
+    var mode = R.pick(['cancelFactor', 'excluded']);
+    var topF = '(x ' + (p < 0 ? '- ' + Math.abs(p) : '+ ' + p) + ')(x ' + (q < 0 ? '- ' + Math.abs(q) : '+ ' + q) + ')';
+    if (mode === 'excluded') {
+      var lo = Math.min(-p, -q), hi = Math.max(-p, -q);
+      return multi('For ~\\f{x + 1}{' + topF + '}~, which values of ~x~ must be excluded? ' +
+        'Give both, smaller first.',
+        [{ label: 'Smaller excluded value', answer: lo }, { label: 'Larger excluded value', answer: hi }],
+        ['A rational expression is *undefined* wherever its denominator is zero.',
+         'Set each factor to zero: ~x = ' + (-p) + '~ and ~x = ' + (-q) + '~.',
+         'Excluded: **' + lo + '** and **' + hi + '**.',
+         'Find the exclusions from the *original* denominator, before any cancelling — a cancelled factor still breaks the expression.']);
+    }
+    var r = R.nonzero(-8, 8);
+    while (r === p || r === q) r = R.nonzero(-8, 8);
+    /* (x+p)(x+q) / (x+p)(x+r) cancels to (x+q)/(x+r) */
+    return expr('Simplify ~\\f{' + quad(1, p + q, p * q) + '}{' + quad(1, p + r, p * r) + '}~',
+      '(x+' + q + ')/(x+' + r + ')',
+      ['Factor top and bottom: ~\\f{(x ' + (p < 0 ? '- ' + Math.abs(p) : '+ ' + p) + ')(x ' +
+        (q < 0 ? '- ' + Math.abs(q) : '+ ' + q) + ')}{(x ' + (p < 0 ? '- ' + Math.abs(p) : '+ ' + p) +
+        ')(x ' + (r < 0 ? '- ' + Math.abs(r) : '+ ' + r) + ')}~.',
+       'The factor ~(x ' + (p < 0 ? '- ' + Math.abs(p) : '+ ' + p) + ')~ appears top and bottom, so it cancels.',
+       'Answer: **~\\f{x ' + (q < 0 ? '- ' + Math.abs(q) : '+ ' + q) + '}{x ' +
+         (r < 0 ? '- ' + Math.abs(r) : '+ ' + r) + '}~**, with ~x \\ne ' + (-p) + '~ still excluded.',
+       'You may only cancel *factors*, never individual terms. Crossing out an ~x~ from a sum is the classic error.']);
+  });
+
+  g('rational-mult-div', function (R, d) {
+    var a = R.nonzero(-7, 7), b = R.nonzero(-7, 7), c = R.nonzero(-7, 7);
+    while (b === a) b = R.nonzero(-7, 7);
+    while (c === a || c === b) c = R.nonzero(-7, 7);
+    var divide = R.bool();
+    function fac(k) { return 'x ' + (k < 0 ? '- ' + Math.abs(k) : '+ ' + k); }
+    if (divide) {
+      return expr('Simplify ~\\f{' + fac(a) + '}{' + fac(b) + '} \\div \\f{' + fac(c) + '}{' + fac(b) + '}~',
+        '(x+' + a + ')/(x+' + c + ')',
+        ['Dividing by a fraction means multiplying by its reciprocal — flip the second one.',
+         '~\\f{' + fac(a) + '}{' + fac(b) + '} \\times \\f{' + fac(b) + '}{' + fac(c) + '}~.',
+         'Now ~' + fac(b) + '~ appears both top and bottom and cancels.',
+         'Answer: **~\\f{' + fac(a) + '}{' + fac(c) + '}~**.']);
+    }
+    return expr('Simplify ~\\f{' + fac(a) + '}{' + fac(b) + '} \\times \\f{' + fac(b) + '}{' + fac(c) + '}~',
+      '(x+' + a + ')/(x+' + c + ')',
+      ['Multiply straight across, but look for common factors first — cancelling early keeps it small.',
+       '~' + fac(b) + '~ is on the top of one and the bottom of the other, so it cancels.',
+       'Answer: **~\\f{' + fac(a) + '}{' + fac(c) + '}~**.',
+       'Factoring everything before multiplying is what makes these quick rather than grim.']);
+  });
+
+  g('rational-add-sub', function (R, d) {
+    var a = R.nonzero(1, 9), b = R.nonzero(1, 9), k = R.nonzero(-7, 7);
+    var mode = R.pick(['numberDen', 'linearDen']);
+    if (mode === 'numberDen') {
+      var L = MC.lcm(a, b);
+      var sub = R.bool(0.4);
+      var n1 = L / a, n2 = L / b;
+      var topCoef = n1 + (sub ? -1 : 1) * n2;
+      return expr('Combine into a single fraction: ~\\f{x}{' + a + '} ' + (sub ? '-' : '+') +
+        ' \\f{x}{' + b + '}~', '(' + topCoef + '*x)/' + L,
+        ['The least common denominator of ' + a + ' and ' + b + ' is ' + L + '.',
+         'Rewrite: ~\\f{' + n1 + 'x}{' + L + '} ' + (sub ? '-' : '+') + ' \\f{' + n2 + 'x}{' + L + '}~.',
+         (sub ? 'Subtract' : 'Add') + ' the numerators: ~\\f{' + topCoef + 'x}{' + L + '}~.',
+         'Answer: **~\\f{' + topCoef + 'x}{' + L + '}~**.']);
+    }
+    /* 1/(x+k) + 1/x  ->  (2x+k)/(x(x+k)) */
+    return expr('Combine into a single fraction: ~\\f{1}{x ' + (k < 0 ? '- ' + Math.abs(k) : '+ ' + k) +
+      '} + \\f{1}{x}~', '(2*x+' + k + ')/(x*(x+' + k + '))',
+      ['The denominators share nothing, so the common denominator is their product: ~x(x ' +
+        (k < 0 ? '- ' + Math.abs(k) : '+ ' + k) + ')~.',
+       'Rewrite each: ~\\f{x}{x(x ' + (k < 0 ? '- ' + Math.abs(k) : '+ ' + k) + ')} + \\f{x ' +
+         (k < 0 ? '- ' + Math.abs(k) : '+ ' + k) + '}{x(x ' + (k < 0 ? '- ' + Math.abs(k) : '+ ' + k) + ')}~.',
+       'Add the numerators: ~x + x ' + (k < 0 ? '- ' + Math.abs(k) : '+ ' + k) + ' = ' +
+         poly([[2, 'x'], [k, '']]) + '~.',
+       'Answer: **~\\f{' + poly([[2, 'x'], [k, '']]) + '}{x(x ' +
+         (k < 0 ? '- ' + Math.abs(k) : '+ ' + k) + ')}~**.',
+       'Adding denominators is never a step. ~\\f{1}{a} + \\f{1}{b}~ is not ~\\f{1}{a+b}~ — test it with numbers if you doubt it.']);
+  });
+
+  g('rational-equations', function (R, d) {
+    var mode = R.pick(['proportion', 'extraneous']);
+    if (mode === 'proportion') {
+      var k = R.nonzero(-8, 8), a = R.nonzero(1, 7), b = R.nonzero(1, 7);
+      /* a/(x+k) = b  ->  x = a/b - k */
+      var x = R.nonzero(-8, 8);
+      while (x + k === 0) x = R.nonzero(-8, 8);
+      var num_ = b * (x + k);
+      return num('Solve ~\\f{' + num_ + '}{x ' + (k < 0 ? '- ' + Math.abs(k) : '+ ' + k) + '} = ' + b + '~',
+        x,
+        ['Multiply both sides by the denominator: ~' + num_ + ' = ' + b + '(x ' +
+          (k < 0 ? '- ' + Math.abs(k) : '+ ' + k) + ')~.',
+         'Expand and solve: ~' + num_ + ' = ' + term(b, 'x') + ' + ' + (b * k) + '~, so ~x = ' + x + '~.',
+         '~x = ~**' + x + '**. It does not make the denominator zero, so it is valid.'],
+        { tol: 0.005 });
+    }
+    /* x^2/(x-a) = a^2/(x-a) style trap: the only algebraic solution is excluded */
+    var a2 = R.nonzero(2, 9);
+    var sh = choiceSet(R, 'No solution', ['~x = ' + a2 + '~', '~x = ' + (-a2) + '~', '~x = 0~']);
+    return mc('Solve ~\\f{x}{x - ' + a2 + '} = \\f{' + a2 + '}{x - ' + a2 + '}~', sh.choices, sh.answer,
+      ['The denominators match, so the numerators must be equal: ~x = ' + a2 + '~.',
+       'But check it against the original: at ~x = ' + a2 + '~ the denominator ~x - ' + a2 +
+         '~ becomes zero, and division by zero is *undefined*.',
+       'So ~x = ' + a2 + '~ is an **extraneous solution** and the equation has **no solution**.',
+       'Multiplying by an expression containing the variable can introduce answers that do not belong. Checking every candidate in the original equation is not optional.']);
+  });
+
+  g('radical-operations', function (R, d) {
+    var mode = R.pick(d === 1 ? ['combine', 'simplifyMult'] : ['combine', 'simplifyMult', 'rationalise']);
+    if (mode === 'combine') {
+      var k = R.pick([2, 3, 5, 6, 7, 10, 11]);
+      var c1 = R.nonzero(1, 7), c2 = R.nonzero(1, 7);
+      var sub = R.bool(0.4);
+      var res = c1 + (sub ? -1 : 1) * c2;
+      return num('Simplify ~' + c1 + 'sqrt{' + k + '} ' + (sub ? '-' : '+') + ' ' + c2 + 'sqrt{' + k +
+        '}~. Enter the number in front of ~sqrt{' + k + '}~.', res,
+        ['Like radicals combine the same way like terms do — the ~sqrt{' + k + '}~ is just a common factor.',
+         c1 + ' ' + (sub ? '-' : '+') + ' ' + c2 + ' = ' + res + '.',
+         'So the answer is **' + res + '**~sqrt{' + k + '}~.',
+         'Only identical radicals combine: ~sqrt{2} + sqrt{3}~ cannot be simplified at all.']);
+    }
+    if (mode === 'simplifyMult') {
+      var a = R.pick([2, 3, 5, 6, 7]), b = R.pick([2, 3, 5, 6, 7]);
+      var prod = a * b, out = Math.sqrt(MC.squareFactor(prod)), inside = prod / (out * out);
+      return multi('Simplify ~sqrt{' + a + '} \\times sqrt{' + b + '}~ to the form ~a\\,sqrt{b}~. Give ~a~ and ~b~.',
+        [{ label: 'a (outside)', answer: out }, { label: 'b (inside)', answer: inside }],
+        ['Roots multiply under one sign: ~sqrt{' + a + '} \\times sqrt{' + b + '} = sqrt{' + prod + '}~.',
+         out > 1 ? 'Now pull out the largest square factor: ~' + prod + ' = ' + (out * out) + ' \\times ' +
+             inside + '~, so ~sqrt{' + prod + '} = ' + out + 'sqrt{' + inside + '}~.'
+           : 'There is no square factor to pull out, so it stays as ~sqrt{' + prod + '}~ (outside is 1).',
+         'Answer: **' + out + 'sqrt{' + inside + '}**.']);
+    }
+    var den = R.pick([2, 3, 5, 6, 7, 10]), top = R.nonzero(1, 9);
+    var g0 = MC.gcd(top, den);
+    return multi('Rationalise the denominator of ~\\f{' + top + '}{sqrt{' + den +
+      '}}~ and write it as ~\\f{a\\,sqrt{' + den + '}}{b}~. Give ~a~ and ~b~.',
+      [{ label: 'a (numerator coefficient)', answer: top / g0 }, { label: 'b (denominator)', answer: den / g0 }],
+      ['Multiply top and bottom by ~sqrt{' + den + '}~ — that is multiplying by 1, so the value is unchanged.',
+       '~\\f{' + top + '}{sqrt{' + den + '}} \\times \\f{sqrt{' + den + '}}{sqrt{' + den + '}} = \\f{' +
+         top + 'sqrt{' + den + '}}{' + den + '}~.',
+       g0 > 1 ? 'Reduce by ' + g0 + ': ~\\f{' + (top / g0) + 'sqrt{' + den + '}}{' + (den / g0) + '}~.'
+              : 'Nothing reduces, so that is the answer.',
+       'Answer: **~\\f{' + (top / g0) + 'sqrt{' + den + '}}{' + (den / g0) + '}~**.',
+       'A radical in the denominator is not *wrong*, but the rationalised form is the standard one and makes answers comparable.']);
+  });
+
+  g('radical-equations', function (R, d) {
+    var mode = R.pick(['solve', 'extraneous']);
+    if (mode === 'solve') {
+      var k = R.nonzero(-9, 9), r = R.int(1, 10);
+      /* sqrt(x + k) = r  ->  x = r^2 - k */
+      return num('Solve ~sqrt{x ' + (k < 0 ? '- ' + Math.abs(k) : '+ ' + k) + '} = ' + r + '~',
+        r * r - k,
+        ['Square both sides to clear the root: ~x ' + (k < 0 ? '- ' + Math.abs(k) : '+ ' + k) + ' = ' + (r * r) + '~.',
+         'Solve: ~x = ' + (r * r) + (k < 0 ? ' + ' + Math.abs(k) : ' - ' + k) + ' = ' + (r * r - k) + '~.',
+         'Check it in the original: ~sqrt{' + (r * r) + '} = ' + r + '~ ✓. So ~x = ~**' + (r * r - k) + '**.',
+         'Squaring can create false solutions, so the check is part of the method rather than good manners.']);
+    }
+    var a = R.int(1, 8), neg = -R.int(1, 9);
+    var sh = choiceSet(R, 'No solution', ['~x = ' + (neg * neg - a) + '~', '~x = ' + (a - neg * neg) + '~', '~x = 0~']);
+    return mc('Solve ~sqrt{x + ' + a + '} = ' + neg + '~', sh.choices, sh.answer,
+      ['Squaring would give ~x + ' + a + ' = ' + (neg * neg) + '~ and an apparently fine answer.',
+       'But the radical sign means the *positive* square root, which can never equal ' + neg + '.',
+       'So there is **no solution**, and you can see that before squaring anything.',
+       'Any candidate from squaring must be checked against the original equation — that is where extraneous solutions get caught.']);
+  });
+
+  g('rational-exponents', function (R, d) {
+    var mode = R.pick(['toRadical', 'evaluate', 'simplify']);
+    if (mode === 'toRadical') {
+      var n = R.int(2, 5), m = R.int(1, 4);
+      var sh = choiceSet(R, '~sqrt{x^{' + m + '}}~ with index ' + n + ' (the ' + n + 'th root of ~x^{' + m + '}~)',
+        ['The ' + m + 'th root of ~x^{' + n + '}~', '~x^{' + (m * n) + '}~', '~' + n + 'x^{' + m + '}~']);
+      return mc('What does ~x^{' + m + '/' + n + '}~ mean?', sh.choices, sh.answer,
+        ['In a fractional exponent, the bottom is the root and the top is the power.',
+         'So ~x^{' + m + '/' + n + '}~ is the ' + n + 'th root of ~x^{' + m + '}~.',
+         'Remembering which is which: the denominator *denominates* the root.']);
+    }
+    if (mode === 'evaluate') {
+      var base = R.pick([4, 8, 9, 16, 25, 27, 32, 36, 64, 81, 100, 125]);
+      var roots = { 4: [2, 2], 8: [3, 2], 9: [2, 3], 16: [2, 4], 25: [2, 5], 27: [3, 3], 32: [5, 2],
+                    36: [2, 6], 64: [2, 8], 81: [2, 9], 100: [2, 10], 125: [3, 5] };
+      var rt = roots[base][0], val = roots[base][1];
+      var pw = R.int(1, 3);
+      return num('Evaluate ~' + base + '^{' + pw + '/' + rt + '}~', Math.pow(val, pw),
+        ['Take the ' + rt + 'th root first, because it keeps the numbers small: ~' + base + '^{1/' + rt +
+          '} = ' + val + '~.',
+         'Then raise to the power ' + pw + ': ~' + val + '^{' + pw + '} = ' + Math.pow(val, pw) + '~.',
+         'Answer: **' + Math.pow(val, pw) + '**.',
+         'Rooting before powering is almost always easier than powering first.']);
+    }
+    var p1 = R.int(1, 5), q1 = R.int(2, 5), p2 = R.int(1, 5), q2 = R.int(2, 5);
+    var sum = Frac.add(F(p1, q1), F(p2, q2));
+    return { prompt: 'Simplify ~x^{' + p1 + '/' + q1 + '} \\cdot x^{' + p2 + '/' + q2 +
+        '}~ and give the resulting exponent as a fraction in lowest terms.',
+      kind: 'frac', answer: { n: sum.n, d: sum.d }, lowest: true,
+      solution: ['Multiplying powers of the same base adds the exponents — fractions included.',
+        '~\\f{' + p1 + '}{' + q1 + '} + \\f{' + p2 + '}{' + q2 + '} = ' + Frac.str(sum) + '~.',
+        'So the result is ~x^{' + Frac.str(sum) + '}~, exponent **' + Frac.str(sum) + '**.',
+        'The exponent rules do not change when the exponents stop being whole numbers.'] };
+  });
+
+  g('arithmetic-sequences', function (R, d) {
+    var a1 = R.nonzero(-20, 30), diff = R.nonzero(-9, 9);
+    var mode = R.pick(['nextTerm', 'nthTerm', 'findN', 'rule']);
+    var terms = [a1, a1 + diff, a1 + 2 * diff, a1 + 3 * diff];
+    if (mode === 'nextTerm') {
+      return num('Find the next term: ~' + terms.join(',\; ') + ',\; ?~', a1 + 4 * diff,
+        ['Check the differences: each step adds ' + diff + ', the same every time, so it is arithmetic.',
+         terms[3] + ' + (' + diff + ') = **' + (a1 + 4 * diff) + '**.']);
+    }
+    if (mode === 'nthTerm') {
+      var n = R.int(8, 40);
+      return num('An arithmetic sequence starts ~' + terms.join(',\; ') + '~. What is the ' +
+        MC.ordinal(n) + ' term?', a1 + (n - 1) * diff,
+        ['The rule is ~a_{n} = a_{1} + (n - 1)d~ with ~a_{1} = ' + a1 + '~ and ~d = ' + diff + '~.',
+         'At ~n = ' + n + '~: ~' + a1 + ' + ' + (n - 1) + '(' + diff + ') = ' + (a1 + (n - 1) * diff) + '~.',
+         'Answer: **' + (a1 + (n - 1) * diff) + '**.',
+         'It is ~n - 1~, not ~n~, because the first term has had no steps added to it yet.']);
+    }
+    if (mode === 'findN') {
+      var k = R.int(6, 30), target = a1 + (k - 1) * diff;
+      return num('In the sequence ~' + terms.join(',\; ') + '~, which term equals ' + target + '?', k,
+        ['Set the rule equal to the target: ~' + a1 + ' + (n - 1)(' + diff + ') = ' + target + '~.',
+         '~(n - 1)(' + diff + ') = ' + (target - a1) + '~, so ~n - 1 = ' + (k - 1) + '~.',
+         'So it is term number **' + k + '**.']);
+    }
+    return num('For the sequence ~' + terms.join(',\; ') + '~, written as ~a_{n} = ' + a1 +
+      ' + (n - 1)d~, what is ~d~?', diff,
+      ['~d~ is the common difference: subtract any term from the one after it.',
+       terms[1] + ' - (' + terms[0] + ') = **' + diff + '**.',
+       'A constant difference is what makes a sequence arithmetic, and it is the slope of the straight line through its terms.']);
+  });
+
+  g('geometric-sequences', function (R, d) {
+    var a1 = R.nonzero(1, 12), r = R.pick([2, 3, -2, -3, 5, 10]);
+    var mode = R.pick(['nextTerm', 'nthTerm', 'ratio']);
+    var terms = [a1, a1 * r, a1 * r * r, a1 * r * r * r];
+    if (mode === 'nextTerm') {
+      return num('Find the next term: ~' + terms.join(',\; ') + ',\; ?~', a1 * Math.pow(r, 4),
+        ['The differences are not constant, so check the ratios: ' + terms[1] + ' \\div ' + terms[0] +
+          ' = ' + r + ', and the same each step.',
+         terms[3] + ' \\times (' + r + ') = **' + (a1 * Math.pow(r, 4)) + '**.',
+         'A constant *ratio* means geometric; a constant *difference* would mean arithmetic.']);
+    }
+    if (mode === 'nthTerm') {
+      var n = R.int(5, 9);
+      return num('A geometric sequence starts ~' + terms.join(',\; ') + '~. What is the ' +
+        MC.ordinal(n) + ' term?', a1 * Math.pow(r, n - 1),
+        ['The rule is ~a_{n} = a_{1}r^{n-1}~ with ~a_{1} = ' + a1 + '~ and ~r = ' + r + '~.',
+         'At ~n = ' + n + '~: ~' + a1 + ' \\times (' + r + ')^{' + (n - 1) + '} = ' +
+           (a1 * Math.pow(r, n - 1)) + '~.',
+         'Answer: **' + (a1 * Math.pow(r, n - 1)) + '**.',
+         Math.abs(r) > 1 ? 'Geometric growth outruns arithmetic growth very quickly — this is the shape of compound interest.'
+                         : 'Terms shrink toward zero when the ratio is between -1 and 1.']);
+    }
+    return num('For the sequence ~' + terms.join(',\; ') + '~, what is the common ratio?', r,
+      ['Divide any term by the one before it.',
+       terms[1] + ' \\div (' + terms[0] + ') = **' + r + '**.',
+       r < 0 ? 'A negative ratio makes the terms alternate in sign.' :
+         'Check it against another pair to be sure the ratio really is constant.'], { tol: 0.005 });
+  });
+
+  g('exponential-growth', function (R, d) {
+    var P = R.int(2, 40) * 50, rate = R.pick([5, 8, 10, 12, 15, 20, 25]);
+    var decay = R.bool(0.4);
+    var t = R.int(2, 12);
+    var factor = decay ? 1 - rate / 100 : 1 + rate / 100;
+    var val = P * Math.pow(factor, t);
+    var mode = R.pick(['value', 'readRate', 'compare']);
+    if (mode === 'value') {
+      return num('A quantity starts at ' + MC.commas(P) + ' and ' + (decay ? 'falls' : 'grows') + ' by ~' +
+        rate + '\\%~ each year. What is it after ' + t + ' years? Round to 2 decimal places.',
+        Math.round(val * 100) / 100,
+        ['Each year multiplies by ~1 ' + (decay ? '-' : '+') + ' ' + MC.fmt(rate / 100, 4) + ' = ' +
+          MC.fmt(factor, 4) + '~, so the model is ~y = ' + P + '(' + MC.fmt(factor, 4) + ')^{t}~.',
+         'After ' + t + ' years: ~' + P + ' \\times ' + MC.fmt(factor, 4) + '^{' + t + '} = ' +
+           MC.fmt(val, 2) + '~.',
+         'Answer: **' + MC.fmt(Math.round(val * 100) / 100, 2) + '**.',
+         'The percentage applies to the *current* amount each year, which is why it compounds rather than adding the same amount repeatedly.'],
+        { tol: 0.05 });
+    }
+    if (mode === 'readRate') {
+      return num('A model is ~y = ' + P + '(' + MC.fmt(factor, 4) + ')^{t}~. What is the yearly percentage ' +
+        (decay ? 'decrease' : 'increase') + '? Enter just the number.', rate,
+        ['Compare the base with 1: ~' + MC.fmt(factor, 4) + (decay ? ' = 1 - ' : ' = 1 + ') +
+          MC.fmt(rate / 100, 4) + '~.',
+         'So the rate is ' + MC.fmt(rate / 100, 4) + ', which is **' + rate + '**%.',
+         'A base above 1 means growth; below 1 means decay. The base is never the percentage itself.'],
+        { tol: 0.05 });
+    }
+    var linRate = Math.round(P * rate / 100);
+    var yrs = R.int(10, 25);
+    var expVal = P * Math.pow(1 + rate / 100, yrs), linVal = P + linRate * yrs;
+    var sh = shuffleChoices(R, ['The one growing by ~' + rate + '\\%~ each year',
+      'The one growing by ' + MC.commas(linRate) + ' each year'], 0);
+    return mc('Two quantities both start at ' + MC.commas(P) + '. One grows by ~' + rate +
+      '\\%~ a year, the other by ' + MC.commas(linRate) + ' a year — the same amount as the first year’s growth. ' +
+      'Which is larger after ' + yrs + ' years?', sh.choices, sh.answer,
+      ['They match after one year, but the percentage one then takes its percentage of a bigger number.',
+       'After ' + yrs + ' years: percentage growth gives about ' + MC.commas(Math.round(expVal)) +
+         ', steady growth gives ' + MC.commas(linVal) + '.',
+       'The **percentage** one is larger — exponential growth always overtakes linear growth eventually, whatever the starting rates.']);
+  });
+
+  g('linear-vs-exponential', function (R, d) {
+    var mode = R.pick(['fromTable', 'fromWords']);
+    if (mode === 'fromTable') {
+      var isLinear = R.bool();
+      var a = R.int(2, 10), step = R.nonzero(2, 9), ratio = R.pick([2, 3, 5]);
+      var ys = isLinear ? [a, a + step, a + 2 * step, a + 3 * step]
+                        : [a, a * ratio, a * ratio * ratio, a * ratio * ratio * ratio];
+      var right = isLinear ? 'Linear' : 'Exponential';
+      var sh = shuffleChoices(R, ['Linear', 'Exponential'], isLinear ? 0 : 1);
+      return mc('For ~x = 0, 1, 2, 3~ the outputs are ' + ys.join(', ') +
+        '. Is the relationship linear or exponential?', sh.choices, sh.answer,
+        ['Test the differences, then the ratios.',
+         isLinear ? 'Differences: each step adds ' + step + ' — constant, so it is **linear**.'
+                  : 'Differences change, but each term is ' + ratio + ' times the one before — a constant ratio, so it is **exponential**.',
+         'Constant difference means linear; constant ratio means exponential. Check differences first, because they are quicker.']);
+    }
+    var cases = [
+      { s: 'a salary rising by ' + MC.money(2000) + ' a year', ans: 'Linear' },
+      { s: 'a salary rising by 3% a year', ans: 'Exponential' },
+      { s: 'a population doubling every decade', ans: 'Exponential' },
+      { s: 'a tank draining 5 litres a minute', ans: 'Linear' },
+      { s: 'a car losing 15% of its value each year', ans: 'Exponential' },
+      { s: 'a phone plan charging ' + MC.money(0.1) + ' per minute', ans: 'Linear' },
+      { s: 'a bacterial colony tripling every hour', ans: 'Exponential' }
+    ];
+    var c = R.pick(cases);
+    var sh2 = shuffleChoices(R, ['Linear', 'Exponential'], c.ans === 'Linear' ? 0 : 1);
+    return mc('Would you model ' + c.s + ' as linear or exponential?', sh2.choices, sh2.answer,
+      ['Ask whether the change is a fixed *amount* or a fixed *percentage* each period.',
+       c.ans === 'Linear' ? 'This adds the same amount each time, so it is **linear**.'
+                          : 'This multiplies by the same factor each time, so it is **exponential**.',
+       'The giveaway words: "per" and a fixed amount point to linear; a percentage, "doubling" or "tripling" point to exponential.']);
+  });
+
+  g('distance-rate-time', function (R, d) {
+    var kind = R.pick(['meeting', 'catchUp', 'roundTrip']);
+    if (kind === 'meeting') {
+      var s1 = R.int(30, 80), s2 = R.int(30, 80), hrs = R.int(2, 6);
+      var dist = (s1 + s2) * hrs;
+      return num('Two cars leave the same point in opposite directions at ' + s1 + ' km/h and ' + s2 +
+        ' km/h. After how many hours are they ' + MC.commas(dist) + ' km apart?', hrs,
+        ['Moving apart, the gap grows at the sum of the speeds: ' + s1 + ' + ' + s2 + ' = ' + (s1 + s2) + ' km/h.',
+         'Time = distance \\div combined speed = ' + dist + ' \\div ' + (s1 + s2) + '.',
+         '**' + hrs + ' hours.**',
+         'Adding the speeds works because each car contributes its own distance to the same gap.'],
+        { tol: 0.005 });
+    }
+    if (kind === 'catchUp') {
+      var slow = R.int(40, 70), fast = slow + R.int(10, 40), head = R.int(1, 4);
+      var tCatch = slow * head / (fast - slow);
+      return num('A truck leaves at ' + slow + ' km/h. ' + head + ' hour' + (head > 1 ? 's' : '') +
+        ' later a car leaves from the same place at ' + fast +
+        ' km/h. How many hours does the car take to catch up? Round to 2 decimal places.',
+        Math.round(tCatch * 100) / 100,
+        ['The truck has a head start of ' + slow + ' \\times ' + head + ' = ' + (slow * head) + ' km.',
+         'The car closes the gap at ' + fast + ' - ' + slow + ' = ' + (fast - slow) + ' km/h.',
+         'Time = ' + (slow * head) + ' \\div ' + (fast - slow) + ' = **' + MC.fmt(tCatch, 2) + ' hours**.',
+         'Catching up uses the *difference* of the speeds; moving apart uses the sum.'],
+        { tol: 0.015 });
+    }
+    var out = R.int(40, 70), back = out + R.int(10, 30), dd = R.int(2, 15) * 10;
+    var total = dd / out + dd / back;
+    return num('A cyclist rides ' + dd + ' km out at ' + out + ' km/h and returns at ' + back +
+      ' km/h. What is the total time in hours? Round to 2 decimal places.',
+      Math.round(total * 100) / 100,
+      ['Work out each leg separately: ' + dd + ' \\div ' + out + ' = ' + MC.fmt(dd / out, 3) +
+        ' h and ' + dd + ' \\div ' + back + ' = ' + MC.fmt(dd / back, 3) + ' h.',
+       'Add them: **' + MC.fmt(total, 2) + ' hours**.',
+       'The average speed for the trip is *not* the average of the two speeds — it is total distance over total time, which is always lower.'],
+      { tol: 0.015 });
+  });
+
+  g('work-rate', function (R, d) {
+    var kind = R.pick(['together', 'oneLeft']);
+    var a = R.int(2, 12), b = R.int(2, 12);
+    if (kind === 'together') {
+      var t = 1 / (1 / a + 1 / b);
+      return num('One painter takes ' + a + ' hours to paint a room and another takes ' + b +
+        ' hours. Working together, how many hours do they take? Round to 2 decimal places.',
+        Math.round(t * 100) / 100,
+        ['Work with rates, not times: the first does ~\\f{1}{' + a + '}~ of the room per hour, the second ~\\f{1}{' + b + '}~.',
+         'Together: ~\\f{1}{' + a + '} + \\f{1}{' + b + '} = ' + MC.fmt(1 / a + 1 / b, 5) + '~ of the room per hour.',
+         'Time is one whole room divided by that rate: **' + MC.fmt(t, 2) + ' hours**.',
+         'Adding the *times* is always wrong — two people cannot take longer together than either alone.'],
+        { tol: 0.015 });
+    }
+    var worked = R.int(1, a - 1);
+    var remain = (1 - worked / a) * b;
+    return num('A tap fills a tank in ' + a + ' hours. It runs for ' + worked + ' hour' +
+      (worked > 1 ? 's' : '') + ' and is then replaced by a tap that fills the whole tank in ' + b +
+      ' hours. How many more hours to finish? Round to 2 decimal places.',
+      Math.round(remain * 100) / 100,
+      ['In ' + worked + ' hour' + (worked > 1 ? 's' : '') + ' the first tap fills ~\\f{' + worked + '}{' + a +
+        '}~ of the tank, leaving ~' + MC.fmt(1 - worked / a, 4) + '~ to go.',
+       'The second tap fills ~\\f{1}{' + b + '}~ per hour, so it needs ~' + MC.fmt(1 - worked / a, 4) +
+         ' \\div \\f{1}{' + b + '} = ' + MC.fmt(remain, 3) + '~ hours.',
+       '**' + MC.fmt(remain, 2) + ' hours.**'],
+      { tol: 0.015 });
+  });
+
+  g('mixture-problems', function (R, d) {
+    var kind = R.pick(['concentration', 'value']);
+    if (kind === 'concentration') {
+      var c1 = R.pick([10, 20, 25, 30, 40]), c2 = R.pick([50, 60, 70, 80, 90]);
+      var v1 = R.int(2, 20) * 5, v2 = R.int(2, 20) * 5;
+      var finalC = (c1 * v1 + c2 * v2) / (v1 + v2);
+      return num(v1 + ' litres of a ~' + c1 + '\\%~ solution is mixed with ' + v2 + ' litres of a ~' + c2 +
+        '\\%~ solution. What percentage is the mixture? Round to 2 decimal places.',
+        Math.round(finalC * 100) / 100,
+        ['Track the pure substance, not the percentages: ~' + c1 + '\\%~ of ' + v1 + ' is ' +
+          MC.fmt(c1 * v1 / 100, 2) + ' litres, and ~' + c2 + '\\%~ of ' + v2 + ' is ' +
+          MC.fmt(c2 * v2 / 100, 2) + ' litres.',
+         'Total pure: ' + MC.fmt((c1 * v1 + c2 * v2) / 100, 2) + ' litres in ' + (v1 + v2) + ' litres of mixture.',
+         'Concentration = ' + MC.fmt((c1 * v1 + c2 * v2) / 100, 2) + ' \\div ' + (v1 + v2) + ' = **' +
+           MC.fmt(finalC, 2) + '%**.',
+         'Averaging the two percentages only works when the volumes are equal — otherwise the bigger batch pulls harder.'],
+        { tol: 0.02 });
+    }
+    var p1 = R.int(2, 9), p2 = p1 + R.int(2, 10);
+    var k1 = R.int(2, 20), k2 = R.int(2, 20);
+    var blend = (p1 * k1 + p2 * k2) / (k1 + k2);
+    return num(k1 + ' kg of coffee at ' + MC.money(p1) + '/kg is blended with ' + k2 + ' kg at ' +
+      MC.money(p2) + '/kg. What is the blend worth per kg, in dollars? Round to 2 decimal places.',
+      Math.round(blend * 100) / 100,
+      ['Total value: ' + k1 + ' \\times ' + p1 + ' + ' + k2 + ' \\times ' + p2 + ' = ' +
+        MC.money(p1 * k1 + p2 * k2) + '.',
+       'Total weight: ' + (k1 + k2) + ' kg.',
+       'Price per kg = ' + MC.fmt(p1 * k1 + p2 * k2, 2) + ' \\div ' + (k1 + k2) + ' = **' +
+         MC.money(blend) + '**.',
+       'This is a weighted average, and it always lands between the two prices, nearer the larger batch.'],
+      { unit: 'dollars', tol: 0.02 });
+  });
+
+  g('age-consecutive', function (R, d) {
+    var kind = R.pick(['ages', 'consecutiveOdd', 'relation']);
+    if (kind === 'ages') {
+      var childNow = R.int(4, 20), mult = R.int(2, 5), yrs = R.int(2, 12);
+      /* parent is mult times child's age now; in yrs years parent = k times child */
+      var parentNow = childNow * mult;
+      return num('A parent is ' + mult + ' times as old as their child. In ' + yrs + ' years the parent will be ' +
+        parentNow + ' + ' + yrs + ' = ' + (parentNow + yrs) + ' and the child ' + (childNow + yrs) +
+        '. How old is the child now?', childNow,
+        ['Let the child be ~x~ now, so the parent is ~' + mult + 'x~.',
+         'In ' + yrs + ' years they are ~x + ' + yrs + '~ and ~' + mult + 'x + ' + yrs + '~.',
+         'The stated future parent age gives ~' + mult + 'x + ' + yrs + ' = ' + (parentNow + yrs) +
+           '~, so ~x = ' + childNow + '~.',
+         'Child is **' + childNow + '** now.',
+         'Add the same number of years to *every* person. Ages change together, which is what makes these solvable.']);
+    }
+    if (kind === 'consecutiveOdd') {
+      var n = R.int(1, 30) * 2 + 1;
+      var sum = n + (n + 2) + (n + 4);
+      return num('Three consecutive odd numbers add to ' + sum + '. What is the smallest?', n,
+        ['Consecutive odd numbers are 2 apart, so call them ~x~, ~x + 2~, ~x + 4~.',
+         'Sum: ~3x + 6 = ' + sum + '~, so ~3x = ' + (sum - 6) + '~ and ~x = ' + n + '~.',
+         'Smallest: **' + n + '**. Check: ' + n + ' + ' + (n + 2) + ' + ' + (n + 4) + ' = ' + sum + '.',
+         'Consecutive *integers* step by 1; consecutive odds or evens step by 2. Using the wrong step is the usual error.']);
+    }
+    var small = R.int(3, 30), gap = R.int(2, 15);
+    var big = small + gap, tot = small + big;
+    return num('Two numbers add to ' + tot + ' and differ by ' + gap + '. What is the smaller one?', small,
+      ['Let the smaller be ~x~; the larger is ~x + ' + gap + '~.',
+       'Sum: ~2x + ' + gap + ' = ' + tot + '~, so ~2x = ' + (tot - gap) + '~ and ~x = ' + small + '~.',
+       'Smaller number: **' + small + '**. Check: ' + small + ' + ' + big + ' = ' + tot + ' and ' +
+         big + ' - ' + small + ' = ' + gap + '.',
+       'Checking both conditions, not just one, is what catches an arithmetic slip here.']);
+  });
+
   root.GENERATORS = GEN;
   if (typeof module !== 'undefined' && module.exports) module.exports = GEN;
 })(typeof window !== 'undefined' ? window : globalThis);

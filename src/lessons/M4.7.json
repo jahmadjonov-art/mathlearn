@@ -1,0 +1,51 @@
+{
+ "module": "M4.7",
+ "skills": {
+  "quad-zero-product": {
+   "why": "The zero product property is the reason factoring matters: if two things multiply to zero, at least one of them *is* zero. That converts one hard quadratic equation into two easy linear ones, and it is the only reason anyone factors by hand.",
+   "traps": [
+    "It only works against zero. From ~(x-2)(x+5) = 6~ you may **not** say ~x - 2 = 6~ — rearrange to zero first.",
+    "Get everything on one side before factoring. This step is skipped more often than any other."
+   ]
+  },
+  "quad-square-root": {
+   "why": "When the equation has no plain ~x~ term, you can isolate the square and take roots directly. It is the fastest method when it applies, and it is how completing the square finishes, so fluency here pays off twice.",
+   "traps": [
+    "Keep **both** signs: ~x^{2} = 49~ gives ~x = \\pm 7~. Writing only 7 throws away half the answer.",
+    "~x^{2} = -9~ has no real solution, because a real square is never negative."
+   ]
+  },
+  "quad-complete-square": {
+   "why": "Completing the square rewrites any quadratic as a perfect square plus a constant, which both solves it and hands you the vertex. It always works — and the quadratic formula is literally this method carried out once on the general case, which is why it is worth doing by hand at least a few times.",
+   "traps": [
+    "Halve the coefficient of ~x~, then square it. Halving after squaring gives nonsense.",
+    "If the leading coefficient is not 1, divide it out first."
+   ]
+  },
+  "quad-formula": {
+   "why": "The quadratic formula solves every quadratic, factorable or not. It is worth memorising because it removes all guesswork: identify ~a~, ~b~ and ~c~, substitute, simplify.",
+   "traps": [
+    "It is ~-b~, not ~b~. When ~b~ is negative, ~-b~ is positive — this is the commonest error in the formula.",
+    "The whole numerator sits over ~2a~, including the ~-b~. Divide both parts, not just the root."
+   ],
+   "code": {
+    "body": "import math\ndef roots(a, b, c):\n    d = b*b - 4*a*c\n    if d < 0: return []                       # no real roots\n    r = math.sqrt(d)\n    return [(-b - r)/(2*a), (-b + r)/(2*a)]",
+    "note": "Checking the discriminant before taking the root is what stops the code crashing. The mathematics and the error handling are the same decision."
+   }
+  },
+  "discriminant": {
+   "why": "The discriminant ~b^{2} - 4ac~ tells you how many real roots exist before you find them: positive gives two, zero gives one, negative gives none. It is the part under the root sign, so its sign decides whether that root is real at all.",
+   "traps": [
+    "Zero means one *repeated* root, where the parabola touches the axis rather than crossing it.",
+    "A negative discriminant means no real roots, not no roots — there are two complex ones."
+   ]
+  },
+  "quad-word-problems": {
+   "why": "Quadratics model anything where two quantities multiply and one depends on the other: area from two dimensions, revenue from price times quantity, height under gravity. The algebra gives two roots, and deciding which one the situation allows is part of the problem.",
+   "traps": [
+    "Discard impossible roots explicitly. A negative length or a time before the throw is not an answer.",
+    "Read whether the question wants *when* (the input) or *how high* (the output). They are different numbers."
+   ]
+  }
+ }
+}

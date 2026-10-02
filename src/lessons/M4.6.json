@@ -1,0 +1,44 @@
+{
+ "module": "M4.6",
+ "skills": {
+  "factor-gcf": {
+   "why": "Factoring turns a sum into a product, and a product is what lets you solve equations — because a product can only be zero when one of its parts is. Pulling out the greatest common factor is always the first move: it makes everything that follows smaller.",
+   "traps": [
+    "Take out the *greatest* common factor, including any shared power of the variable, or you will be factoring again a minute later.",
+    "Expand your answer back as a check. It costs ten seconds and catches a dropped term."
+   ]
+  },
+  "factor-trinomial-1": {
+   "why": "For ~x^{2} + bx + c~ you need two numbers that multiply to ~c~ and add to ~b~. That works because expanding ~(x+p)(x+q)~ gives exactly ~x^{2} + (p+q)x + pq~ — you are reading the expansion backwards.",
+   "traps": [
+    "Signs follow a pattern: ~c~ positive means both numbers share the sign of ~b~; ~c~ negative means they have opposite signs. Using it narrows the search immediately."
+   ]
+  },
+  "factor-trinomial-a": {
+   "why": "With a leading coefficient the search is wider, so use structure instead of guessing: multiply ~a~ by ~c~, find two numbers multiplying to that and adding to ~b~, split the middle term, then factor by grouping. It is mechanical and it always works.",
+   "traps": [
+    "Take out any common factor before starting. Factoring ~6x^{2} + 15x + 6~ without first removing the 3 makes the AC search three times harder."
+   ]
+  },
+  "factor-difference-squares": {
+   "why": "~a^{2} - b^{2} = (a+b)(a-b)~ is worth recognising on sight, because the middle terms cancel. It turns up constantly in simplifying fractions, rationalising denominators and mental arithmetic (~99 \\times 101 = 100^{2} - 1~).",
+   "traps": [
+    "A *sum* of squares does not factor over the integers. ~x^{2} + 9~ is already finished.",
+    "Check for a repeat: ~x^{4} - 16~ factors to ~(x^{2}+4)(x^{2}-4)~, and the second bracket factors again."
+   ]
+  },
+  "factor-grouping": {
+   "why": "With four terms, pair them up, factor each pair, and hope the same bracket appears in both — then take it out. This is also the engine inside the AC method for hard trinomials, so it is worth being comfortable with.",
+   "traps": [
+    "If the two brackets do not match, try a different pairing before concluding it will not factor.",
+    "Watch the sign when the third term is negative: factor out ~-1~ with it if that makes the brackets agree."
+   ]
+  },
+  "factor-strategy": {
+   "why": "Factoring is a decision, not a single procedure. Always pull out the common factor first, then count terms: two suggests a difference of squares, three a trinomial, four grouping. Having that order in mind beats trying things at random.",
+   "traps": [
+    "Many expressions need two steps. After one successful factoring, look at each bracket and ask whether it factors again."
+   ]
+  }
+ }
+}

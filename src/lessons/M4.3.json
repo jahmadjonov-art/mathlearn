@@ -1,0 +1,45 @@
+{
+ "module": "M4.3",
+ "skills": {
+  "system-graphing": {
+   "why": "Two equations in two unknowns ask where two conditions hold at once — geometrically, where two lines cross. That picture explains all three possible outcomes immediately: lines cross once, are parallel and never meet, or lie on top of each other.",
+   "traps": [
+    "A solution must satisfy *both* equations. Checking only one is how a wrong answer survives."
+   ]
+  },
+  "system-substitution": {
+   "why": "Substitution is the method to reach for when one variable is already alone, or nearly so. You replace it everywhere in the other equation, which collapses two unknowns into one.",
+   "traps": [
+    "Substitute the whole expression, with brackets. Putting ~2x - 3~ into ~5y~ gives ~5(2x - 3)~, not ~5 \\cdot 2x - 3~.",
+    "Having found one variable, do not forget to go back for the other — the answer is a *point*."
+   ]
+  },
+  "system-elimination": {
+   "why": "Elimination adds or subtracts whole equations to make one variable vanish. It is the better method when neither variable is isolated, and it is the ancestor of Gaussian elimination, which is how computers solve systems with thousands of unknowns.",
+   "traps": [
+    "Scale *every* term in an equation, including the right-hand side.",
+    "Watch the sign when subtracting: subtracting a negative coefficient adds."
+   ]
+  },
+  "system-special": {
+   "why": "Not every system has one answer. If the equations are multiples of each other, they are the same line and every point on it works. If the left sides match but the right sides do not, they are parallel and nothing works. Recognising these before grinding saves real time.",
+   "traps": [
+    "'No solution' and 'infinitely many' both make the variables disappear. What is left tells you which: a false statement means none, a true one means all."
+   ]
+  },
+  "system-word-problems": {
+   "why": "Two unknowns need two independent pieces of information. Most of these problems give one equation counting things and another measuring them — tickets and takings, coins and value, items and cost. Spotting that pattern is most of the work.",
+   "traps": [
+    "Keep units consistent inside each equation. Mixing dollars and cents is the standard disaster.",
+    "Define both variables in words before writing anything."
+   ]
+  },
+  "system-inequalities": {
+   "why": "Replacing equals with an inequality turns each line into a region. A system of inequalities is where the regions overlap, and that overlap is the set of all workable options — which is exactly how businesses model constraints like budget, time and capacity.",
+   "traps": [
+    "Test a point to decide which side to shade; do not guess from the inequality sign after rearranging.",
+    "A point satisfying one inequality but not the others is not a solution."
+   ]
+  }
+ }
+}

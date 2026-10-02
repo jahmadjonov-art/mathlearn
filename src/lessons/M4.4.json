@@ -1,0 +1,26 @@
+{
+ "module": "M4.4",
+ "skills": {
+  "abs-equations": {
+   "why": "~|x| = 5~ asks which numbers sit 5 away from zero, and two do. That is why absolute value equations usually split into two cases: the inside is ~+5~ or the inside is ~-5~.",
+   "traps": [
+    "An absolute value can never equal a negative, so ~|x - 3| = -2~ has no solution — see that before doing algebra.",
+    "~|x| = 0~ has exactly one solution. Three cases worth knowing on sight: positive gives two, zero gives one, negative gives none."
+   ]
+  },
+  "abs-inequalities": {
+   "why": "Less-than means close to zero, so the inside is trapped between ~-k~ and ~k~ — one interval, an *and*. Greater-than means far from zero in either direction — two separate pieces, an *or*. Getting that distinction right is the whole topic.",
+   "traps": [
+    "~|x| > 3~ is not ~-3 < x < 3~. It is ~x < -3~ *or* ~x > 3~, which is the outside, not the inside.",
+    "Tolerances in engineering are written exactly this way: ~|measured - target| \\le 0.5~."
+   ]
+  },
+  "abs-graphs": {
+   "why": "The graph of ~y = |x|~ is a V, because the negative half gets reflected upward. Everything you know about shifting and stretching applies to it, and the corner sits at the vertex ~(h, k)~ in ~y = a|x - h| + k~.",
+   "traps": [
+    "The sign inside the bars flips: ~|x + 4|~ has its corner at ~x = -4~.",
+    "A negative ~a~ turns the V upside down, making the vertex a maximum rather than a minimum."
+   ]
+  }
+ }
+}

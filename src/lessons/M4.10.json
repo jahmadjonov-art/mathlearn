@@ -1,0 +1,37 @@
+{
+ "module": "M4.10",
+ "skills": {
+  "arithmetic-sequences": {
+   "why": "An arithmetic sequence adds the same amount each step, so its terms lie on a straight line and its rule is ~a_n = a_1 + (n-1)d~. It is the discrete version of a linear function, and the ~n-1~ is there because the first term has had no steps added to it yet.",
+   "traps": [
+    "It is ~(n-1)d~, not ~nd~. Testing your rule on ~n = 1~ catches this instantly.",
+    "A constant *difference* means arithmetic. A constant *ratio* means geometric — check differences first because they are quicker."
+   ]
+  },
+  "geometric-sequences": {
+   "why": "A geometric sequence multiplies by the same factor each step: ~a_n = a_1 r^{n-1}~. This is the shape of compound interest, population growth, radioactive decay and anything that grows in proportion to its current size — which is most things that grow.",
+   "traps": [
+    "A negative ratio makes terms alternate in sign.",
+    "When ~|r| < 1~ the terms shrink toward zero, which is what makes an infinite geometric series able to have a finite sum."
+   ],
+   "code": {
+    "body": "a, r = 3, 2\nterms = [a * r**n for n in range(6)]   # 3, 6, 12, 24, 48, 96",
+    "note": "Note the exponent runs from 0, which is the same off-by-one as the ~n-1~ in the formula. Index conventions are the most common source of bugs when turning a sequence into code."
+   }
+  },
+  "exponential-growth": {
+   "why": "Exponential models multiply by a fixed factor per period: ~y = a(1+r)^{t}~. The base carries the rate — above 1 is growth, below 1 is decay — and the key insight is that the percentage applies to the *current* amount, which is why it compounds instead of adding the same amount repeatedly.",
+   "traps": [
+    "The base is not the percentage. A base of 1.08 means 8% growth; a base of 0.92 means 8% decay.",
+    "A 10% rise followed by a 10% fall does not return you to the start, because the fall is taken from a larger number."
+   ]
+  },
+  "linear-vs-exponential": {
+   "why": "Choosing the wrong model is worse than arithmetic error. The test is simple: a fixed amount added each period is linear, a fixed percentage is exponential. And exponential always overtakes linear eventually, however small the rate — which is the single most under-appreciated fact in personal finance.",
+   "traps": [
+    "In a table, check differences first, then ratios. Constant difference means linear; constant ratio means exponential.",
+    "Words to watch: 'per unit' and a fixed amount point to linear; a percentage, 'doubling' or 'halving' point to exponential."
+   ]
+  }
+ }
+}

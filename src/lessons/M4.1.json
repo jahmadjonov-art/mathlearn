@@ -1,0 +1,35 @@
+{
+ "module": "M4.1",
+ "skills": {
+  "function-definition": {
+   "why": "A function is a rule that gives each input exactly one output. That single restriction is what makes mathematics predictable: if you could put 3 in and get two different answers out, nothing downstream would be reliable. Everything from a spreadsheet formula to a trading model is a function.",
+   "traps": [
+    "Repeated *outputs* are fine — several inputs may share an answer. Only a repeated input with different outputs breaks it.",
+    "The vertical line test works because a vertical line is a single input: if it hits the graph twice, that input has two outputs."
+   ],
+   "code": {
+    "body": "def f(x):\n    return 2*x + 1\n\nf(3)   # 7, every time",
+    "note": "A mathematical function must return the same output for the same input. A function in code that reads a database or a random number is not one in this sense — that difference matters when you reason about what your code does."
+   }
+  },
+  "function-notation": {
+   "why": "~f(x)~ is a name for a machine and a slot to feed it. Once you have the name, you can talk about ~f(3)~, ~f(a+1)~ or ~f(x)~ itself without rewriting the rule each time. It is notation that buys you the ability to discuss functions in general.",
+   "traps": [
+    "~f(3)~ does not mean ~f~ times 3. The brackets are a slot, not multiplication.",
+    "In ~f(x+2)~, the whole of ~x+2~ goes in wherever ~x~ appeared — including inside powers."
+   ]
+  },
+  "domain-range": {
+   "why": "The domain is what you are allowed to put in; the range is what can come out. Only two things usually restrict a domain in algebra: dividing by zero, and taking an even root of a negative. Finding the domain is the habit that stops you confidently reporting an answer the function cannot produce.",
+   "traps": [
+    "In context the domain is often narrower than the algebra allows: a model of ticket sales has no meaning at ~x = -4~ tickets, however happily the formula evaluates."
+   ]
+  },
+  "function-from-context": {
+   "why": "Real models are almost always a fixed part plus a rate times a variable. Reading which number is which — and what each means in the situation — is the skill that turns algebra into something useful. The intercept is the starting amount; the slope is the per-unit change.",
+   "traps": [
+    "Answer the question that was asked: ~C(5)~ is a cost, while solving ~C(h) = 90~ gives hours. Mixing up which variable you are reporting is the usual lost mark."
+   ]
+  }
+ }
+}

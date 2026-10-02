@@ -1,5 +1,6 @@
 const E = require('../src/engine.js');
 const CUR = require('../src/curriculum.js');
+const GEN = require('../src/generators.js');
 let fails = 0, n = 0;
 function ok(c, label) { n++; if (!c) { fails++; console.log('FAIL: ' + label); } }
 function eq(a, b, label) { n++; if (a !== b) { fails++; console.log('FAIL: ' + label + ' got ' + JSON.stringify(a) + ' want ' + JSON.stringify(b)); } }
@@ -81,8 +82,11 @@ ok(s5.length > 0, 'review never comes back empty when something has been studied
 // overview and weak spots
 const ov = E.overview(h, T);
 eq(ov.learned, E.levelStats(h, 'L0').total, 'overview counts learned skills');
-ok(ov.totalSkills === 589, 'overview sees the whole map (' + ov.totalSkills + ')');
-ok(ov.builtSkills === 131, 'overview counts practisable skills (' + ov.builtSkills + ')');
+/* Derived, not hardcoded: these must agree with the map and the generator registry,
+   and that stays true as levels are added rather than failing on every new one. */
+const mapTotal = CUR.levels.reduce((a, l) => a + l.modules.reduce((b, m) => b + m.skills.length, 0), 0);
+eq(ov.totalSkills, mapTotal, 'overview sees every skill in the map');
+eq(ov.builtSkills, Object.keys(GEN).length, 'overview counts exactly the skills that have generators');
 let w = E.emptyProgress();
 w.skills[id] = { a: 10, c: 3, st: 0, lv: 1, due: T, last: T };
 eq(E.weakSkills(w)[0].id, id, 'weak skills surfaces a low accuracy');

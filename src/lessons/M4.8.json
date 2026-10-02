@@ -1,0 +1,33 @@
+{
+ "module": "M4.8",
+ "skills": {
+  "parabola-vertex": {
+   "why": "The vertex is the turning point, and almost every quadratic question is really asking for it: maximum profit, minimum cost, greatest height. From vertex form you read it off; from standard form it is at ~x = -\\f{b}{2a}~, then substitute for ~y~.",
+   "traps": [
+    "The sign inside the bracket flips: ~(x + 3)^{2}~ has its vertex at ~x = -3~.",
+    "~-\\f{b}{2a}~ gives the ~x~ of the vertex only. You still have to substitute to get ~y~."
+   ]
+  },
+  "parabola-graph": {
+   "why": "Four features give a complete sketch: which way it opens (the sign of ~a~), where it crosses the ~x~-axis (the roots), where it crosses the ~y~-axis (the constant), and the vertex (halfway between the roots). With those you never need a table of values.",
+   "traps": [
+    "The ~y~-intercept of a polynomial in standard form is just the constant term — no work needed.",
+    "The vertex always sits exactly halfway between the two roots, which gives you a free fifth point."
+   ]
+  },
+  "parabola-transformations": {
+   "why": "Every quadratic is ~y = x^{2}~ moved and stretched. Learning the four parameters in ~y = a(x-h)^{2} + k~ once means you can sketch any quadratic, and the same rules then transfer unchanged to every other function family you will meet.",
+   "traps": [
+    "Horizontal shifts go against the sign you see: ~(x - 4)^{2}~ moves *right* 4. The bracket is asking which input makes it zero.",
+    "~|a| > 1~ narrows the graph; ~|a| < 1~ widens it. The sign of ~a~ only flips it."
+   ]
+  },
+  "max-min-quadratic": {
+   "why": "Optimisation without calculus: if a quantity is quadratic, its best value is at the vertex. Revenue problems are quadratic because price multiplies quantity while quantity falls with price, and fencing problems are quadratic because area multiplies two dimensions that share a fixed perimeter.",
+   "traps": [
+    "Check whether the parabola opens up or down. A downward one has a maximum; an upward one has a minimum, and asking for the wrong one is a real error.",
+    "For a fixed perimeter the maximum-area rectangle is always a square — a useful sanity check on your algebra."
+   ]
+  }
+ }
+}

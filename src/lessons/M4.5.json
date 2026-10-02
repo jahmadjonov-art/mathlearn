@@ -1,0 +1,37 @@
+{
+ "module": "M4.5",
+ "skills": {
+  "poly-vocabulary": {
+   "why": "Degree and leading coefficient are the two numbers that control a polynomial's large-scale behaviour: the degree says how many turns and roots are possible, and the leading coefficient says which way the ends go. Naming the parts precisely is what lets you predict a graph before plotting anything.",
+   "traps": [
+    "Standard form means highest power first. Degree and leading coefficient are read from that order, so put it in order first."
+   ]
+  },
+  "poly-add-sub": {
+   "why": "Adding polynomials is just collecting like terms, because only matching powers can combine. Subtraction is the same with one extra step that causes most of the errors: the minus sign applies to every term in the bracket.",
+   "traps": [
+    "~(3x^{2} + 2x - 1) - (x^{2} - 4x + 5)~ becomes ~3x^{2} + 2x - 1 - x^{2} + 4x - 5~. All three signs flip, not just the first."
+   ]
+  },
+  "poly-multiply": {
+   "why": "Multiplying polynomials is the distributive law applied repeatedly: every term in one bracket meets every term in the other. The grid or area picture is worth keeping in mind, because it makes it obvious when a product has been missed.",
+   "traps": [
+    "Count your products: two binomials give four, a binomial times a trinomial gives six. If you have fewer, you dropped one.",
+    "Add exponents when multiplying powers; never multiply them."
+   ]
+  },
+  "special-products": {
+   "why": "Three patterns appear so often they are worth recognising instantly: ~(a+b)^{2}~, ~(a-b)^{2}~ and ~(a+b)(a-b)~. Knowing them forwards speeds up expanding; knowing them backwards is what makes factoring fast.",
+   "traps": [
+    "~(x + 5)^{2}~ is **not** ~x^{2} + 25~. The middle term ~10x~ is real and forgetting it is the single most common algebra error there is.",
+    "Only the difference of squares collapses. ~x^{2} + 25~ does not factor over the integers."
+   ]
+  },
+  "poly-divide": {
+   "why": "Polynomial division answers 'is this a factor?' and 'what is left over?'. A remainder of zero means the divisor divides exactly, which connects division to factoring and, later, to finding roots.",
+   "traps": [
+    "Keep place-holders for missing powers when dividing: write ~x^{3} + 0x^{2} - 4x + 1~ so the columns line up."
+   ]
+  }
+ }
+}

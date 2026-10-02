@@ -12,11 +12,11 @@ devices)
 | | |
 |---|---|
 | Curriculum map | 13 levels, 111 modules, **589 skills** — the whole route, written out |
-| Practice built | **131 skills** (levels 0–3: counting → pre-algebra), unlimited generated questions |
-| Lesson prose | 131 written lessons, about 7,800 words |
-| Checks | 47,000+ generated questions validated per run, plus a real Chromium run |
+| Practice built | **187 skills** (levels 0–4: counting → algebra I), unlimited generated questions |
+| Lesson prose | 187 written lessons, about 12,200 words |
+| Checks | 67,000+ generated questions validated per run, plus a real Chromium run |
 
-Levels 4–12 are mapped in full and listed in the app as being written. Progress
+Levels 5–12 are mapped in full and listed in the app as being written. Progress
 is stored per skill id, so adding a level never disturbs existing progress.
 
 ## The route

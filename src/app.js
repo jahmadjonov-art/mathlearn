@@ -377,19 +377,43 @@
         'supply and no way to memorise an answer key. Every question can show its full working, ' +
         'step by step — including the specific mistake most people make on it.</p></div>') +
       card('', '<h2>Where this is going</h2><div class="prose">' +
-        '<p>Levels 0 to 3 — counting through pre-algebra — are fully built: ' +
-        E.overview(S.progress).builtSkills + ' skills with unlimited practice. The remaining levels ' +
+        '<p>' + builtSoFar() + ' The remaining levels ' +
         'are mapped out in full and are being written in order, so the course grows ahead of you. ' +
         'Your progress is kept against the skill, so nothing is lost when new material lands.</p>' +
-        '<p>After pre-algebra comes algebra, geometry, the SAT and ACT layer, pre-calculus, calculus, ' +
-        'discrete mathematics and the mathematics of computing, linear algebra, probability and ' +
-        'statistics, and finally applied tracks: money and accounting, trading and quantitative ' +
-        'mathematics, machine learning, optimisation.</p></div>') +
+        '<p>Still to come: ' + stillToCome() + '.</p></div>') +
       card('flat', '<div class="eyebrow">Answering</div><div class="prose small">' +
         '<p>Type numbers plainly: <code>12</code>, <code>-3.5</code>, <code>3/4</code>, ' +
         '<code>1 1/2</code> for one and a half. Fractions are accepted in any equivalent form unless ' +
         'the question asks for lowest terms. For algebra, write <code>2x+3</code> or <code>2*x+3</code> — ' +
         'any correct arrangement is accepted, because the answer is checked by value, not by spelling.</p></div>');
+  }
+
+
+  /* The About page states how much is built. Deriving it from the generators means
+     it cannot drift out of date as levels are added. */
+  function levelsFullyBuilt() {
+    var done = [];
+    for (var i = 0; i < CUR.levels.length; i++) {
+      var st = E.levelStats(S.progress, CUR.levels[i].id);
+      if (st.ready === st.total) done.push(CUR.levels[i]);
+      else break;
+    }
+    return done;
+  }
+  function builtSoFar() {
+    var done = levelsFullyBuilt();
+    var ov = E.overview(S.progress);
+    if (!done.length) return 'The course map is complete and the practice is being written.';
+    var span = done.length === 1 ? done[0].id : done[0].id + ' to ' + done[done.length - 1].id;
+    return 'Levels ' + span.replace(/L/g, '') + ' — ' + esc(done[0].title.toLowerCase()) + ' through ' +
+      esc(done[done.length - 1].title.toLowerCase()) + ' — are fully built: ' + ov.builtSkills +
+      ' skills with unlimited practice and a written lesson each.';
+  }
+  function stillToCome() {
+    var done = levelsFullyBuilt().length;
+    var rest = CUR.levels.slice(done).map(function (l) { return esc(l.title.toLowerCase()); });
+    if (!rest.length) return 'nothing — every level is built';
+    return rest.slice(0, -1).join(', ') + (rest.length > 1 ? ' and ' : '') + rest[rest.length - 1];
   }
 
   /* ---------------- PRACTICE ---------------- */

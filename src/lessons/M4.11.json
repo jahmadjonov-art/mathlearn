@@ -1,0 +1,34 @@
+{
+ "module": "M4.11",
+ "skills": {
+  "distance-rate-time": {
+   "why": "Everything here comes from ~d = rt~, and the skill is deciding which quantity is shared between the two travellers. Moving apart, the speeds add. Chasing, the speeds subtract. Meeting at the same place, the distances are equal or sum to the gap.",
+   "traps": [
+    "For a round trip, the average speed is **not** the average of the two speeds. It is total distance over total time, and it is always lower than the plain average.",
+    "Keep units consistent: minutes and hours in the same equation is the usual error."
+   ]
+  },
+  "work-rate": {
+   "why": "Work problems become easy the moment you switch from times to rates. If a job takes 6 hours, the rate is ~\\f{1}{6}~ of the job per hour, and rates simply add. Times do not add — which is obvious once stated, because two people cannot take longer together than one alone.",
+   "traps": [
+    "Add the rates, then invert to get the time. Adding the times is the classic wrong answer.",
+    "The combined time is always shorter than the faster worker alone — a free sanity check."
+   ]
+  },
+  "mixture-problems": {
+   "why": "Track the pure substance, not the percentage. Litres of alcohol, kilograms of coffee, dollars of value — the amount of the thing is what adds. Then divide by the total at the end to get the new concentration.",
+   "traps": [
+    "Averaging two percentages only works when the quantities are equal. Otherwise the larger batch pulls the result toward itself.",
+    "This is a weighted average, and the answer always lands between the two inputs — if yours does not, something is wrong."
+   ]
+  },
+  "age-consecutive": {
+   "why": "These problems are pure translation practice, which is why they survive in textbooks. The two patterns worth internalising: everyone ages by the same number of years at once, and consecutive integers step by 1 while consecutive odds or evens step by 2.",
+   "traps": [
+    "Add the years to *every* person, not just one.",
+    "Using a step of 1 for consecutive odd numbers is the standard mistake — it must be 2.",
+    "Check your answer against both conditions, not just the one you used to solve."
+   ]
+  }
+ }
+}
