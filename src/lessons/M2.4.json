@@ -1,0 +1,47 @@
+{
+ "module": "M2.4",
+ "skills": {
+  "percent-meaning": {
+   "why": "Percent means per hundred — it is a fraction with the denominator fixed, which is exactly what makes percentages comparable. Being able to convert freely between 25%, 0.25 and ~\\f{1}{4}~ makes most percentage questions mental arithmetic.",
+   "traps": [
+    "Percent and percentage point are different. Going from 4% to 6% is a rise of 2 percentage points but a 50% increase."
+   ]
+  },
+  "percent-of": {
+   "why": "Build any percentage from 10% (divide by ten) and 1% (divide by a hundred). 35% is 10% three times plus half of 10%. This beats reaching for a calculator and it keeps you numerate under pressure.",
+   "traps": [
+    "'Of' means multiply. 20% of 50 is 0.2 × 50 = 10."
+   ]
+  },
+  "percent-missing": {
+   "why": "There are only three percentage questions: find the part, find the whole, or find the rate. One relationship covers all three — part = rate × whole — and you rearrange it for whichever is missing.",
+   "traps": [
+    "Finding the whole means *dividing* by the rate. 15 is 20% of 75, not of 3."
+   ]
+  },
+  "percent-change": {
+   "why": "Percent change is always measured against the original value. Change divided by original. Getting the denominator wrong is the single most common error in business arithmetic, and it is the one that flatters bad results.",
+   "traps": [
+    "A rise from 40 to 50 is a 25% increase; a fall from 50 to 40 is a 20% decrease. Same gap, different base, different percentage."
+   ]
+  },
+  "percent-reverse": {
+   "why": "After a 20% discount the price is 80% of the original, so recovering the original means dividing by 0.8 — not adding 20% back. Working out the multiplier first turns every reverse-percentage question into one division.",
+   "traps": [
+    "Adding 20% to a discounted price does not get you back. 100 → 80 → 96."
+   ]
+  },
+  "percent-traps": {
+   "why": "Percentages multiply; they do not add. Up 10% then down 10% leaves you at 99%, not 100%, because the fall is calculated on a larger number. This is why 'average annual return' can be positive while an investment loses money.",
+   "traps": [
+    "Successive discounts of 20% and 30% are not 50% off. They are 0.8 × 0.7 = 0.56, so 44% off."
+   ]
+  },
+  "discount-tax-tip": {
+   "why": "Real prices chain several percentage adjustments. Order matters when the adjustments are of different kinds: tax is charged on what you actually pay, so discounts come first. Doing each step as a multiplier makes chains quick and reliable.",
+   "traps": [
+    "A 40% markup on cost is not a 40% profit margin on the selling price. Always check which base a percentage refers to."
+   ]
+  }
+ }
+}

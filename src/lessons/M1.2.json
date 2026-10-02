@@ -1,0 +1,33 @@
+{
+ "module": "M1.2",
+ "skills": {
+  "mult-by-ten": {
+   "why": "Multiplying by ten shifts every digit one place left, because each place is worth ten times the one to its right. The appended zero is a consequence, not a rule — which is why the trick breaks if you try to memorise it for decimals.",
+   "traps": [
+    "With decimals, 'add a zero' fails: 2.5 × 10 is 25, not 2.50. Move the point instead."
+   ]
+  },
+  "mult-area-model": {
+   "why": "Splitting 23 × 47 into four rectangles (20×40, 20×7, 3×40, 3×7) shows you exactly what the column method is doing under the hood. It is also the distributive law, which is the single most used rule in algebra.",
+   "traps": [
+    "All four pieces must be added. Forgetting the small corner piece is the usual slip."
+   ],
+   "code": {
+    "body": "# 23 x 47 by parts\n(20*40) + (20*7) + (3*40) + (3*7)   # 800 + 140 + 120 + 21 = 1081",
+    "note": "In algebra this same split is written ~(a+b)(c+d) = ac + ad + bc + bd~."
+   }
+  },
+  "mult-standard": {
+   "why": "The column algorithm is the area model written compactly: each row is one partial product, shifted left to account for its place value. Knowing that is what lets you debug it when a line comes out wrong.",
+   "traps": [
+    "The shift is not optional. When multiplying by the tens digit, the partial product must start one column left."
+   ]
+  },
+  "mult-mental-tricks": {
+   "why": "Fast mental multiplication is a handful of moves: double and halve, multiply by ten and adjust, use a near-round number. ×5 is ×10 then halve; ×9 is ×10 minus one copy. These are worth knowing because they make estimation instant.",
+   "traps": [
+    "When you round a factor up, you must subtract the excess, and the excess is a multiple of the *other* factor."
+   ]
+  }
+ }
+}

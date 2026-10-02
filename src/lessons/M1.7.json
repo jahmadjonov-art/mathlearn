@@ -1,0 +1,33 @@
+{
+ "module": "M1.7",
+ "skills": {
+  "exponent-meaning": {
+   "why": "An exponent counts how many copies of the base are multiplied. ~2^{5}~ is five 2s multiplied, which is 32 — not 2 × 5. Exponents grow terrifyingly fast, and that is exactly why compound interest and algorithmic complexity both live here.",
+   "traps": [
+    "~x^{2}~ and ~2x~ are completely different. At ~x = 10~ one is 100 and the other is 20."
+   ],
+   "code": {
+    "body": "2 ** 5    # 32  — exponent\n2 * 5     # 10  — product",
+    "note": "Most languages write powers as ~**~ or ~^~; be careful, because in some languages ~^~ means bitwise XOR instead."
+   }
+  },
+  "perfect-squares-cubes": {
+   "why": "Knowing the squares to 25 by sight makes factoring, the Pythagorean theorem and simplifying radicals fast rather than laborious. Recognising 144 as 12² is the difference between seeing structure and grinding.",
+   "traps": [
+    "Squares end in only 0, 1, 4, 5, 6 or 9. A number ending in 2, 3, 7 or 8 is never a perfect square — a free check."
+   ]
+  },
+  "square-roots-exact": {
+   "why": "A square root undoes a square. Most roots are irrational, so the useful skill is bracketing: ~sqrt{50}~ sits between 7 and 8 because 49 and 64 sit either side of 50.",
+   "traps": [
+    "The radical sign means the positive root only. ~sqrt{9} = 3~, even though ~x^{2} = 9~ has two solutions."
+   ]
+  },
+  "powers-of-ten": {
+   "why": "Powers of ten are the scaffolding of our number system, and negative powers extend it past the decimal point. Fluency here is what makes scientific notation and unit conversion trivial later.",
+   "traps": [
+    "~10^{-3}~ is 0.001, not -1000. A negative exponent means a reciprocal, never a negative number."
+   ]
+  }
+ }
+}

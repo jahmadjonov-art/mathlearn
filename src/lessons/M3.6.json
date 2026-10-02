@@ -1,0 +1,29 @@
+{
+ "module": "M3.6",
+ "skills": {
+  "plot-points": {
+   "why": "Coordinates turn algebra into pictures, which is how the rest of mathematics becomes visible. The order is fixed — across, then up — and the signs of the pair determine the quadrant.",
+   "traps": [
+    "~(3, 5)~ and ~(5, 3)~ are different points. The convention is always horizontal first."
+   ]
+  },
+  "distance-midpoint": {
+   "why": "The distance formula is the Pythagorean theorem in coordinates: the horizontal and vertical gaps are the legs of a right triangle. The midpoint is just the average of each coordinate separately.",
+   "traps": [
+    "Subtract coordinates of the same kind: x with x, y with y. Mixing them is the usual slip."
+   ]
+  },
+  "tables-to-graphs": {
+   "why": "A table, a graph, an equation and a description are four views of one relationship. Being able to move between them is most of what algebra is for. A constant difference in the outputs means a straight line; a constant ratio means exponential.",
+   "traps": [
+    "The ~y~ value when ~x = 0~ is the starting amount, not the rate. Confusing the two swaps slope and intercept."
+   ]
+  },
+  "read-graphs": {
+   "why": "On any graph of a quantity against time, the steepness is the rate. Reading that off — and reading where a line crosses an axis — is the skill behind interpreting every chart you will meet in business or science.",
+   "traps": [
+    "Check the axis labels and scales before drawing conclusions. A truncated vertical axis makes a small change look dramatic, which is the most common way charts mislead."
+   ]
+  }
+ }
+}

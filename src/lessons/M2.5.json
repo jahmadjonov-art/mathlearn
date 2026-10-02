@@ -1,0 +1,41 @@
+{
+ "module": "M2.5",
+ "skills": {
+  "ratio-meaning": {
+   "why": "A ratio compares parts to each other; a fraction compares a part to the whole. In a 2:3 ratio of cats to dogs, cats are ~\\f{2}{5}~ of the animals, not ~\\f{2}{3}~. Keeping those two straight removes most ratio mistakes.",
+   "traps": [
+    "Scaling a ratio means multiplying both parts by the same number — never adding to both."
+   ]
+  },
+  "ratio-share": {
+   "why": "Sharing in a ratio is a three-step move: add the parts, divide the total by the number of parts, multiply out each share. Checking that the shares add back to the total catches any slip.",
+   "traps": [
+    "Divide by the *total* parts, not by the number of people. A 3:1 split between two people is four parts, not two."
+   ]
+  },
+  "unit-rate": {
+   "why": "A unit rate reduces any comparison to a common footing — price per gram, cost per mile, miles per hour. 'Per' is a division sign written in words. This is the single most useful consumer-numeracy skill there is.",
+   "traps": [
+    "Compare per-unit values, never totals. The bigger pack is not automatically cheaper per unit."
+   ]
+  },
+  "proportion-solve": {
+   "why": "A proportion says two ratios are equal, and cross-multiplying converts it into an ordinary equation. Before doing that, look for the scale factor between the two fractions — often you can do the whole thing in your head.",
+   "traps": [
+    "Keep the units in the same position in both fractions. Miles over hours must equal miles over hours, not hours over miles."
+   ]
+  },
+  "direct-inverse": {
+   "why": "Direct variation keeps the ratio fixed (~\\f{y}{x} = k~): double one, double the other. Inverse variation keeps the product fixed (~xy = k~): double one, halve the other. Which one applies is a fact about the situation, so ask what happens when the first quantity doubles.",
+   "traps": [
+    "More workers means less time, not more. Rates of work are inverse, and treating them as direct gives nonsense."
+   ]
+  },
+  "scale-drawings": {
+   "why": "A scale factor on lengths becomes its square on areas and its cube on volumes. Double the dimensions of a box and it holds eight times as much. This catches almost everybody once, and it matters for everything from map reading to pricing materials.",
+   "traps": [
+    "A 1:100 map scale means 1 cm is 100 cm in reality, but 1 cm² is 10,000 cm² — not 100."
+   ]
+  }
+ }
+}

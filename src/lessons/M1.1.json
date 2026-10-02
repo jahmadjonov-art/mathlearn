@@ -1,0 +1,23 @@
+{
+ "module": "M1.1",
+ "skills": {
+  "add-multidigit": {
+   "why": "Column addition works because place value lets you add each column independently, and a carry is just ten of one unit traded for one of the next. Nothing about it is arbitrary once you see that.",
+   "traps": [
+    "Line up by place value, not by the left edge. Adding 1,205 and 97 by lining up the first digits is the classic disaster."
+   ]
+  },
+  "sub-multidigit": {
+   "why": "Borrowing is the carry run backwards: you break one of the larger unit into ten of the smaller. Across a zero you have to break further left, which turns the zeros into nines.",
+   "traps": [
+    "Subtracting across several zeros (1,000 - 437) is where most errors live. Either borrow carefully, or count up from 437 to 1,000 instead."
+   ]
+  },
+  "add-sub-checks": {
+   "why": "A professional habit worth more than speed: never report an arithmetic answer you have not checked by an independent route. Addition checks subtraction and vice versa, and digit sums catch most slips in seconds.",
+   "traps": [
+    "Re-doing the same calculation the same way is not a check — you will repeat the same mistake."
+   ]
+  }
+ }
+}

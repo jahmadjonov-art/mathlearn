@@ -1,0 +1,27 @@
+{
+ "module": "M2.7",
+ "skills": {
+  "simple-interest": {
+   "why": "Simple interest pays only on the original amount: ~I = Prt~. It is rare in practice but it is the base case that makes compound interest understandable by contrast, and the formula rearranges to answer any of the four questions.",
+   "traps": [
+    "The rate and the time must use the same period. A 6% annual rate over 18 months is t = 1.5, not 18."
+   ]
+  },
+  "compound-interest-intro": {
+   "why": "Compound interest pays on interest already earned, so growth is multiplicative: ~A = P(1+\\f{r}{n})^{nt}~. This single formula explains savings, loans, inflation and why debt gets away from people. It is also where exponential functions first earn their keep.",
+   "traps": [
+    "Divide the annual rate by the number of periods and multiply the years by the same number. Monthly at 12% means 1% twelve times a year, which is more than 12% a year."
+   ],
+   "code": {
+    "body": "P, r, n, t = 1000, 0.12, 12, 5\nA = P * (1 + r/n) ** (n*t)   # 1816.70",
+    "note": "Compare with simple interest, 1000 + 1000*0.12*5 = 1600. The gap is interest on interest."
+   }
+  },
+  "percent-finance-words": {
+   "why": "Commission, margin, markup, unit price and loan payments are all percentage arithmetic with different vocabulary. The skill is identifying which quantity is the base — the number the percentage is *of* — because the words rarely say so outright.",
+   "traps": [
+    "Markup is a percentage of cost; margin is a percentage of selling price. The same profit gives two different percentages, and quoting the flattering one is a standard sales tactic."
+   ]
+  }
+ }
+}

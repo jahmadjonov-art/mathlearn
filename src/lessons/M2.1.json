@@ -1,0 +1,35 @@
+{
+ "module": "M2.1",
+ "skills": {
+  "fraction-meaning": {
+   "why": "A fraction is three things at once: parts of a whole, a division waiting to happen, and a point on the number line. The division reading is the most powerful — ~\\f{3}{4}~ *is* 3 ÷ 4 — because it explains why fractions and decimals are the same objects in different clothes.",
+   "traps": [
+    "The parts must be equal. Three of four unequal pieces is not ~\\f{3}{4}~ of anything."
+   ]
+  },
+  "equivalent-fractions": {
+   "why": "Multiplying top and bottom by the same number is legal because it is multiplying by ~\\f{k}{k}~, which is 1. Nothing else in fraction work is as load-bearing as that: it is how you find common denominators, simplify, rationalise and scale recipes.",
+   "traps": [
+    "You may multiply or divide top and bottom, never add to them. ~\\f{1}{2}~ is not ~\\f{2}{3}~."
+   ]
+  },
+  "simplify-fractions": {
+   "why": "Lowest terms is the standard form, so answers can be compared. Dividing by the greatest common factor finishes the job in one move; dividing by anything smaller means going round again.",
+   "traps": [
+    "Cancel factors, not digits. In ~\\f{16}{64}~ you may not cross out the 6s — that it happens to give the right answer here is a coincidence."
+   ]
+  },
+  "improper-mixed": {
+   "why": "~\\f{7}{4}~ and ~1\\f{3}{4}~ are the same number written for different purposes. Mixed numbers are for reading and measuring; improper fractions are for calculating. Convert to improper before you multiply or divide anything.",
+   "traps": [
+    "~1\\f{3}{4}~ means one *plus* three quarters, not one times three quarters — unlike ~2x~, where the letters do mean multiply."
+   ]
+  },
+  "compare-fractions": {
+   "why": "Three reliable methods: common denominators, cross-multiplying, or benchmarking against ~\\f{1}{2}~ and 1. Cross-multiplying is the fastest and is really just the common-denominator method with the writing skipped.",
+   "traps": [
+    "A bigger denominator means smaller pieces. ~\\f{1}{8} < \\f{1}{3}~, which is the opposite of the whole-number instinct."
+   ]
+  }
+ }
+}

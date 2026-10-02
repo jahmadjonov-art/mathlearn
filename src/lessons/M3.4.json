@@ -1,0 +1,29 @@
+{
+ "module": "M3.4",
+ "skills": {
+  "inequality-meaning": {
+   "why": "An inequality describes a range rather than a point, so its answer is a region of the number line. Hollow circle means the endpoint is excluded; filled means included. Interval notation says the same thing with brackets.",
+   "traps": [
+    "Infinity always takes a round bracket, because it is never reached."
+   ]
+  },
+  "solve-inequalities": {
+   "why": "Inequalities solve exactly like equations, with one exception: multiplying or dividing by a negative reverses the sign. The reason is visible on the number line — multiplying by -1 reflects everything, so the order flips.",
+   "traps": [
+    "Only multiplying or dividing by a negative flips the sign. Adding or subtracting a negative does not."
+   ]
+  },
+  "compound-inequalities": {
+   "why": "'And' means the overlap of two conditions; 'or' means either. A three-part inequality like ~2 < x < 7~ is an 'and', and you operate on all three parts at once.",
+   "traps": [
+    "An 'and' with no overlap has no solution. An 'or' covering everything is all real numbers. Check whether the regions actually meet."
+   ]
+  },
+  "inequality-words": {
+   "why": "The only question is whether the boundary value itself is allowed. 'At least' and 'no more than' include it; 'more than' and 'fewer than' exclude it. Contracts, speed limits and tax brackets all turn on this distinction.",
+   "traps": [
+    "'At least 18' is ~x \\ge 18~. 'Over 18' is ~x > 18~. One of them includes an eighteen-year-old and one does not."
+   ]
+  }
+ }
+}

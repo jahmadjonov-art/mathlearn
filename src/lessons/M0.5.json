@@ -1,0 +1,29 @@
+{
+ "module": "M0.5",
+ "skills": {
+  "money-count": {
+   "why": "Money is place value you can hold, and it is where most adults actually do arithmetic. Counting up to make change is faster and safer than subtracting, which is why tills do it that way.",
+   "traps": [
+    "Keep dollars and cents in the same unit while you work. Mixing 5 (dollars) with 50 (cents) in one sum is how people lose a factor of a hundred."
+   ]
+  },
+  "time-read": {
+   "why": "Time is the one measurement system in daily use that is not base ten: 60 seconds, 60 minutes, 24 hours. That is exactly why it needs practice — every habit you have from decimals is wrong here.",
+   "traps": [
+    "2.5 hours is 2 hours 30 minutes, not 2 hours 50. The decimal is a fraction of 60, not of 100."
+   ]
+  },
+  "time-elapsed": {
+   "why": "Elapsed time is subtraction in base 60, and the safest method is to count up through the round numbers rather than borrow. From 10:40 to 13:15: 20 minutes to 11:00, two hours to 13:00, 15 more. Two hours 35.",
+   "traps": [
+    "Crossing noon or midnight is where errors happen. Switch to 24-hour time whenever a calculation crosses a day boundary."
+   ]
+  },
+  "measure-units": {
+   "why": "A number without a unit is not an answer. Choosing a sensible unit is also a sanity check: if a room is 4,000 of something, you have probably picked the wrong something.",
+   "traps": [
+    "Area and volume units carry the power with them: a square metre is 10,000 square centimetres, not 100."
+   ]
+  }
+ }
+}

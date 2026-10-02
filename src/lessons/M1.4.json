@@ -1,0 +1,27 @@
+{
+ "module": "M1.4",
+ "skills": {
+  "order-ops-basic": {
+   "why": "The order of operations is a shared convention so that one written expression means one thing to everybody. It is not a mathematical truth — it is a grammar. Brackets, then powers, then × and ÷, then + and -.",
+   "traps": [
+    "× and ÷ rank equally and run left to right, and so do + and -. ~8 \\div 4 \\times 2~ is 4, not 1."
+   ]
+  },
+  "order-ops-nested": {
+   "why": "A fraction bar is a grouping symbol: everything above it is one quantity and everything below is another. That is why ~\\f{3+5}{2}~ is 4 and not 3 + 2.5.",
+   "traps": [
+    "When you type a fraction on one line, you must add the brackets the bar was doing for you: ~(3+5)/2~, never ~3+5/2~."
+   ],
+   "code": {
+    "body": "(3 + 5) / 2   # 4.0  correct\n3 + 5 / 2     # 5.5  the bar's grouping was lost",
+    "note": "Translating a formula into code is where missing brackets become silent wrong answers."
+   }
+  },
+  "order-ops-traps": {
+   "why": "Almost every order-of-operations error is one of three things: treating equal-rank operations as right-to-left, mishandling a minus sign, or forgetting that ~-x^{2}~ squares only the ~x~.",
+   "traps": [
+    "~-3^{2} = -9~ but ~(-3)^{2} = 9~. The brackets are the entire difference, and this one appears on every standardised test."
+   ]
+  }
+ }
+}

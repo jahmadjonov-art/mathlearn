@@ -1,0 +1,43 @@
+{
+ "module": "M0.1",
+ "skills": {
+  "count-sequence": {
+   "why": "Counting in steps is the first time a pattern replaces effort. Counting to 60 in tens takes six moves instead of sixty, and that trade — find the structure, do less work — is what the whole of mathematics is.",
+   "traps": [
+    "Counting backwards past zero trips people up. After 2, 1, 0 comes -1, not 1 again."
+   ],
+   "code": {
+    "body": "for n in range(0, 60, 10):\n    print(n)        # 0 10 20 30 40 50",
+    "note": "A step count is exactly what a programming loop does: start, stop, step."
+   }
+  },
+  "number-line-place": {
+   "why": "A number line turns numbers into positions, and that single picture carries you all the way to graphs, negative numbers, decimals and calculus. Reading an unlabelled tick forces you to work out the scale first — which is the same skill you need to read any chart.",
+   "traps": [
+    "Count the gaps, not the marks. Six tick marks have five gaps between them."
+   ]
+  },
+  "compare-whole": {
+   "why": "Comparing numbers is a place-value test, not a feeling. More digits means larger; with the same number of digits, the first place where the digits differ decides it, and nothing after that matters.",
+   "traps": [
+    "A longer string of digits is not always a larger number once decimals appear: 0.9 beats 0.1234."
+   ]
+  },
+  "order-whole": {
+   "why": "Ordering is comparing repeatedly. Doing it reliably means having a rule rather than an impression, which is also why computers sort by comparing pairs.",
+   "traps": [
+    "Read whether the question wants smallest first or largest first. Half of all lost marks here are for answering the right question backwards."
+   ]
+  },
+  "ordinal-position": {
+   "why": "There are two different questions hiding in a queue: *how many* and *which one*. Cardinal numbers count a set; ordinal numbers name a position. Confusing them is the origin of the off-by-one error that haunts programming.",
+   "traps": [
+    "If you are 4th from the front of 10, you are 7th from the back, not 6th: you count yourself from both ends, so the two positions add to 11, not 10."
+   ],
+   "code": {
+    "body": "names = ['a','b','c','d']\nnames[0]   # 'a' — the FIRST item is at index 0\nlen(names) # 4 — how many",
+    "note": "Most languages number positions from 0, so the 3rd item is at index 2. This is the same cardinal/ordinal distinction in disguise."
+   }
+  }
+ }
+}

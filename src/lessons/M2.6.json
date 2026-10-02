@@ -1,0 +1,33 @@
+{
+ "module": "M2.6",
+ "skills": {
+  "metric-convert": {
+   "why": "The metric system is built on powers of ten, so every conversion is a decimal-point move. The prefixes are worth learning once — milli, centi, kilo — and they then work identically for length, mass and volume.",
+   "traps": [
+    "Ask whether the answer should be a bigger or smaller number before you multiply. Going to a smaller unit always gives more of them."
+   ]
+  },
+  "imperial-convert": {
+   "why": "Customary units have no common base — 12 inches, 3 feet, 16 ounces, 5,280 feet — so each conversion factor has to be known. This is exactly why the metric system exists, and why unit errors have destroyed actual spacecraft.",
+   "traps": [
+    "Converting through two steps means two factors. Yards to inches is × 3 then × 12, which is × 36."
+   ]
+  },
+  "dimensional-analysis": {
+   "why": "Write the units into the calculation and multiply by fractions that equal 1, chosen so the unwanted units cancel. The units then tell you whether to multiply or divide, which means you never have to guess. This single technique carries through chemistry, physics and finance.",
+   "traps": [
+    "If the units do not cancel to what you want, the arithmetic is wrong — no matter how right the numbers look."
+   ],
+   "code": {
+    "body": "# 90 km/h in m/s\n90 * (1000/1)  * (1/3600)   # km->m, h->s  =>  25.0",
+    "note": "Each bracket is a multiplication by 1 in different units. Nothing about the quantity changes, only how it is expressed."
+   }
+  },
+  "area-volume-units": {
+   "why": "Squared and cubed units carry the power into the conversion factor. One metre is 100 cm, so one square metre is 100² = 10,000 cm², and one cubic metre is a million cm³.",
+   "traps": [
+    "Using 100 instead of 10,000 for m² to cm² is the standard error and it is out by a factor of a hundred."
+   ]
+  }
+ }
+}

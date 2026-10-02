@@ -1,0 +1,45 @@
+{
+ "module": "M1.5",
+ "skills": {
+  "factors-multiples": {
+   "why": "Factors divide into a number; multiples are built from it. A number has finitely many factors and endlessly many multiples. Keeping the two words straight is most of the battle.",
+   "traps": [
+    "To list factors you only need to test up to the square root — past that the pairs repeat."
+   ]
+  },
+  "divisibility-rules": {
+   "why": "Divisibility rules let you factor by inspection instead of by trial division, and they all come from place value. The rule for 3 works because 10 leaves remainder 1 when divided by 3, so only the digit sum matters.",
+   "traps": [
+    "Divisible by 2 and by 3 means divisible by 6 — but divisible by 2 and by 4 does not mean divisible by 8. The shortcut only works when the factors share nothing."
+   ]
+  },
+  "primes-composites": {
+   "why": "Primes are the atoms of multiplication: every whole number is a product of them, in exactly one way. That uniqueness is what makes GCF, LCM, fraction simplification and modern cryptography work.",
+   "traps": [
+    "1 is not prime. It has only one factor, and admitting it would destroy the uniqueness of prime factorisation."
+   ]
+  },
+  "prime-factorisation": {
+   "why": "Factorising into primes is like getting a number's fingerprint. Once you have it, the greatest common factor, the least common multiple, whether a fraction will terminate, and whether a root simplifies all become readable at a glance.",
+   "traps": [
+    "Keep dividing until every factor is prime. Stopping at 4 × 9 is not a prime factorisation."
+   ]
+  },
+  "gcf": {
+   "why": "The greatest common factor is what two numbers share. It is the thing you cancel to put a fraction in lowest terms and the thing you factor out of an algebraic expression — the same operation in two costumes.",
+   "traps": [
+    "Use the GCF, not just any common factor, or you will have to simplify twice."
+   ],
+   "code": {
+    "body": "from math import gcd\ngcd(84, 36)   # 12",
+    "note": "The Euclidean algorithm behind this is 2,300 years old and still the fastest known method."
+   }
+  },
+  "lcm": {
+   "why": "The least common multiple is the first moment two cycles line up — two buses leaving together, two gears meeting, two fractions sharing a denominator. GCF is about splitting things up; LCM is about things coinciding.",
+   "traps": [
+    "Word problems about events repeating together want the LCM. Problems about splitting into equal groups want the GCF. Ask which one the situation is."
+   ]
+  }
+ }
+}

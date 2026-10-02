@@ -1,0 +1,36 @@
+{
+ "module": "M0.2",
+ "skills": {
+  "place-value-name": {
+   "why": "Ten symbols describe every number ever written, because a digit's *position* carries a power of ten. The 5 in 500 is not a bigger 5; it is five hundreds. Once you see position as a multiplier, every written method in arithmetic stops being arbitrary.",
+   "traps": [
+    "A zero is not nothing — it holds a place. 502 and 52 differ only by that placeholder."
+   ]
+  },
+  "expanded-form": {
+   "why": "Expanded form writes out what place value means: 437 is 400 + 30 + 7. Every column method you will ever use, and every mental trick, is just this split applied cleverly.",
+   "traps": [
+    "Give each digit its full value: in 437 the 3 is worth 30, not 3."
+   ]
+  },
+  "read-write-large": {
+   "why": "Commas group digits in threes because our number names work in thousands: thousand, million, billion. Reading the groups rather than the digits is what makes 4,308,000 sayable at a glance.",
+   "traps": [
+    "The groups are counted from the right, never the left."
+   ]
+  },
+  "round-whole": {
+   "why": "Rounding is deliberately throwing away precision you do not need, to get a number you can hold in your head. It is the most-used mathematical skill in adult life and the basis of every sanity check.",
+   "traps": [
+    "Only the digit immediately to the right decides. Rounding 2,449 to the nearest hundred gives 2,400 — the 9 at the end never gets a vote.",
+    "Rounding twice is wrong: 2.49 to one decimal is 2.5, but to a whole number it is 2, not 3."
+   ]
+  },
+  "estimate-sums": {
+   "why": "An estimate cannot tell you the answer, but it reliably tells you which answers are impossible. Getting into the habit of predicting the size before calculating catches the misplaced decimal point and the dropped zero — the two errors that cost real money.",
+   "traps": [
+    "Rounding both numbers up makes the estimate too high every time. If you need a bound rather than a guess, decide which way you are rounding on purpose."
+   ]
+  }
+ }
+}

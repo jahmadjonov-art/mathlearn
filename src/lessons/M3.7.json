@@ -1,0 +1,45 @@
+{
+ "module": "M3.7",
+ "skills": {
+  "exponent-rules": {
+   "why": "The exponent laws are not rules to memorise; they are consequences of what an exponent means. ~x^{3} \\cdot x^{4}~ is three copies times four copies, so seven copies. Derive them once from counting copies and you will never mix them up.",
+   "traps": [
+    "Add exponents when multiplying, subtract when dividing, multiply for a power of a power. The one thing you never do is multiply when multiplying."
+   ],
+   "code": {
+    "body": "x**3 * x**4 == x**7      # add\nx**7 / x**4 == x**3      # subtract\n(x**3)**4   == x**12     # multiply",
+    "note": null
+   }
+  },
+  "zero-negative-exponents": {
+   "why": "~x^{0} = 1~ and ~x^{-n} = \\f{1}{x^{n}}~ are forced by the division rule, not invented. ~\\f{x^{3}}{x^{3}}~ is both ~x^{0}~ and 1, so they must be equal. Continuing the pattern downward past zero produces reciprocals.",
+   "traps": [
+    "A negative exponent never makes a negative answer. ~2^{-3} = \\f{1}{8}~, not -8."
+   ]
+  },
+  "scientific-notation": {
+   "why": "Scientific notation separates a number's digits from its size, which is how science and engineering handle quantities spanning forty orders of magnitude. Exactly one non-zero digit sits before the point.",
+   "traps": [
+    "~0.4 \\times 10^{5}~ is not in scientific notation — the number part must be at least 1 and under 10."
+   ]
+  },
+  "sci-notation-arithmetic": {
+   "why": "Handle the number parts and the powers separately: multiply the fronts and add the exponents, or divide the fronts and subtract. Then renormalise if the front has drifted outside 1 to 10.",
+   "traps": [
+    "Adding and subtracting needs the *same* exponent first. ~3\\times10^{5} + 4\\times10^{3}~ is not ~7\\times10^{8}~."
+   ]
+  },
+  "radicals-simplify": {
+   "why": "Simplifying a root means pulling out the largest perfect square. ~sqrt{72} = sqrt{36 \\cdot 2} = 6sqrt{2}~. Exact form matters because it stays exact — rounding early compounds error through a long calculation.",
+   "traps": [
+    "~sqrt{a+b}~ is not ~sqrt{a} + sqrt{b}~. Test it: ~sqrt{9+16} = 5~ but ~3 + 4 = 7~."
+   ]
+  },
+  "rational-irrational": {
+   "why": "Rational means expressible as a ratio of whole numbers; everything else is irrational. Terminating and repeating decimals are rational; ~sqrt{2}~ and ~\\pi~ are not. The distinction is what tells you when an answer can be exact.",
+   "traps": [
+    "A rational plus an irrational is always irrational, but an irrational times an irrational can be rational: ~sqrt{2} \\times sqrt{2} = 2~."
+   ]
+  }
+ }
+}

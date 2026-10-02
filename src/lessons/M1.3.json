@@ -1,0 +1,27 @@
+{
+ "module": "M1.3",
+ "skills": {
+  "div-short": {
+   "why": "Short division carries the remainder from each digit into the next, which is just place value again: a leftover ten becomes ten ones for the next column.",
+   "traps": [
+    "Write the carried remainder down. Holding it in your head across four digits is where it gets lost."
+   ]
+  },
+  "div-long": {
+   "why": "Long division is estimate, multiply, subtract, bring down — repeated. The estimating is the hard part, and it is the same skill as approximating, which is why rounding practice pays off here.",
+   "traps": [
+    "If a subtraction leaves a number larger than the divisor, your estimate was too small. Fix it before moving on."
+   ]
+  },
+  "div-remainder-meaning": {
+   "why": "The arithmetic is the easy half. The real question is what the remainder means: ignore it (complete bunches), round up (buses needed), report it (sweets left over), or convert it to a fraction. The same division gives four different answers depending on the question.",
+   "traps": [
+    "'How many buses?' always rounds up. 101 people in 50-seat buses needs 3 buses, not 2.02."
+   ],
+   "code": {
+    "body": "17 // 5   # 3  — the quotient, rounded down\n17 %  5   # 2  — the remainder\n-(-17 // 5)  # 4 — rounding up",
+    "note": "Most languages give you both halves separately: ~//~ for the quotient and ~%~ for the remainder."
+   }
+  }
+ }
+}

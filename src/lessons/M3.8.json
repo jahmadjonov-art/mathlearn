@@ -1,0 +1,29 @@
+{
+ "module": "M3.8",
+ "skills": {
+  "mean-median-mode": {
+   "why": "Three different answers to 'what is typical'. The mean uses every value and is dragged by extremes; the median is the middle and ignores how extreme the extremes are; the mode is the most common. Which one is honest depends on the shape of the data.",
+   "traps": [
+    "Sort the data before taking a median. The median of an unsorted list is meaningless."
+   ]
+  },
+  "mean-reverse": {
+   "why": "Working backwards from an average means reasoning through the total: a mean of 80 over five tests requires 400 marks. Means cannot be averaged with each other unless they cover the same number of items.",
+   "traps": [
+    "Averaging two averages is usually wrong. 50% on a 10-mark test and 90% on a 90-mark test is not 70% overall."
+   ]
+  },
+  "data-displays": {
+   "why": "Each display answers a different question: bar charts compare categories, line graphs show change over time, histograms show distribution, box plots show spread and outliers, two-way tables show the relationship between two categorical variables.",
+   "traps": [
+    "In a two-way table, read carefully whether a percentage is of the row, the column or the whole table. Those are three different numbers and the choice between them is how statistics gets spun."
+   ]
+  },
+  "outliers-spread": {
+   "why": "A single number never describes a data set; you need centre *and* spread. Outliers pull the mean and the range hard while barely moving the median — which is exactly why house prices and incomes are reported as medians.",
+   "traps": [
+    "An outlier is not automatically a mistake to delete. Deciding to exclude a data point is a judgement that has to be stated, not hidden."
+   ]
+  }
+ }
+}

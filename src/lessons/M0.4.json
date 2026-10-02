@@ -1,0 +1,49 @@
+{
+ "module": "M0.4",
+ "skills": {
+  "mult-meaning": {
+   "why": "Multiplication has three faces: equal groups, a rectangle's area, and repeated addition. The rectangle is the most useful one, because it makes the commutative law obvious (turn it sideways) and the area model, factoring and completing the square all become pictures rather than rules.",
+   "traps": [
+    "Repeated addition alone stops working once you multiply fractions. Three groups of ~\\f{1}{2}~ makes sense; ~\\f{1}{2}~ a group of ~\\f{1}{3}~ needs the area picture."
+   ]
+  },
+  "times-tables": {
+   "why": "The tables are the alphabet of arithmetic. Every method for factoring, simplifying fractions and spotting patterns assumes you can see 56 and think 7 × 8 immediately.",
+   "traps": [
+    "The genuinely hard ones are few: 6×7, 7×8, 8×9, 7×9, 6×8, 12×12. Drill those rather than the whole grid."
+   ]
+  },
+  "div-meaning": {
+   "why": "Division answers two different-sounding questions with one calculation: how much does each get (sharing), and how many groups fit (grouping). Knowing which one a word problem is asking is what tells you what the remainder means.",
+   "traps": [
+    "~12 \\div 3~ and ~3 \\div 12~ are different. Division is not commutative."
+   ]
+  },
+  "div-facts": {
+   "why": "Each multiplication fact carries two divisions with it. You are not learning a new table — you are reading the one you have backwards.",
+   "traps": [
+    "Dividing by 1 changes nothing; dividing by itself gives 1. Both are easy to second-guess under pressure."
+   ]
+  },
+  "mult-div-relation": {
+   "why": "Four facts live in every multiplication family: 6 × 7 = 42, 7 × 6 = 42, 42 ÷ 6 = 7, 42 ÷ 7 = 6. Moving between them is how you find any missing number, and it is the ancestor of solving ~6x = 42~.",
+   "traps": [
+    "To undo a multiplication you divide — by the number that was multiplied, not by the answer."
+   ],
+   "code": {
+    "body": "# these two are the same statement\n6 * 7 == 42\n42 / 6 == 7",
+    "note": "Later, solving an equation is this move applied to a letter instead of a box."
+   }
+  },
+  "zero-one-rules": {
+   "why": "Zero and one behave specially because of what the operations mean, not by decree. Anything times zero is zero because zero groups holds nothing. And ~5 \\div 0~ has no answer because no number times zero gives 5.",
+   "traps": [
+    "Division by zero is not infinity and not zero. It is *undefined* — there is no such number. This matters: it is the single most common crash in real software."
+   ],
+   "code": {
+    "body": "5 / 0     # ZeroDivisionError\n0 / 5     # 0.0 — perfectly fine",
+    "note": "Dividing *by* zero is an error. Dividing zero *by* something is just zero."
+   }
+  }
+ }
+}

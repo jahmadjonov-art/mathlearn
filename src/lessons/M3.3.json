@@ -1,0 +1,47 @@
+{
+ "module": "M3.3",
+ "skills": {
+  "one-step-equations": {
+   "why": "An equation is a balance. Whatever you do to one side you do to the other, and it stays true. Solving means undoing operations until the unknown is alone — and you undo in the reverse of the order they were applied.",
+   "traps": [
+    "Undo with the inverse operation. To clear ~+7~ you subtract 7; to clear ~\\times 7~ you divide."
+   ]
+  },
+  "two-step-equations": {
+   "why": "Work backwards through the order of operations: the thing done last is undone first. In ~3x + 5 = 20~, the 5 was added last, so it comes off first.",
+   "traps": [
+    "Dividing before clearing the constant is legal but produces fractions unnecessarily. Clear the constant first."
+   ]
+  },
+  "multi-step-equations": {
+   "why": "Simplify each side fully before you start moving things across. Multi-step equations are not harder in kind, only in bookkeeping, so one line per step is the whole technique.",
+   "traps": [
+    "When a bracket is multiplied by a number, either distribute it or divide the whole equation by it — but do not do half of each."
+   ]
+  },
+  "variables-both-sides": {
+   "why": "Collect the unknowns on one side and the numbers on the other. Moving the smaller coefficient keeps the remaining number positive, which removes a whole class of sign errors.",
+   "traps": [
+    "Subtracting a term from both sides is the same move as 'moving it across and changing the sign' — they are not two rules."
+   ]
+  },
+  "equations-fractions": {
+   "why": "Multiply every term by the least common denominator and the fractions vanish. Doing this first is almost always faster than carrying fractions through the whole solution.",
+   "traps": [
+    "*Every* term must be multiplied, including the ones with no fraction in them."
+   ]
+  },
+  "special-solutions": {
+   "why": "Sometimes the unknown cancels out. If what remains is true (~5 = 5~), every number works — the two sides were the same expression. If it is false (~5 = 8~), nothing works. Neither case is an error; both are answers.",
+   "traps": [
+    "'No solution' and 'the solution is 0' are completely different. ~x = 0~ is a perfectly good solution."
+   ]
+  },
+  "equation-word-problems": {
+   "why": "Four steps, always: define the variable in a sentence, write the equation, solve it, then answer the question that was asked. The middle step is the easy one.",
+   "traps": [
+    "If you defined ~x~ as the smaller number, make sure the final answer is the quantity the question wanted."
+   ]
+  }
+ }
+}

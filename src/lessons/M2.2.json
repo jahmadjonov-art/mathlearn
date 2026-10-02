@@ -1,0 +1,47 @@
+{
+ "module": "M2.2",
+ "skills": {
+  "add-sub-like": {
+   "why": "The denominator names the size of the pieces. Adding three eighths to two eighths gives five eighths because you are counting pieces of the same size — and the size does not change when you count them.",
+   "traps": [
+    "Never add the denominators. ~\\f{1}{4} + \\f{1}{4}~ is ~\\f{2}{4} = \\f{1}{2}~, not ~\\f{2}{8}~."
+   ]
+  },
+  "add-sub-unlike": {
+   "why": "You cannot add pieces of different sizes, so first rewrite both fractions with a common denominator. The least common denominator keeps the numbers small, but any common denominator gives the right answer.",
+   "traps": [
+    "Whatever you multiply the bottom by, multiply the top by too. Changing one alone changes the value."
+   ]
+  },
+  "add-sub-mixed": {
+   "why": "Two routes work: convert both to improper fractions, or handle wholes and parts separately. Converting first is a few more strokes of the pen but far harder to get wrong, especially when subtraction needs a borrow.",
+   "traps": [
+    "~3\\f{1}{4} - 1\\f{3}{4}~ needs a borrow: the fraction parts alone would give a negative. Converting to ~\\f{13}{4} - \\f{7}{4}~ avoids the problem entirely."
+   ]
+  },
+  "mult-fractions": {
+   "why": "Multiply straight across — and notice that 'of' means multiply, so half of a third is ~\\f{1}{2} \\times \\f{1}{3}~. This is the operation where the area picture is essential: it is a rectangle half as wide and a third as tall.",
+   "traps": [
+    "Multiplying by a number below 1 makes things *smaller*. That feels wrong if you learned that multiplication makes things bigger."
+   ]
+  },
+  "div-fractions": {
+   "why": "Dividing by a fraction is multiplying by its reciprocal. The reason: ~6 \\div \\f{1}{2}~ asks how many halves fit in 6, and twelve do. Dividing by a number below 1 makes the answer bigger, because you are counting smaller pieces.",
+   "traps": [
+    "Flip the *second* fraction only, and only after you have rewritten the division as a multiplication."
+   ]
+  },
+  "fraction-of-quantity": {
+   "why": "Finding a fraction of an amount is the most common real use of fractions: divide by the denominator, multiply by the numerator. Going the other way — recovering the whole from a part — means dividing by the fraction.",
+   "traps": [
+    "If ~\\f{2}{3}~ of a number is 18, the number is 27, not 12. Find one part first (9), then take three of them."
+   ]
+  },
+  "complex-fractions": {
+   "why": "A fraction whose parts are themselves fractions looks alarming and is not: the main bar still means divide. Rewrite it as a division and multiply by the reciprocal. This exact pattern reappears throughout algebra and in every rate-of-a-rate.",
+   "traps": [
+    "Identify the main bar first. ~\\f{1}{\\f{2}{3}}~ is 1.5, but ~\\f{\\f{1}{2}}{3}~ is about 0.167."
+   ]
+  }
+ }
+}

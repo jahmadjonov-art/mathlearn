@@ -1,0 +1,29 @@
+{
+ "module": "M3.2",
+ "skills": {
+  "commutative-associative": {
+   "why": "Addition and multiplication can be reordered and regrouped freely. Subtraction and division cannot. That asymmetry is why you rewrite subtraction as adding a negative — it buys back the freedom to rearrange.",
+   "traps": [
+    "~8 - 3 \\ne 3 - 8~ and ~8 \\div 4 \\ne 4 \\div 8~. Rearranging a subtraction silently is a common source of sign errors."
+   ]
+  },
+  "distributive": {
+   "why": "The distributive law, ~a(b+c) = ab + ac~, is the bridge between adding and multiplying, and the most used rule in all of algebra. Read left to right it expands; read right to left it factors. Both directions matter equally.",
+   "traps": [
+    "A negative outside the bracket flips the sign of every term inside: ~-2(x - 3) = -2x + 6~."
+   ]
+  },
+  "like-terms": {
+   "why": "Only terms with identical variable parts can be combined, because ~3x + 2x~ is counting the same thing. ~x^{2}~ and ~x~ measure different things and never combine, however similar they look.",
+   "traps": [
+    "~3x + 2x^{2}~ is already fully simplified. Writing ~5x^{3}~ or ~5x^{2}~ is the classic error."
+   ]
+  },
+  "simplify-expressions": {
+   "why": "Simplifying is distribute, then collect. Doing the two in that order, and writing each step down, is what keeps multi-term expressions under control. Most algebra marks are lost to speed, not to difficulty.",
+   "traps": [
+    "A minus sign in front of a bracket applies to everything in it. ~5 - (2x - 3)~ is ~5 - 2x + 3 = 8 - 2x~."
+   ]
+  }
+ }
+}

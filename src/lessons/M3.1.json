@@ -1,0 +1,33 @@
+{
+ "module": "M3.1",
+ "skills": {
+  "variable-meaning": {
+   "why": "A letter in algebra stands for a number you do not yet know, or one that can vary. That is a smaller idea than it looks, and it is the hinge the whole subject turns on: once quantities have names, you can state relationships before you know the values.",
+   "traps": [
+    "A letter is not a label for an object. In ~5a~, if ~a~ is the price of an apple then ~5a~ is a cost, not five apples."
+   ],
+   "code": {
+    "body": "price = 3        # a variable in code HOLDS a value\ntotal = 5 * price\n\n# in algebra, 5p = 15 means p is UNKNOWN; you solve for it",
+    "note": "Same word, two different meanings. In code a variable is a labelled box you put values in; in algebra it is an unknown you deduce. Keeping them apart saves a lot of confusion later."
+   }
+  },
+  "translate-expressions": {
+   "why": "Most algebra mistakes are translation mistakes made before any algebra started. English puts things in an order that symbols sometimes reverse, and a handful of phrases are reliably treacherous.",
+   "traps": [
+    "'5 less than x' is ~x - 5~, not ~5 - x~. 'x subtracted from 5' is ~5 - x~. Read these aloud slowly, every time."
+   ]
+  },
+  "evaluate-expressions": {
+   "why": "Evaluating is substitution followed by the order of operations. Putting brackets round every substituted value, especially negatives, removes most of the risk: ~x^{2}~ at ~x = -3~ is ~(-3)^{2} = 9~.",
+   "traps": [
+    "Substitute into *every* occurrence of the letter, not just the first."
+   ]
+  },
+  "terms-coefficients": {
+   "why": "Terms are separated by + and - at the top level; the coefficient is the number multiplying a term, carrying its own sign. Naming the parts precisely is what lets you follow instructions like 'collect like terms' without guessing.",
+   "traps": [
+    "The sign belongs to the coefficient. In ~3x - 7y~ the coefficient of ~y~ is -7, not 7."
+   ]
+  }
+ }
+}

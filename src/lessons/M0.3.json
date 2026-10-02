@@ -1,0 +1,35 @@
+{
+ "module": "M0.3",
+ "skills": {
+  "make-ten": {
+   "why": "Ten is the number our whole system is built on, so getting to a ten makes everything downstream easy. Splitting 8 + 5 into 8 + 2 + 3 is the single technique behind almost all mental arithmetic.",
+   "traps": [
+    "You must split the *second* number by what the first one needs, not by half."
+   ]
+  },
+  "add-facts": {
+   "why": "Addition facts to 20 need to be recall, not calculation. Not because speed matters in itself, but because every later step — fractions, algebra, long division — spends working memory, and any spent on 7 + 8 is unavailable for the actual problem.",
+   "traps": [
+    "If you count on fingers past about 12 you will drop one. Use making ten instead."
+   ]
+  },
+  "sub-facts": {
+   "why": "Subtraction is best read as a missing addend: 13 - 8 asks what adds to 8 to make 13. Counting up is faster, less error-prone, and it is exactly how a cashier gives change.",
+   "traps": [
+    "Order matters: 8 - 13 is not 13 - 8. Subtraction is not commutative."
+   ]
+  },
+  "add-sub-relation": {
+   "why": "Addition and subtraction are one operation read in two directions. Seeing that lets you check any answer instantly and solve any missing-number problem without a new technique — which is also how you will later solve equations.",
+   "traps": [
+    "In ~\\square - 8 = 5~ the missing number is the biggest one, 13. Subtracting makes things smaller, so the unknown must have started larger."
+   ]
+  },
+  "mental-add-strategies": {
+   "why": "Mental arithmetic is not the written method done in your head — it is a different, better set of moves: round to a friendly number and compensate. 47 + 29 becomes 47 + 30 - 1.",
+   "traps": [
+    "Compensate in the right direction. Adding 30 instead of 29 means you added one too many, so you take one back off."
+   ]
+  }
+ }
+}

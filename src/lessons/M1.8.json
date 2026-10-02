@@ -1,0 +1,23 @@
+{
+ "module": "M1.8",
+ "skills": {
+  "one-step-words": {
+   "why": "The arithmetic in a word problem is rarely the hard part — deciding which operation the words describe is. Build the habit of naming the operation out loud before touching the numbers.",
+   "traps": [
+    "Keywords mislead. 'More' usually means add but 'how many more' means subtract."
+   ]
+  },
+  "multi-step-words": {
+   "why": "Multi-step problems reward planning over speed. Write down what you need to find, what you can work out immediately, and in what order. That plan is the mathematics; the calculation is clerical.",
+   "traps": [
+    "Answer the question asked. Finding the total when the question wanted the change is the single most common lost mark in school mathematics."
+   ]
+  },
+  "reasonableness": {
+   "why": "Before you accept any answer, ask whether it is the right size and in the right units. This habit catches misplaced decimal points, dropped zeros and operations applied the wrong way round — and it stays useful for the rest of your life.",
+   "traps": [
+    "An answer bigger than the total, or a negative length, is wrong no matter how clean the arithmetic looked."
+   ]
+  }
+ }
+}

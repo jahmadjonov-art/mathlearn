@@ -1,0 +1,35 @@
+{
+ "module": "M1.6",
+ "skills": {
+  "integers-line": {
+   "why": "Negative numbers finish the number line. They are not 'less than nothing' — they are quantities in the opposite direction: debt, temperature below freezing, depth below sea level.",
+   "traps": [
+    "Among negatives, bigger digits mean a smaller number: ~-30 < -4~."
+   ]
+  },
+  "absolute-value": {
+   "why": "Absolute value is distance from zero, and distance has no direction. That is why it is never negative, and why ~|x| = 5~ has two solutions: two points sit five units from zero.",
+   "traps": [
+    "~|x|~ is not 'make it positive' once letters are involved: ~|x| = -2~ has no solution at all."
+   ]
+  },
+  "add-sub-integers": {
+   "why": "There is one rule, not four: subtracting is adding the opposite. Rewrite every subtraction as an addition first, then ask whether the signs match (add the sizes, keep the sign) or differ (subtract the sizes, take the sign of the larger).",
+   "traps": [
+    "~5 - (-3)~ is ~5 + 3 = 8~. Two minus signs in a row become a plus because you are removing a debt."
+   ]
+  },
+  "mult-div-integers": {
+   "why": "Multiplying by a negative reverses direction. Doing it twice turns you back to face forward, which is why two negatives multiply to a positive — it is a geometric fact, not a convention to memorise.",
+   "traps": [
+    "The sign rules for × and ÷ are the same, but they are not the rules for + and -. ~-3 \\times -4 = 12~ while ~-3 + -4 = -7~."
+   ]
+  },
+  "integer-word-problems": {
+   "why": "Signed numbers are how you model anything with two opposite directions in one scale: profit and loss, rise and fall, credit and debit. Choosing which direction is positive is yours to decide, but you must then stay consistent.",
+   "traps": [
+    "Decide the positive direction before you start and write it down. Most errors here are a sign flipped halfway through."
+   ]
+  }
+ }
+}

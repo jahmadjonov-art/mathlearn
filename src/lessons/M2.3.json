@@ -1,0 +1,47 @@
+{
+ "module": "M2.3",
+ "skills": {
+  "decimal-place-value": {
+   "why": "Decimal places continue the same pattern leftward of the point: each step right divides by ten. A decimal is simply a fraction whose denominator is a power of ten, which is why decimals and fractions convert so easily.",
+   "traps": [
+    "More digits does not mean larger: 0.4 is bigger than 0.3999. Compare place by place from the left."
+   ]
+  },
+  "round-decimals": {
+   "why": "Rounding decimals is how you report a measurement honestly: writing 2.3847 metres implies you measured to a tenth of a millimetre. Significant figures and decimal places are different questions — read which one is asked.",
+   "traps": [
+    "Only the next digit decides. Rounding 1.4999 to one decimal place gives 1.5, but to a whole number it gives 1."
+   ]
+  },
+  "add-sub-decimals": {
+   "why": "Line up the points, not the right-hand edges, because you are adding tenths to tenths. Filling the gaps with zeros makes the columns match and removes the guesswork.",
+   "traps": [
+    "Adding 2.5 and 0.75 by right-aligning gives 2.80 instead of 3.25. Always align the point."
+   ]
+  },
+  "mult-decimals": {
+   "why": "Multiply as whole numbers, then count decimal places. It works because multiplying by 0.1 is dividing by ten: every decimal place in the inputs contributes one in the answer.",
+   "traps": [
+    "Count the places in *both* numbers and add them. 0.3 × 0.2 = 0.06, not 0.6 — this one is worth checking by estimation every time."
+   ]
+  },
+  "div-decimals": {
+   "why": "Shift both numbers until the divisor is a whole number. A division is unchanged when both parts are scaled by the same factor, which is the same fact that lets you simplify fractions.",
+   "traps": [
+    "Shift *both* numbers by the same amount. Shifting only the divisor changes the answer by a factor of ten."
+   ]
+  },
+  "fraction-decimal-convert": {
+   "why": "Fractions and decimals are the same numbers. To go one way, divide; to come back, read the place value and reduce. Being able to move freely between them is what makes percentages painless.",
+   "traps": [
+    "Some fractions never terminate. ~\\f{1}{3} = 0.333\\dots~ exactly, so writing 0.33 is an approximation and should be marked as one."
+   ]
+  },
+  "terminating-repeating": {
+   "why": "Whether a decimal stops is decided entirely by the denominator in lowest terms. Our decimals are base ten and ten factors into 2 × 5, so only denominators built from 2s and 5s can land exactly. Everything else repeats forever.",
+   "traps": [
+    "Reduce the fraction first. ~\\f{5}{10}~ looks like a tenth but is really ~\\f{1}{2}~, and so it terminates."
+   ]
+  }
+ }
+}

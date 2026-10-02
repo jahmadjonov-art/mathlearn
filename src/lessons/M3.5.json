@@ -1,0 +1,23 @@
+{
+ "module": "M3.5",
+ "skills": {
+  "use-formulas": {
+   "why": "A formula is a stored relationship: substitute what you know and read off what you do not. Carrying the units through the substitution is what tells you whether the answer is sensible.",
+   "traps": [
+    "Check the formula's assumptions. ~A = \\f{1}{2}bh~ needs the height perpendicular to the base, not a slanted side."
+   ]
+  },
+  "rearrange-formulas": {
+   "why": "Solving for a different letter uses exactly the rules for solving a numerical equation — treat every other letter as though it were a number. This is the skill that turns one formula into every formula you need from it.",
+   "traps": [
+    "Isolate the target letter completely. ~2x = y - b~ is not solved for ~x~ until you divide by 2."
+   ]
+  },
+  "formula-build": {
+   "why": "Writing your own formula is the real skill: a fixed amount becomes a constant, a per-unit amount multiplies the variable, and something being used up subtracts. Every pricing model, pay structure and depreciation schedule is built this way.",
+   "traps": [
+    "Decide what each letter means and write it down. A formula without stated meanings cannot be checked by anyone, including you."
+   ]
+  }
+ }
+}

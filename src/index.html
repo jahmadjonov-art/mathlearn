@@ -1,0 +1,291 @@
+<title>Zero to Quant</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one column of cards on a faint graph-paper ground, a sticky status bar
+   at the top, and a fixed tab bar at the bottom on phones. Prose is held near
+   65 characters; worked solutions sit in a mono face so figures line up. */
+:root {
+  --paper: #f3f5f2;          /* slightly green-grey, not a neutral default white */
+  --card: #ffffff;
+  --card-2: #e9ede8;
+  --ink: #18201c;
+  --ink-2: #4a5852;
+  --ink-3: #7b8a83;
+  --rule: #d4dbd5;
+  --accent: #1f6f5c;         /* pine */
+  --accent-soft: #e2efe9;
+  --accent-ink: #14503f;
+  --warn: #b26a12;           /* amber, for streaks and attention */
+  --warn-soft: #fbf0dd;
+  --bad: #9c2f33;
+  --bad-soft: #fae9e9;
+  --good: #1f6f5c;
+  --grid: rgba(31, 111, 92, .07);
+  --shadow: 0 1px 2px rgba(24, 32, 28, .06), 0 8px 24px -16px rgba(24, 32, 28, .18);
+  --ui: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --prose: "Spectral", Georgia, "Times New Roman", serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #11150f;
+    --card: #181e18;
+    --card-2: #212a22;
+    --ink: #e7ece6;
+    --ink-2: #a9b5ad;
+    --ink-3: #7a8880;
+    --rule: #2c362e;
+    --accent: #58b396;
+    --accent-soft: #19291f;
+    --accent-ink: #9fd9c4;
+    --warn: #d9a351;
+    --warn-soft: #2a2213;
+    --bad: #e08a8a;
+    --bad-soft: #2d1a1a;
+    --good: #58b396;
+    --grid: rgba(88, 179, 150, .07);
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 30px -18px rgba(0, 0, 0, .7);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #11150f; --card: #181e18; --card-2: #212a22;
+  --ink: #e7ece6; --ink-2: #a9b5ad; --ink-3: #7a8880; --rule: #2c362e;
+  --accent: #58b396; --accent-soft: #19291f; --accent-ink: #9fd9c4;
+  --warn: #d9a351; --warn-soft: #2a2213; --bad: #e08a8a; --bad-soft: #2d1a1a;
+  --good: #58b396; --grid: rgba(88, 179, 150, .07);
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.7);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px),
+                    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 22px 22px;
+  color: var(--ink);
+  font-family: var(--ui);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-text-size-adjust: 100%;
+}
+.wrap { max-width: 760px; margin: 0 auto; padding-inline: 16px; padding-block: 0 96px; }
+
+/* ---------- status bar ---------- */
+.bar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+}
+.bar-in { max-width: 760px; margin: 0 auto; padding: 10px 16px; display: flex; align-items: center; gap: 12px; }
+.brand { font-family: var(--prose); font-weight: 600; font-size: 1.05rem; letter-spacing: -.01em; margin-right: auto; }
+.brand span { color: var(--accent); }
+.chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: .78rem; font-weight: 500; padding: 3px 9px; border-radius: 999px;
+  background: var(--card-2); color: var(--ink-2); white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.chip.flame { background: var(--warn-soft); color: var(--warn); }
+.chip.due { background: var(--accent-soft); color: var(--accent-ink); }
+.sync { font-size: .7rem; color: var(--ink-3); }
+.sync.err { color: var(--bad); }
+
+/* ---------- cards and type ---------- */
+.card {
+  background: var(--card); border: 1px solid var(--rule); border-radius: 14px;
+  padding: 18px; margin-top: 16px; box-shadow: var(--shadow);
+}
+.card.flat { box-shadow: none; }
+.card.lead { border-color: color-mix(in srgb, var(--accent) 40%, var(--rule)); }
+h1 { font-family: var(--prose); font-size: 1.6rem; line-height: 1.2; margin: 24px 0 4px; text-wrap: balance; font-weight: 600; }
+h2 { font-family: var(--prose); font-size: 1.22rem; margin: 0 0 8px; text-wrap: balance; font-weight: 600; }
+h3 { font-size: .95rem; margin: 0 0 6px; font-weight: 600; }
+p { margin: 0 0 10px; }
+.prose { font-family: var(--prose); font-size: 1.02rem; line-height: 1.68; max-width: 65ch; }
+.prose p { margin: 0 0 12px; }
+.eyebrow { font-size: .7rem; letter-spacing: .09em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
+.muted { color: var(--ink-2); }
+.small { font-size: .85rem; }
+.tiny { font-size: .76rem; }
+code { font-family: var(--mono); font-size: .9em; background: var(--card-2); padding: 1px 5px; border-radius: 4px; }
+
+/* ---------- maths typesetting (no external library, so it renders everywhere) ---------- */
+.math { font-family: var(--mono); font-size: .97em; white-space: nowrap; }
+.mfrac { display: inline-flex; flex-direction: column; vertical-align: -0.55em; text-align: center; margin: 0 .18em; }
+.mfrac .mnum { border-bottom: 1.2px solid currentColor; padding: 0 .25em; line-height: 1.25; }
+.mfrac .mden { padding: 0 .25em; line-height: 1.25; }
+.mroot { white-space: nowrap; }
+.mroot .mrad { padding-right: .05em; }
+.mroot .mrtc { border-top: 1.2px solid currentColor; padding: 0 .15em; }
+.math sup { font-size: .72em; }
+.math sub { font-size: .72em; }
+
+/* ---------- buttons ---------- */
+.btn {
+  font: inherit; font-weight: 500; cursor: pointer; border-radius: 10px;
+  border: 1px solid var(--rule); background: var(--card); color: var(--ink);
+  padding: 10px 15px; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  min-height: 42px;
+}
+.btn:hover { border-color: var(--accent); }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+:root[data-theme="dark"] .btn.primary, :root:not([data-theme="light"]) .btn.primary { color: #08140f; }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) .btn.primary { color: #fff; } }
+.btn.primary:hover { filter: brightness(1.06); }
+.btn.ghost { background: transparent; }
+.btn.small { padding: 6px 11px; min-height: 34px; font-size: .85rem; }
+.btn[disabled] { opacity: .45; cursor: not-allowed; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 14px; }
+
+/* ---------- progress ---------- */
+.meter { height: 7px; border-radius: 99px; background: var(--card-2); overflow: hidden; }
+.meter > i { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
+.meter.thin { height: 5px; }
+.meter > i.built { background: repeating-linear-gradient(135deg, var(--ink-3) 0 3px, transparent 3px 7px); opacity: .5; }
+.stat-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.stat {
+  flex: 1 1 110px; min-width: 0; background: var(--card-2); border-radius: 11px; padding: 11px 13px;
+}
+.stat b { display: block; font-size: 1.5rem; line-height: 1.1; font-variant-numeric: tabular-nums; font-family: var(--prose); }
+.stat span { font-size: .74rem; color: var(--ink-2); }
+
+/* ---------- level / module / skill lists ---------- */
+.lvl { border: 1px solid var(--rule); border-radius: 13px; background: var(--card); margin-top: 11px; overflow: hidden; }
+.lvl > summary {
+  cursor: pointer; padding: 13px 15px; display: grid; gap: 3px 11px; list-style: none;
+  grid-template-columns: 42px 1fr auto; align-items: center;
+}
+.lvl > summary::-webkit-details-marker { display: none; }
+.lvl-tag {
+  grid-row: span 2; width: 42px; height: 42px; border-radius: 11px; display: grid; place-items: center;
+  background: var(--accent-soft); color: var(--accent-ink); font-weight: 600; font-size: .86rem;
+}
+.lvl.locked .lvl-tag { background: var(--card-2); color: var(--ink-3); }
+.lvl-name { font-family: var(--prose); font-weight: 600; font-size: 1.02rem; }
+.lvl-meta { grid-column: 2 / span 2; font-size: .78rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.lvl-body { padding: 0 15px 13px; border-top: 1px solid var(--rule); }
+.mod { padding: 11px 0; border-bottom: 1px dashed var(--rule); }
+.mod:last-child { border-bottom: 0; }
+.mod-head { display: flex; align-items: baseline; gap: 9px; }
+.mod-head b { font-weight: 600; font-size: .94rem; }
+.mod-aim { font-size: .82rem; color: var(--ink-2); margin: 2px 0 8px; }
+.skill {
+  display: flex; align-items: center; gap: 9px; padding: 6px 0; min-width: 0;
+}
+.skill-dot { width: 9px; height: 9px; border-radius: 99px; background: var(--card-2); flex: none; border: 1px solid var(--rule); }
+.skill-dot.l1 { background: var(--warn); border-color: var(--warn); }
+.skill-dot.l3 { background: var(--accent); border-color: var(--accent); }
+.skill-dot.l5 { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.skill-name { flex: 1 1 auto; min-width: 0; font-size: .89rem; }
+.skill-name small { display: block; color: var(--ink-3); font-size: .76rem; }
+.soon { font-size: .7rem; color: var(--ink-3); border: 1px dashed var(--rule); padding: 1px 6px; border-radius: 6px; flex: none; }
+
+/* ---------- question card ---------- */
+.qmeta { display: flex; align-items: center; gap: 9px; margin-bottom: 12px; }
+.dots { display: flex; gap: 4px; flex-wrap: wrap; margin-left: auto; }
+.dots i { width: 8px; height: 8px; border-radius: 99px; background: var(--card-2); border: 1px solid var(--rule); }
+.dots i.ok { background: var(--good); border-color: var(--good); }
+.dots i.no { background: var(--bad); border-color: var(--bad); }
+.dots i.now { box-shadow: 0 0 0 3px var(--accent-soft); }
+.qtext { font-family: var(--prose); font-size: 1.16rem; line-height: 1.5; margin: 0 0 16px; }
+.qtext .math { font-size: 1.02em; }
+input[type="text"], input[type="number"] {
+  font: inherit; font-family: var(--mono); width: 100%; padding: 12px 13px; border-radius: 10px;
+  border: 1.5px solid var(--rule); background: var(--card); color: var(--ink); min-width: 0;
+}
+input:focus { outline: none; border-color: var(--accent); }
+.keypad { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.keypad button {
+  font: inherit; font-family: var(--mono); cursor: pointer; background: var(--card-2);
+  border: 1px solid var(--rule); border-radius: 8px; padding: 5px 11px; color: var(--ink-2); min-height: 34px;
+}
+.keypad button:hover { border-color: var(--accent); color: var(--ink); }
+.fields { display: grid; gap: 10px; }
+.field label { display: block; font-size: .78rem; color: var(--ink-2); margin-bottom: 4px; }
+.choices { display: grid; gap: 9px; }
+.choice {
+  text-align: left; font: inherit; cursor: pointer; padding: 12px 14px; border-radius: 11px;
+  border: 1.5px solid var(--rule); background: var(--card); color: var(--ink); min-height: 46px;
+}
+.choice:hover { border-color: var(--accent); }
+.choice.picked { border-color: var(--accent); background: var(--accent-soft); }
+.choice.right { border-color: var(--good); background: var(--accent-soft); }
+.choice.wrong { border-color: var(--bad); background: var(--bad-soft); }
+
+.verdict { border-radius: 11px; padding: 13px 15px; margin-top: 14px; }
+.verdict.ok { background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--good) 35%, transparent); }
+.verdict.no { background: var(--bad-soft); border: 1px solid color-mix(in srgb, var(--bad) 35%, transparent); }
+.verdict b { font-size: .95rem; }
+.steps { margin: 10px 0 0; padding: 0; list-style: none; counter-reset: s; }
+.steps li {
+  font-family: var(--mono); font-size: .86rem; line-height: 1.6; padding: 7px 0 7px 30px;
+  position: relative; border-top: 1px solid var(--rule);
+}
+.steps li:before {
+  counter-increment: s; content: counter(s);
+  position: absolute; left: 0; top: 7px; width: 20px; height: 20px; border-radius: 99px;
+  background: var(--card-2); color: var(--ink-2); font-size: .7rem; display: grid; place-items: center;
+}
+.steps li strong { font-family: var(--ui); }
+
+/* ---------- tab bar ---------- */
+.tabs {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+  background: color-mix(in srgb, var(--card) 94%, transparent);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--rule);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.tabs-in { max-width: 760px; margin: 0 auto; display: flex; }
+.tab {
+  flex: 1; font: inherit; font-size: .72rem; cursor: pointer; background: none; border: 0;
+  color: var(--ink-3); padding: 9px 4px 10px; display: grid; gap: 3px; justify-items: center;
+}
+.tab svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.7; }
+.tab.on { color: var(--accent); }
+.hide { display: none; }
+
+@media (min-width: 620px) {
+  .wrap { padding-block: 0 40px; }
+  .tabs { position: sticky; top: auto; bottom: 0; }
+  h1 { font-size: 1.95rem; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .card, .verdict { animation: rise .22s ease-out; }
+  @keyframes rise { from { opacity: .4; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+}
+</style>
+
+<div class="bar">
+  <div class="bar-in">
+    <div class="brand">Zero to <span>Quant</span></div>
+    <span class="chip flame hide" id="chip-streak"></span>
+    <span class="chip due hide" id="chip-due"></span>
+    <span class="chip" id="chip-today"></span>
+  </div>
+</div>
+
+<div class="wrap" id="view">
+  <div class="card">
+    <div class="eyebrow">Loading</div>
+    <h2>Getting your progress</h2>
+    <p class="muted small">If this is your first time, you will start at counting and place value.</p>
+  </div>
+</div>
+
+<nav class="tabs" aria-label="Sections">
+  <div class="tabs-in" id="tabs"></div>
+</nav>
+
+<script src="mathcore.js"></script>
+<script src="curriculum.js"></script>
+<script src="generators.js"></script>
+<script src="grade.js"></script>
+<script src="engine.js"></script>
+<script src="store.js"></script>
+<script src="app.js"></script>
