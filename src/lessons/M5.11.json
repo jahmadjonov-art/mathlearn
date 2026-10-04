@@ -1,0 +1,37 @@
+{
+ "module": "M5.11",
+ "skills": {
+  "conditional-statements": {
+   "why": "A conditional statement says 'if P then Q'. Its converse swaps the parts, its inverse negates both, and its contrapositive does both. Only the contrapositive is guaranteed to share the original's truth value — and mixing up the converse with the original is among the commonest reasoning errors in everyday life.",
+   "traps": [
+    "'All dogs are mammals' is true, but 'all mammals are dogs' is not. A true statement does not guarantee a true converse.",
+    "Proving the contrapositive proves the original, which is sometimes far easier."
+   ],
+   "code": {
+    "body": "# if P then Q  is the same as  (not P) or Q\ndef implies(p, q):\n    return (not p) or q",
+    "note": "A programming condition 'if p then q' is false in exactly one case: p true and q false. The contrapositive, if not q then not p, has the same truth table."
+   }
+  },
+  "deductive-reasoning": {
+   "why": "Deductive reasoning chains established facts to a conclusion that *must* follow. Three patterns are valid: modus ponens (the condition holds, so the result holds), modus tollens (the result fails, so the condition failed) and syllogism (chain two conditionals). One pattern that looks valid is not: affirming the consequent.",
+   "traps": [
+    "From 'if P then Q' and Q you cannot conclude P. Something else may also produce Q.",
+    "A valid argument can still have a false conclusion if a premise is false. Validity is about the form, not the facts."
+   ]
+  },
+  "two-column-proof": {
+   "why": "A proof is a chain of statements each justified by a reason: a given, a definition, a property, a postulate or a theorem already proved. The two-column layout makes that discipline visible, because every line has to say why it is allowed.",
+   "traps": [
+    "'It looks true in the diagram' is never a reason. Diagrams suggest; reasons prove.",
+    "Each line may use only what came before it. Quoting something you have not yet established is circular."
+   ]
+  },
+  "counterexamples": {
+   "why": "A general claim can be destroyed by a single counterexample, however many examples agree with it. A counterexample has to meet the claim's conditions and still break its conclusion. The expression ~n^{2} + n + 41~ is prime for every ~n~ from 0 to 39, and fails at 40 — forty agreeing examples proved nothing.",
+   "traps": [
+    "Examples can support a claim but never prove it. One failure disproves it.",
+    "A counterexample must satisfy the *conditions* of the claim. A case that does not meet the condition does not count."
+   ]
+  }
+ }
+}

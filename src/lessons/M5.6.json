@@ -1,0 +1,26 @@
+{
+ "module": "M5.6",
+ "skills": {
+  "area-basic-figures": {
+   "why": "Every area formula comes from the rectangle. A parallelogram is a rectangle with a triangle moved from one end to the other. A triangle is half a parallelogram. A trapezium is the average of its two parallel sides times the height. Knowing why makes the formulas hard to forget.",
+   "traps": [
+    "The height must be *perpendicular* to the base, not the slanted side.",
+    "The trapezium formula averages the two *parallel* sides; the slanted sides are not involved."
+   ]
+  },
+  "composite-area": {
+   "why": "Awkward shapes are usually simple shapes added together or taken apart. Split an L into two rectangles, or subtract a corner from a bigger one. Choosing the easiest split is most of the skill.",
+   "traps": [
+    "Keep exact values such as ~\\pi~ until the last step. Rounding early shifts the final answer.",
+    "When subtracting, check the removed piece really lies inside the whole shape."
+   ]
+  },
+  "perimeter-problems": {
+   "why": "Perimeter is the distance round the outside, and many practical problems — fencing, edging, trim — are perimeter problems with a twist: a side missing, a wall instead of a fence, a curved part. Read exactly which edges count.",
+   "traps": [
+    "A semicircle's perimeter includes its straight diameter edge as well as the curve.",
+    "Fencing against a wall needs fewer metres than the full perimeter. Read which sides are needed."
+   ]
+  }
+ }
+}

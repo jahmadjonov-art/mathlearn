@@ -4612,6 +4612,1789 @@
        'Checking both conditions, not just one, is what catches an arithmetic slip here.']);
   });
 
+  /* =====================================================================
+     LEVEL 5 — GEOMETRY
+     Figures come from figures.js and are built from the same numbers the
+     question asks about, so a diagram can never contradict its own text.
+     ===================================================================== */
+  var FIG = root.FIGURES || require('./figures.js');
+
+  g('angle-basics', function (R, d) {
+    var deg = R.int(5, 175);
+    var mode = R.pick(['classify', 'complement', 'supplement']);
+    if (mode === 'classify') {
+      var kind = deg < 90 ? 'Acute' : deg === 90 ? 'Right' : deg < 180 ? 'Obtuse' : 'Straight';
+      if (deg === 90) deg = 90;
+      var sh = choiceSet(R, kind, ['Acute', 'Right', 'Obtuse', 'Straight'].filter(function (o) { return o !== kind; }));
+      return mc('What kind of angle is this?', sh.choices, sh.answer,
+        ['Acute is under 90 degrees, right is exactly 90, obtuse is between 90 and 180, straight is 180.',
+         'This one measures ' + deg + ' degrees, so it is **' + kind.toLowerCase() + '**.'],
+        { figure: FIG.angleAt(deg) });
+    }
+    if (mode === 'complement') {
+      var a = R.int(5, 85);
+      return num('Two angles are complementary and one of them is shown. How many degrees is the other?',
+        90 - a,
+        ['Complementary angles add to 90 degrees — together they make a right angle.',
+         '90 - ' + a + ' = **' + (90 - a) + '** degrees.'],
+        { figure: FIG.anglePair('complementary', a), unit: 'degrees' });
+    }
+    var b = R.int(10, 170);
+    return num('The two angles shown sit on a straight line. How many degrees is the unmarked one?',
+      180 - b,
+      ['Angles on a straight line are supplementary — they add to 180 degrees.',
+       '180 - ' + b + ' = **' + (180 - b) + '** degrees.',
+       'Complementary adds to 90, supplementary to 180. The words are easy to swap, so check which the diagram shows.'],
+      { figure: FIG.anglePair('linear', b), unit: 'degrees' });
+  });
+
+  g('angle-pairs', function (R, d) {
+    var kind = R.pick(['vertical', 'linear', 'name']);
+    var a = R.int(20, 160);
+    if (kind === 'vertical') {
+      var v = R.int(25, 80);
+      return num('The two marked angles are vertically opposite. How many degrees is the unmarked one?', v,
+        ['Vertically opposite angles are formed by two crossing lines and are always equal.',
+         'So the unmarked angle is also **' + v + '** degrees.',
+         'The reason: each of them is supplementary to the same neighbouring angle, so they must match.'],
+        { figure: FIG.anglePair('vertical', v), unit: 'degrees' });
+    }
+    if (kind === 'linear') {
+      return num('The marked angles form a linear pair. How many degrees is the unmarked one?', 180 - a,
+        ['A linear pair sits on a straight line, so the two add to 180 degrees.',
+         '180 - ' + a + ' = **' + (180 - a) + '** degrees.'],
+        { figure: FIG.anglePair('linear', a), unit: 'degrees' });
+    }
+    var sets = [
+      { s: 'two angles that add to 90 degrees', ans: 'Complementary' },
+      { s: 'two angles that add to 180 degrees', ans: 'Supplementary' },
+      { s: 'the opposite angles where two lines cross', ans: 'Vertically opposite' },
+      { s: 'two angles sharing a vertex and one side, side by side', ans: 'Adjacent' }
+    ];
+    var st = R.pick(sets);
+    var all = ['Complementary', 'Supplementary', 'Vertically opposite', 'Adjacent'];
+    var sh = choiceSet(R, st.ans, all.filter(function (o) { return o !== st.ans; }));
+    return mc('What are ' + st.s + ' called?', sh.choices, sh.answer,
+      ['These four names cover almost every angle relationship you will be asked to quote as a reason.',
+       'The answer is **' + st.ans.toLowerCase() + '**.',
+       'Adjacent describes position; the others describe a numerical relationship. Two angles can be both.']);
+  });
+
+  g('parallel-transversal', function (R, d) {
+    var a = R.int(25, 155);
+    var pos = R.pick(['corresponding', 'alternate', 'cointerior']);
+    var answer = pos === 'cointerior' ? 180 - a : a;
+    var names = { corresponding: 'corresponding', alternate: 'alternate', cointerior: 'co-interior' };
+    return num('Two parallel lines are cut by a transversal. The marked angle is ' + a +
+      ' degrees. How many degrees is the angle labelled with a question mark? ' +
+      '(They are ' + names[pos] + ' angles.)', answer,
+      [pos === 'corresponding' ? 'Corresponding angles sit in matching positions at the two intersections, and with parallel lines they are equal.'
+        : pos === 'alternate' ? 'Alternate angles sit on opposite sides of the transversal, between the parallels, and with parallel lines they are equal.'
+        : 'Co-interior angles sit on the same side of the transversal, between the parallels, and with parallel lines they add to 180 degrees.',
+       pos === 'cointerior' ? '180 - ' + a + ' = **' + answer + '** degrees.' : 'So it is also **' + answer + '** degrees.',
+       'All three rules need the lines to be parallel. Without that, none of them hold — which is why diagrams mark parallels with arrows.'],
+      { figure: FIG.transversal(a, pos), unit: 'degrees' });
+  });
+
+  g('angle-algebra', function (R, d) {
+    var x = R.int(5, 30), m = R.nonzero(2, 6), b = R.nonzero(-20, 40);
+    var kind = R.pick(['linear', 'vertical', 'complement']);
+    var total = kind === 'complement' ? 90 : 180;
+    /* (mx + b) + other = total */
+    var other = total - (m * x + b);
+    if (other <= 0 || m * x + b <= 0) { x = 15; m = 3; b = 10; other = total - (m * x + b); }
+    return num('Two angles ' + (kind === 'complement' ? 'are complementary' :
+      kind === 'vertical' ? 'sit on a straight line' : 'form a linear pair') +
+      '. One measures ~' + poly([[m, 'x'], [b, '']]) + '~ degrees and the other measures ' + other +
+      ' degrees. What is ~x~?', x,
+      ['They add to ' + total + ' degrees, so write that as an equation.',
+       '~' + poly([[m, 'x'], [b, '']]) + ' + ' + other + ' = ' + total + '~.',
+       'Simplify: ~' + term(m, 'x') + ' = ' + (total - b - other) + '~, so ~x = ~**' + x + '**.',
+       'Check by substituting: the first angle is ' + (m * x + b) + ' degrees, and ' + (m * x + b) +
+         ' + ' + other + ' = ' + total + '. Always check, because a negative or absurd angle means a slip.'],
+      { tol: 0.005 });
+  });
+
+  g('triangle-angle-sum', function (R, d) {
+    var mode = R.pick(['third', 'exterior', 'algebra']);
+    if (mode === 'third') {
+      var a = R.int(20, 120), b = R.int(20, 155 - a);
+      var c = 180 - a - b;
+      return num('Two angles of a triangle are ' + a + ' degrees and ' + b +
+        ' degrees. How many degrees is the third?', c,
+        ['The angles of any triangle add to 180 degrees.',
+         '180 - ' + a + ' - ' + b + ' = **' + c + '** degrees.',
+         'This holds for every triangle in flat geometry, however stretched or squashed it looks.'],
+        { figure: FIG.triangleAngles(a, b, { angles: [{ at: 'A', label: a + '°' }, { at: 'B', label: b + '°' },
+          { at: 'C', label: '?' }] }), unit: 'degrees' });
+    }
+    if (mode === 'exterior') {
+      var p = R.int(25, 90), q = R.int(25, 150 - p);
+      return num('In a triangle, two angles are ' + p + ' degrees and ' + q +
+        ' degrees. How many degrees is the exterior angle at the third vertex?', p + q,
+        ['The exterior angle equals the sum of the two opposite interior angles.',
+         p + ' + ' + q + ' = **' + (p + q) + '** degrees.',
+         'Why: the interior angle at that vertex is ' + (180 - p - q) + ', and the exterior one completes the straight line — ' +
+           (180 - (180 - p - q)) + ' degrees. The shortcut just skips a step.'],
+        { unit: 'degrees' });
+    }
+    var x = R.int(10, 40), k1 = R.int(1, 4), k2 = R.int(1, 4), c2 = R.int(10, 60);
+    var third = 180 - (k1 * x + k2 * x + c2);
+    if (third <= 0) { x = 20; k1 = 2; k2 = 3; c2 = 30; third = 180 - (k1 * x + k2 * x + c2); }
+    return num('The three angles of a triangle are ~' + term(k1, 'x') + '~, ~' + term(k2, 'x') + ' + ' + c2 +
+      '~ and ' + third + ' degrees. What is ~x~?', x,
+      ['Set the three angles equal to 180: ~' + term(k1, 'x') + ' + ' + term(k2, 'x') + ' + ' + c2 +
+        ' + ' + third + ' = 180~.',
+       'Collect: ~' + term(k1 + k2, 'x') + ' = ' + (180 - c2 - third) + '~.',
+       'So ~x = ~**' + x + '**, giving angles of ' + (k1 * x) + ', ' + (k2 * x + c2) + ' and ' + third + ' degrees.',
+       'Check they add to 180 before moving on.'], { tol: 0.005 });
+  });
+
+  g('triangle-classify', function (R, d) {
+    var mode = R.pick(['bySides', 'byAngles', 'isosceles']);
+    if (mode === 'bySides') {
+      var kind = R.pick(['Equilateral', 'Isosceles', 'Scalene']);
+      var a, b, c;
+      if (kind === 'Equilateral') { a = b = c = R.int(3, 15); }
+      else if (kind === 'Isosceles') { a = b = R.int(5, 15); c = R.int(2, 2 * a - 1); while (c === a) c = R.int(2, 2 * a - 1); }
+      else { a = R.int(4, 9); b = a + R.int(1, 4); c = b + R.int(1, 3); while (c >= a + b) c = b + R.int(1, 2); }
+      var sh = choiceSet(R, kind, ['Equilateral', 'Isosceles', 'Scalene'].filter(function (o) { return o !== kind; }));
+      return mc('A triangle has sides ' + a + ', ' + b + ' and ' + c + '. How is it classified by its sides?',
+        sh.choices, sh.answer,
+        ['Equilateral means all three equal, isosceles means exactly two equal, scalene means none equal.',
+         'Here the sides are ' + a + ', ' + b + ', ' + c + ', so it is **' + kind.toLowerCase() + '**.',
+         kind === 'Isosceles' ? 'The two equal sides sit opposite two equal angles, which is the fact you will use most.'
+           : kind === 'Equilateral' ? 'All three angles are then 60 degrees.'
+           : 'With no equal sides, no two angles are equal either.']);
+    }
+    if (mode === 'byAngles') {
+      var kind2 = R.pick(['Acute', 'Right', 'Obtuse']);
+      var A, B, C;
+      if (kind2 === 'Right') { A = 90; B = R.int(20, 69); C = 90 - B; }
+      else if (kind2 === 'Obtuse') { A = R.int(95, 150); B = R.int(15, 179 - A); C = 180 - A - B; }
+      else { A = R.int(50, 85); B = R.int(50, 85); C = 180 - A - B; while (C >= 90 || C <= 0) { A = R.int(55, 85); B = R.int(55, 85); C = 180 - A - B; } }
+      var sh2 = choiceSet(R, kind2, ['Acute', 'Right', 'Obtuse'].filter(function (o) { return o !== kind2; }));
+      return mc('A triangle has angles ' + A + ', ' + B + ' and ' + C +
+        ' degrees. How is it classified by its angles?', sh2.choices, sh2.answer,
+        ['Look at the largest angle only: under 90 is acute, exactly 90 is right, over 90 is obtuse.',
+         'The largest here is ' + Math.max(A, B, C) + ' degrees, so it is **' + kind2.toLowerCase() + '**.',
+         'A triangle can have at most one angle of 90 or more, because the three must total 180.']);
+    }
+    var apex = R.int(20, 140);
+    var base = (180 - apex) / 2;
+    return num('An isosceles triangle has an apex angle of ' + apex +
+      ' degrees. How many degrees is each base angle?', base,
+      ['The two base angles of an isosceles triangle are equal, because they sit opposite the two equal sides.',
+       'They share what is left of 180: ~\\f{180 - ' + apex + '}{2} = \\f{' + (180 - apex) + '}{2}~.',
+       'Each base angle is **' + MC.fmt(base, 2) + '** degrees.'],
+      { figure: FIG.triangleAngles(base, base, {
+        sides: [{ on: 'CA', label: '', ticks: 1 }, { on: 'BC', label: '', ticks: 1 }],
+        angles: [{ at: 'C', label: apex + '°' }, { at: 'A', label: '?' }] }),
+        unit: 'degrees', tol: 0.005 });
+  });
+
+  g('triangle-inequality', function (R, d) {
+    var mode = R.pick(['test', 'range']);
+    if (mode === 'test') {
+      var valid = R.bool();
+      var a, b, c;
+      if (valid) { a = R.int(4, 12); b = R.int(4, 12); c = R.int(Math.abs(a - b) + 1, a + b - 1); }
+      else { a = R.int(2, 6); b = R.int(2, 6); c = a + b + R.int(1, 5); }
+      var sh = shuffleChoices(R, ['Yes, these can form a triangle', 'No, these cannot'], valid ? 0 : 1);
+      return mc('Can three segments of length ' + a + ', ' + b + ' and ' + c + ' form a triangle?',
+        sh.choices, sh.answer,
+        ['Any two sides must add to more than the third. Check the two shortest against the longest.',
+         valid ? a + ' + ' + b + ' = ' + (a + b) + ', which is more than ' + c + ' — and the other pairs are easier still. So **yes**.'
+               : a + ' + ' + b + ' = ' + (a + b) + ', which is not more than ' + c + '. The two short sides cannot reach across. So **no**.',
+         'Only the longest side needs checking: if the two shorter ones beat it, every other pair does too.']);
+    }
+    var p = R.int(5, 20), q = R.int(5, 20);
+    var lo = Math.abs(p - q), hi = p + q;
+    return multi('Two sides of a triangle are ' + p + ' and ' + q +
+      '. The third side must be greater than one number and less than another. Give both.',
+      [{ label: 'Greater than', answer: lo }, { label: 'Less than', answer: hi }],
+      ['The third side must be less than the sum: ' + p + ' + ' + q + ' = ' + hi + '.',
+       'It must also be more than the difference, or the two given sides could not reach: ~|' + p + ' - ' + q +
+         '| = ' + lo + '~.',
+       'So the third side lies strictly between **' + lo + '** and **' + hi + '**.',
+       'Both bounds are strict. At exactly ' + hi + ' the triangle flattens into a straight line.']);
+  });
+
+  g('triangle-centres', function (R, d) {
+    var items = [
+      { q: 'a segment from a vertex to the midpoint of the opposite side', ans: 'Median' },
+      { q: 'a segment from a vertex perpendicular to the opposite side', ans: 'Altitude' },
+      { q: 'a line cutting an angle of the triangle exactly in half', ans: 'Angle bisector' },
+      { q: 'a line through the midpoint of a side, at right angles to it', ans: 'Perpendicular bisector' }
+    ];
+    var centres = [
+      { q: 'the three medians', ans: 'Centroid' },
+      { q: 'the three altitudes', ans: 'Orthocentre' },
+      { q: 'the three angle bisectors', ans: 'Incentre' },
+      { q: 'the three perpendicular bisectors', ans: 'Circumcentre' }
+    ];
+    if (R.bool()) {
+      var it = R.pick(items);
+      var all = items.map(function (x) { return x.ans; });
+      var sh = choiceSet(R, it.ans, all.filter(function (o) { return o !== it.ans; }));
+      return mc('In a triangle, what is ' + it.q + ' called?', sh.choices, sh.answer,
+        ['These four lines are easy to confuse, and the difference is exactly where each one meets the opposite side.',
+         'This one is the **' + it.ans.toLowerCase() + '**.',
+         'A median goes to the midpoint; an altitude meets at right angles. They coincide only in an isosceles triangle, measured from the apex.']);
+    }
+    var ct = R.pick(centres);
+    var allC = centres.map(function (x) { return x.ans; });
+    var sh2 = choiceSet(R, ct.ans, allC.filter(function (o) { return o !== ct.ans; }));
+    return mc('Where ' + ct.q + ' of a triangle meet is called the what?', sh2.choices, sh2.answer,
+      ['Each set of three lines meets at a single point, which is a genuinely surprising fact proved in geometry.',
+       'For ' + ct.q + ' it is the **' + ct.ans.toLowerCase() + '**.',
+       ct.ans === 'Centroid' ? 'The centroid is the balance point, and it sits two-thirds of the way along each median.'
+         : ct.ans === 'Circumcentre' ? 'The circumcentre is equidistant from all three vertices, so it is the centre of the circle through them.'
+         : ct.ans === 'Incentre' ? 'The incentre is equidistant from all three sides, so it is the centre of the inscribed circle.'
+         : 'The orthocentre can fall outside the triangle when one angle is obtuse.']);
+  });
+
+  g('congruence-criteria', function (R, d) {
+    var cases = [
+      { given: 'all three pairs of sides are equal', ans: 'SSS' },
+      { given: 'two sides and the angle between them are equal', ans: 'SAS' },
+      { given: 'two angles and the side between them are equal', ans: 'ASA' },
+      { given: 'two angles and a side not between them are equal', ans: 'AAS' },
+      { given: 'the hypotenuses and one pair of legs of two right triangles are equal', ans: 'HL' }
+    ];
+    var mode = R.pick(['identify', 'whyNotSSA', 'whyNotAAA']);
+    if (mode === 'identify') {
+      var c = R.pick(cases);
+      var all = ['SSS', 'SAS', 'ASA', 'AAS', 'HL'];
+      var sh = choiceSet(R, c.ans, R.shuffle(all.filter(function (o) { return o !== c.ans; })).slice(0, 3));
+      return mc('Two triangles are known to have this: ' + c.given +
+        '. Which congruence criterion does that match?', sh.choices, sh.answer,
+        ['The letters record what is known, in order around the triangle: S for a side, A for an angle.',
+         'This is **' + c.ans + '**.',
+         'The order matters. SAS means the angle is *between* the two sides; ASA means the side is *between* the two angles.']);
+    }
+    if (mode === 'whyNotSSA') {
+      var sh2 = choiceSet(R, 'Two different triangles can fit the same SSA information',
+        ['It gives too much information', 'It only works for right triangles', 'SSA is the same as SAS']);
+      return mc('Why is SSA not a congruence criterion?', sh2.choices, sh2.answer,
+        ['With two sides and an angle *not* between them, the third side can often swing to two different positions.',
+         'That produces two genuinely different triangles from the same measurements, so the information does not pin one down.',
+         'So: **two different triangles can fit the same SSA information**.',
+         'This is the same ambiguity that gives the law of sines its "ambiguous case". The one exception is a right angle, which is why HL works.']);
+    }
+    var sh3 = choiceSet(R, 'They are the same shape but may be different sizes',
+      ['They are congruent', 'They cannot exist', 'They must be equilateral']);
+    return mc('If all three angles of two triangles are equal, what follows?', sh3.choices, sh3.answer,
+      ['Equal angles fix the shape but say nothing about scale.',
+       'A small triangle and a huge one can have identical angles.',
+       'So **they are the same shape but may be different sizes** — that is similarity, not congruence.',
+       'Congruence needs at least one side. This is exactly the line between the two ideas.']);
+  });
+
+  g('cpctc', function (R, d) {
+    var mode = R.pick(['deduce', 'order']);
+    if (mode === 'deduce') {
+      var val = R.int(4, 20);
+      var sh = choiceSet(R, 'It must also be ' + val,
+        ['It could be anything', 'It must be twice ' + val, 'It must be half of ' + val]);
+      return mc('Two triangles have been proved congruent. One side of the first measures ' + val +
+        '. What can you say about the matching side of the second?', sh.choices, sh.answer,
+        ['Congruent means identical in every measurement — all three sides and all three angles.',
+         'So the corresponding side **must also be ' + val + '**.',
+         'This is what CPCTC records: corresponding parts of congruent triangles are congruent. It is the step that lets a congruence proof conclude something about a specific side or angle.']);
+    }
+    var sh2 = choiceSet(R, 'Prove the triangles congruent first, then conclude the parts are equal',
+      ['Conclude the parts are equal first, then prove congruence',
+       'Both can be assumed at once', 'CPCTC proves the triangles congruent']);
+    return mc('In what order does a CPCTC argument work?', sh2.choices, sh2.answer,
+      ['CPCTC is a conclusion, never a starting point.',
+       'You establish congruence by SSS, SAS, ASA, AAS or HL, and only then quote CPCTC to get the part you actually wanted.',
+       'So: **prove the triangles congruent first, then conclude the parts are equal**.',
+       'Using CPCTC to prove congruence is circular, and it is the commonest error in early proof writing.']);
+  });
+
+  g('similarity-criteria', function (R, d) {
+    var mode = R.pick(['identify', 'ratio']);
+    if (mode === 'identify') {
+      var cases = [
+        { given: 'two pairs of angles are equal', ans: 'AA' },
+        { given: 'all three pairs of sides are in the same ratio', ans: 'SSS similarity' },
+        { given: 'two pairs of sides are in the same ratio and the angles between them are equal', ans: 'SAS similarity' }
+      ];
+      var c = R.pick(cases);
+      var all = cases.map(function (x) { return x.ans; });
+      var sh = choiceSet(R, c.ans, all.filter(function (o) { return o !== c.ans; }));
+      return mc('Two triangles have this: ' + c.given + '. Which similarity test does that match?',
+        sh.choices, sh.answer,
+        ['Similarity needs matching shape, not matching size, so ratios replace equalities.',
+         'This is **' + c.ans + '**.',
+         'AA is enough on its own, because the third angle is then forced — which is why it is the test you will use most.']);
+    }
+    var k = R.int(2, 5), a = R.int(3, 12);
+    return num('Two triangles are similar. A side of ' + a + ' in the first corresponds to a side of ' +
+      (a * k) + ' in the second. What is the scale factor from the first to the second?', k,
+      ['The scale factor is the ratio of corresponding sides, in the direction asked.',
+       (a * k) + ' \\div ' + a + ' = **' + k + '**.',
+       'Every pair of corresponding sides gives the same factor. If two pairs disagree, the triangles are not similar.'],
+      { tol: 0.005 });
+  });
+
+  g('similar-side-lengths', function (R, d) {
+    var mode = R.pick(['direct', 'shadow', 'nested']);
+    var k = R.int(2, 4);
+    if (mode === 'direct') {
+      var a = R.int(3, 12), b = R.int(3, 12);
+      return num('Two similar triangles: in the smaller, two sides are ' + a + ' and ' + b +
+        '. In the larger, the side matching the ' + a + ' is ' + (a * k) +
+        '. How long is the side matching the ' + b + '?', b * k,
+        ['Find the scale factor from the pair you know: ' + (a * k) + ' \\div ' + a + ' = ' + k + '.',
+         'Apply it to the other side: ' + b + ' \\times ' + k + ' = **' + (b * k) + '**.',
+         'Set it up as a proportion if you prefer: ~\\f{' + a + '}{' + (a * k) + '} = \\f{' + b + '}{?}~. Keep corresponding sides in matching positions.'],
+        { tol: 0.005 });
+    }
+    if (mode === 'shadow') {
+      var poleH = R.int(2, 12), poleS = R.int(1, 8), manS = R.int(1, 5);
+      var manH = Math.round(poleH * manS / poleS * 100) / 100;
+      return num('A ' + poleH + ' m pole casts a shadow ' + poleS + ' m long. At the same moment a person ' +
+        'casts a shadow ' + manS + ' m long. How tall is the person, in metres? Round to 2 decimal places.',
+        manH,
+        ['The sun gives both the same angle, so the two triangles are similar by AA.',
+         'Set up matching ratios: ~\\f{height}{shadow}~ is the same for both: ~\\f{' + poleH + '}{' + poleS +
+           '} = \\f{h}{' + manS + '}~.',
+         '~h = ' + poleH + ' \\times \\f{' + manS + '}{' + poleS + '} = ~**' + MC.fmt(manH, 2) + '** m.',
+         'Keep the same quantity on top in both fractions. Flipping one is the usual error.'],
+        { tol: 0.015 });
+    }
+    var big = R.int(6, 20), small = R.int(2, big - 2), topLen = R.int(3, 15);
+    var fullLen = Math.round(topLen * big / small * 100) / 100;
+    return num('A line parallel to the base of a triangle cuts off a smaller similar triangle at the top. ' +
+      'The small triangle has height ' + small + ' and base ' + topLen + '; the whole triangle has height ' +
+      big + '. How long is the whole base? Round to 2 decimal places.', fullLen,
+      ['A line parallel to one side makes the small triangle similar to the whole one, by AA.',
+       'Scale factor on heights: ~\\f{' + big + '}{' + small + '} = ' + MC.fmt(big / small, 4) + '~.',
+       'Apply it to the base: ' + topLen + ' \\times ' + MC.fmt(big / small, 4) + ' = **' + MC.fmt(fullLen, 2) + '**.',
+       'Compare the small triangle with the *whole* triangle, not with the trapezium left over — that is the trap in this configuration.'],
+      { tol: 0.015 });
+  });
+
+  g('scale-factor-area-volume', function (R, d) {
+    var k = R.int(2, 5);
+    var mode = R.pick(['area', 'volume', 'backwards']);
+    if (mode === 'area') {
+      var a = R.int(4, 40);
+      return num('Two similar shapes have a length scale factor of ' + k + '. The smaller has area ' + a +
+        ' cm². What is the area of the larger, in cm²?', a * k * k,
+        ['Area is two-dimensional, so it scales by the square of the length factor.',
+         k + '^{2} = ' + (k * k) + ', so ' + a + ' \\times ' + (k * k) + ' = **' + MC.commas(a * k * k) + '** cm².',
+         'Using ' + k + ' instead of ' + (k * k) + ' is the standard mistake, and it is wrong by a factor of ' + k + '.']);
+    }
+    if (mode === 'volume') {
+      var v = R.int(3, 30);
+      return num('Two similar solids have a length scale factor of ' + k + '. The smaller has volume ' + v +
+        ' cm³. What is the volume of the larger, in cm³?', v * k * k * k,
+        ['Volume is three-dimensional, so it scales by the cube of the length factor.',
+         k + '^{3} = ' + (k * k * k) + ', so ' + v + ' \\times ' + (k * k * k) + ' = **' +
+           MC.commas(v * k * k * k) + '** cm³.',
+         'Doubling every dimension of a box multiplies its capacity by eight, not two — which is why a scaled-up recipe or package behaves so unintuitively.']);
+    }
+    var areaRatio = k * k;
+    return num('Two similar shapes have areas in the ratio 1 : ' + areaRatio +
+      '. What is the ratio of their lengths, as the second number (the first is 1)?', k,
+      ['Areas scale by the square of the length factor, so go backwards with a square root.',
+       '~sqrt{' + areaRatio + '} = ' + k + '~.',
+       'Lengths are in the ratio 1 : **' + k + '**.',
+       'Going backwards means taking a root: square root for areas, cube root for volumes.'], { tol: 0.005 });
+  });
+
+  g('pythagoras', function (R, d) {
+    var triples = [[3, 4, 5], [5, 12, 13], [8, 15, 17], [7, 24, 25], [9, 40, 41], [20, 21, 29],
+                   [6, 8, 10], [9, 12, 15], [10, 24, 26], [12, 16, 20]];
+    var t = R.pick(triples);
+    var findHyp = R.bool(0.55);
+    if (findHyp) {
+      return num('A right triangle has legs ' + t[0] + ' and ' + t[1] +
+        '. How long is the hypotenuse?', t[2],
+        ['The hypotenuse is the side opposite the right angle, and it is always the longest.',
+         '~a^{2} + b^{2} = c^{2}~: ' + (t[0] * t[0]) + ' + ' + (t[1] * t[1]) + ' = ' + (t[2] * t[2]) + '.',
+         '~c = sqrt{' + (t[2] * t[2]) + '} = ~**' + t[2] + '**.'],
+        { figure: FIG.rightTriangle(t[1], t[0], { bottom: String(t[1]), left: String(t[0]), hyp: '?' }) });
+    }
+    return num('A right triangle has hypotenuse ' + t[2] + ' and one leg ' + t[0] +
+      '. How long is the other leg?', t[1],
+      ['Rearrange for a leg, not the hypotenuse: ~b^{2} = c^{2} - a^{2}~.',
+       (t[2] * t[2]) + ' - ' + (t[0] * t[0]) + ' = ' + (t[1] * t[1]) + '.',
+       '~b = sqrt{' + (t[1] * t[1]) + '} = ~**' + t[1] + '**.',
+       'Subtract, do not add. Identify the hypotenuse first — it is opposite the right angle — or the whole calculation goes the wrong way.'],
+      { figure: FIG.rightTriangle(t[1], t[0], { bottom: '?', left: String(t[0]), hyp: String(t[2]) }) });
+  });
+
+  g('pythagoras-converse', function (R, d) {
+    var kinds = ['right', 'acute', 'obtuse'];
+    var kind = R.pick(kinds);
+    var a, b, c;
+    if (kind === 'right') { var t = R.pick([[3, 4, 5], [5, 12, 13], [8, 15, 17], [6, 8, 10], [9, 12, 15]]); a = t[0]; b = t[1]; c = t[2]; }
+    else if (kind === 'acute') { a = R.int(6, 12); b = R.int(6, 12); c = Math.max(a, b) + R.int(0, 1); while (c * c >= a * a + b * b || c <= Math.abs(a - b)) { a = R.int(7, 12); b = R.int(7, 12); c = Math.max(a, b); } }
+    else { a = R.int(4, 10); b = R.int(4, 10); c = Math.floor(Math.sqrt(a * a + b * b)) + 1; while (c >= a + b) { a = R.int(5, 10); b = R.int(5, 10); c = Math.floor(Math.sqrt(a * a + b * b)) + 1; } }
+    var lhs = a * a + b * b, rhs = c * c;
+    var right = kind === 'right' ? 'Right' : kind === 'acute' ? 'Acute' : 'Obtuse';
+    var sh = choiceSet(R, right, ['Right', 'Acute', 'Obtuse'].filter(function (o) { return o !== right; }));
+    return mc('A triangle has sides ' + a + ', ' + b + ' and ' + c +
+      '. Using the converse of the Pythagorean theorem, is it right, acute or obtuse?', sh.choices, sh.answer,
+      ['Compare the square of the longest side with the sum of the squares of the other two.',
+       a + '^{2} + ' + b + '^{2} = ' + lhs + ', and ' + c + '^{2} = ' + rhs + '.',
+       rhs === lhs ? 'They are equal, so the triangle is **right**.'
+         : rhs < lhs ? 'The longest side squared is smaller, so the angle opposite it is under 90 degrees — **acute**.'
+         : 'The longest side squared is larger, so the angle opposite it is over 90 degrees — **obtuse**.',
+       'Always square the *longest* side on its own side of the comparison, or the test reverses.']);
+  });
+
+  g('special-right-triangles', function (R, d) {
+    var kind = R.pick(['45', '30-60']);
+    if (kind === '45') {
+      var leg = R.int(2, 15);
+      var askHyp = R.bool();
+      if (askHyp) {
+        return num('A 45-45-90 triangle has legs of ' + leg +
+          '. Its hypotenuse is ~a\\,sqrt{2}~ — what is ~a~?', leg,
+          ['In a 45-45-90 triangle the two legs are equal and the hypotenuse is a leg times ~sqrt{2}~.',
+           'So the hypotenuse is ~' + leg + 'sqrt{2}~, and ~a = ~**' + leg + '**.',
+           'This comes straight from Pythagoras: ~' + leg + '^{2} + ' + leg + '^{2} = ' + (2 * leg * leg) +
+             '~, and ~sqrt{' + (2 * leg * leg) + '} = ' + leg + 'sqrt{2}~.']);
+      }
+      return num('A 45-45-90 triangle has hypotenuse ~' + leg + 'sqrt{2}~. How long is each leg?', leg,
+        ['The hypotenuse is a leg times ~sqrt{2}~, so divide by ~sqrt{2}~ to go back.',
+         '~' + leg + 'sqrt{2} \\div sqrt{2} = ' + leg + '~.',
+         'Each leg is **' + leg + '**.']);
+    }
+    var short = R.int(2, 12);
+    var ask = R.pick(['hyp', 'long']);
+    if (ask === 'hyp') {
+      return num('In a 30-60-90 triangle the side opposite the 30-degree angle is ' + short +
+        '. How long is the hypotenuse?', 2 * short,
+        ['The sides are in the ratio ~1 : sqrt{3} : 2~, with the shortest opposite the 30-degree angle.',
+         'The hypotenuse is twice the shortest side: ' + short + ' \\times 2 = **' + (2 * short) + '**.',
+         'The shortest side is always opposite the smallest angle — that is how you anchor the ratio.']);
+    }
+    return num('In a 30-60-90 triangle the side opposite the 30-degree angle is ' + short +
+      '. The side opposite 60 degrees is ~a\\,sqrt{3}~ — what is ~a~?', short,
+      ['The ratio is ~1 : sqrt{3} : 2~ for the sides opposite 30, 60 and 90.',
+       'So the side opposite 60 degrees is ~' + short + 'sqrt{3}~, giving ~a = ~**' + short + '**.',
+       'Knowing these two triangles exactly is what lets you do trigonometry without a calculator.']);
+  });
+
+  g('trig-ratios', function (R, d) {
+    var triples = [[3, 4, 5], [5, 12, 13], [8, 15, 17], [7, 24, 25], [6, 8, 10], [9, 12, 15]];
+    var t = R.pick(triples);
+    var which = R.pick(['sin', 'cos', 'tan']);
+    var opp = t[0], adj = t[1], hyp = t[2];
+    var val = which === 'sin' ? opp / hyp : which === 'cos' ? adj / hyp : opp / adj;
+    var frac = which === 'sin' ? F(opp, hyp) : which === 'cos' ? F(adj, hyp) : F(opp, adj);
+    var names = { sin: 'sine', cos: 'cosine', tan: 'tangent' };
+    var defs = { sin: 'opposite over hypotenuse', cos: 'adjacent over hypotenuse', tan: 'opposite over adjacent' };
+    return num('In a right triangle, the side opposite angle ~\\theta~ is ' + opp + ', the side next to it is ' +
+      adj + ', and the hypotenuse is ' + hyp + '. What is ~\\' + which + ' \\theta~? Give a decimal to 4 places.',
+      Math.round(val * 10000) / 10000,
+      ['SOH CAH TOA: ' + names[which] + ' is ' + defs[which] + '.',
+       '~\\' + which + ' \\theta = \\f{' + (which === 'cos' ? adj : opp) + '}{' +
+         (which === 'tan' ? adj : hyp) + '} = ' + Frac.str(frac) + '~.',
+       'As a decimal: **' + MC.fmt(val, 4) + '**.',
+       'Opposite and adjacent are relative to the angle you chose. Switch angles and they swap — only the hypotenuse is fixed.'],
+      { figure: FIG.rightTriangle(adj, opp, { bottom: String(adj), left: String(opp), hyp: String(hyp), theta: 'θ' }),
+        tol: 0.00006 });
+  });
+
+  g('inverse-trig-angles', function (R, d) {
+    var opp = R.int(2, 20), adj = R.int(2, 20);
+    var hyp = Math.sqrt(opp * opp + adj * adj);
+    var which = R.pick(['tan', 'sin', 'cos']);
+    var ang = which === 'tan' ? Math.atan(opp / adj) * 180 / Math.PI
+            : which === 'sin' ? Math.asin(opp / hyp) * 180 / Math.PI
+            : Math.acos(adj / hyp) * 180 / Math.PI;
+    var given = which === 'tan' ? 'the opposite side is ' + opp + ' and the adjacent side is ' + adj
+              : which === 'sin' ? 'the opposite side is ' + opp + ' and the hypotenuse is ' + MC.fmt(hyp, 4)
+              : 'the adjacent side is ' + adj + ' and the hypotenuse is ' + MC.fmt(hyp, 4);
+    return num('In a right triangle, ' + given + '. How many degrees is the angle ~\\theta~? ' +
+      'Round to 2 decimal places.', Math.round(ang * 100) / 100,
+      ['You know a ratio and want the angle, so use the inverse function.',
+       '~\\' + which + ' \\theta = ' + MC.fmt(which === 'tan' ? opp / adj : which === 'sin' ? opp / hyp : adj / hyp, 5) + '~.',
+       '~\\theta = \\' + which + '^{-1}(' + MC.fmt(which === 'tan' ? opp / adj : which === 'sin' ? opp / hyp : adj / hyp, 5) +
+         ') = ~**' + MC.fmt(ang, 2) + '** degrees.',
+       'Make sure the calculator is in degrees, not radians. A radian answer looks plausible and is completely wrong.'],
+      { unit: 'degrees', tol: 0.015 });
+  });
+
+  g('elevation-depression', function (R, d) {
+    var kind = R.pick(['height', 'distance', 'angle']);
+    var ang = R.int(15, 70), dist = R.int(10, 200);
+    if (kind === 'height') {
+      var h = Math.round(dist * Math.tan(ang * Math.PI / 180) * 100) / 100;
+      return num('From ' + dist + ' m away, the angle of elevation to the top of a tower is ' + ang +
+        ' degrees. How tall is the tower, in metres? Round to 2 decimal places.', h,
+        ['Draw it: the ground is the adjacent side, the tower is the opposite side, and the angle is at your eye.',
+         'Opposite over adjacent is tangent: ~\\tan ' + ang + '\\deg = \\f{h}{' + dist + '}~.',
+         '~h = ' + dist + ' \\times \\tan ' + ang + '\\deg = ~**' + MC.fmt(h, 2) + '** m.',
+         'The angle of elevation is measured up from the horizontal, and an angle of depression is measured down from it. They are equal between the same two points.'],
+        { figure: FIG.elevation('elevation', ang, { angle: ang + '°', dist: dist + ' m', height: '?' }), tol: 0.02 });
+    }
+    if (kind === 'distance') {
+      var height = R.int(5, 150);
+      var dd = Math.round(height / Math.tan(ang * Math.PI / 180) * 100) / 100;
+      return num('A cliff is ' + height + ' m high. From the top, the angle of depression to a boat is ' + ang +
+        ' degrees. How far is the boat from the base of the cliff, in metres? Round to 2 decimal places.', dd,
+        ['The angle of depression from the top equals the angle of elevation from the boat, so the triangle is the same either way.',
+         '~\\tan ' + ang + '\\deg = \\f{' + height + '}{d}~, so ~d = \\f{' + height + '}{\\tan ' + ang + '\\deg}~.',
+         '**' + MC.fmt(dd, 2) + ' m.**',
+         'A common slip is putting the angle of depression inside the triangle at the wrong vertex. Marking the horizontal at the top first prevents it.'],
+        { figure: FIG.elevation('depression', ang, { angle: ang + '°', height: height + ' m', dist: '?' }), tol: 0.02 });
+    }
+    var hh = R.int(5, 90), base = R.int(10, 150);
+    var a2 = Math.atan(hh / base) * 180 / Math.PI;
+    return num('A tree ' + hh + ' m tall stands ' + base +
+      ' m away. How many degrees is the angle of elevation to its top? Round to 2 decimal places.',
+      Math.round(a2 * 100) / 100,
+      ['You have opposite (' + hh + ') and adjacent (' + base + '), so use tangent and then its inverse.',
+       '~\\tan \\theta = \\f{' + hh + '}{' + base + '} = ' + MC.fmt(hh / base, 5) + '~.',
+       '~\\theta = ~**' + MC.fmt(a2, 2) + '** degrees.'],
+      { figure: FIG.elevation('elevation', Math.round(a2 * 10) / 10, { angle: '?', dist: base + ' m', height: hh + ' m' }),
+        unit: 'degrees', tol: 0.015 });
+  });
+
+  g('polygon-angles', function (R, d) {
+    var n = R.int(3, 12);
+    var mode = R.pick(['sum', 'eachInterior', 'eachExterior', 'findN']);
+    if (mode === 'sum') {
+      return num('What is the sum of the interior angles of a polygon with ' + n + ' sides, in degrees?',
+        (n - 2) * 180,
+        ['Any ~n~-sided polygon splits into ~n - 2~ triangles from a single vertex.',
+         'Each triangle contributes 180 degrees: ~(' + n + ' - 2) \\times 180 = ' + ((n - 2) * 180) + '~.',
+         '**' + MC.commas((n - 2) * 180) + '** degrees.',
+         'That is why a quadrilateral is 360 and a pentagon 540 — each extra side adds one more triangle.'],
+        { unit: 'degrees' });
+    }
+    if (mode === 'eachInterior') {
+      var each = (n - 2) * 180 / n;
+      return num('In a **regular** polygon with ' + n + ' sides, how many degrees is each interior angle? ' +
+        'Round to 2 decimal places.', Math.round(each * 100) / 100,
+        ['Total interior angles: ~(' + n + ' - 2) \\times 180 = ' + ((n - 2) * 180) + '~ degrees.',
+         'Regular means all equal, so divide by ' + n + ': ~\\f{' + ((n - 2) * 180) + '}{' + n + '}~.',
+         '**' + MC.fmt(each, 2) + '** degrees.',
+         'Dividing only works because the polygon is regular. An irregular one has the same total shared out unevenly.'],
+        { unit: 'degrees', tol: 0.015 });
+    }
+    if (mode === 'eachExterior') {
+      var ext = 360 / n;
+      return num('In a regular polygon with ' + n + ' sides, how many degrees is each exterior angle? ' +
+        'Round to 2 decimal places.', Math.round(ext * 100) / 100,
+        ['The exterior angles of any polygon always add to 360 degrees — walk once round the shape and you have turned through a full circle.',
+         'Regular, so divide: ~\\f{360}{' + n + '} = ' + MC.fmt(ext, 4) + '~.',
+         '**' + MC.fmt(ext, 2) + '** degrees.',
+         'The 360 total does not depend on the number of sides, which makes exterior angles the easier route into most polygon problems.'],
+        { unit: 'degrees', tol: 0.015 });
+    }
+    var nn = R.pick([3, 4, 5, 6, 8, 9, 10, 12, 15, 18, 20, 24, 36]);
+    return num('Each exterior angle of a regular polygon is ' + (360 / nn) + ' degrees. How many sides does it have?',
+      nn,
+      ['Exterior angles always total 360 degrees.',
+       '~\\f{360}{' + (360 / nn) + '} = ~**' + nn + '** sides.',
+       'If a question gives the interior angle instead, subtract from 180 first to get the exterior one — it is much the quicker route.']);
+  });
+
+  g('quadrilateral-properties', function (R, d) {
+    var facts = [
+      { q: 'Which quadrilateral has four right angles and four equal sides?', ans: 'Square',
+        why: 'A square is both a rectangle and a rhombus — it satisfies every condition both impose.' },
+      { q: 'Which quadrilateral has four equal sides but not necessarily right angles?', ans: 'Rhombus',
+        why: 'A rhombus is a "pushed over" square: equal sides, but the angles need not be 90 degrees.' },
+      { q: 'Which quadrilateral has four right angles but not necessarily equal sides?', ans: 'Rectangle',
+        why: 'A rectangle fixes the angles and leaves the side lengths free.' },
+      { q: 'Which quadrilateral has exactly one pair of parallel sides?', ans: 'Trapezium',
+        why: 'Exactly one pair is the defining feature; two pairs would make it a parallelogram.' },
+      { q: 'Which quadrilateral has two pairs of adjacent equal sides, but opposite sides unequal?', ans: 'Kite',
+        why: 'A kite pairs its equal sides next to each other rather than opposite.' },
+      { q: 'In which quadrilateral do the diagonals always bisect each other?', ans: 'Parallelogram',
+        why: 'Every parallelogram has this, and so do rectangles, rhombuses and squares, because they are all parallelograms.' }
+    ];
+    var f = R.pick(facts);
+    var all = ['Square', 'Rhombus', 'Rectangle', 'Trapezium', 'Kite', 'Parallelogram'];
+    var sh = choiceSet(R, f.ans, R.shuffle(all.filter(function (o) { return o !== f.ans; })).slice(0, 3));
+    return mc(f.q, sh.choices, sh.answer,
+      ['The quadrilateral family is a hierarchy, not a list of separate shapes.',
+       f.why,
+       'Answer: **' + f.ans.toLowerCase() + '**.',
+       'Every square is a rectangle and a rhombus; every rectangle and rhombus is a parallelogram. The arrows only run one way.']);
+  });
+
+  g('quadrilateral-proofs', function (R, d) {
+    var cases = [
+      { given: 'both pairs of opposite sides are equal', ans: 'Parallelogram',
+        why: 'Equal opposite sides force the opposite sides to be parallel too, which is the definition.' },
+      { given: 'the diagonals bisect each other', ans: 'Parallelogram',
+        why: 'Diagonals bisecting each other is enough on its own to make a parallelogram.' },
+      { given: 'it is a parallelogram with one right angle', ans: 'Rectangle',
+        why: 'In a parallelogram, opposite angles are equal and co-interior ones add to 180, so one right angle forces all four.' },
+      { given: 'it is a parallelogram with two adjacent sides equal', ans: 'Rhombus',
+        why: 'Opposite sides are already equal, so one adjacent pair being equal makes all four equal.' },
+      { given: 'the diagonals are equal and bisect each other at right angles', ans: 'Square',
+        why: 'Equal diagonals give a rectangle, perpendicular diagonals give a rhombus; both together give a square.' }
+    ];
+    var c = R.pick(cases);
+    var all = ['Parallelogram', 'Rectangle', 'Rhombus', 'Square'];
+    var sh = choiceSet(R, c.ans, all.filter(function (o) { return o !== c.ans; }));
+    return mc('A quadrilateral is known to have this: ' + c.given +
+      '. What is the most specific name you can prove it has?', sh.choices, sh.answer,
+      ['The question asks what the evidence is *enough* to establish — no more and no less.',
+       c.why,
+       'So the most specific provable name is **' + c.ans.toLowerCase() + '**.',
+       'Claiming more than the given facts support is the commonest error in these proofs: a parallelogram with equal diagonals is a rectangle, but not necessarily a square.']);
+  });
+
+  g('area-basic-figures', function (R, d) {
+    var kind = R.pick(['rectangle', 'triangle', 'parallelogram', 'trapezium']);
+    var b = R.int(3, 25), h = R.int(3, 20), a = R.int(2, b - 1);
+    var area, steps, labels;
+    if (kind === 'rectangle') {
+      area = b * h;
+      labels = { base: String(b), height: String(h) };
+      steps = ['Area of a rectangle is base times height.', b + ' \\times ' + h + ' = **' + area + '**.'];
+    } else if (kind === 'triangle') {
+      area = b * h / 2;
+      labels = { base: String(b), height: String(h) };
+      steps = ['Area of a triangle is half the base times the perpendicular height.',
+        '~\\f{1}{2} \\times ' + b + ' \\times ' + h + ' = ~**' + MC.fmt(area, 2) + '**.',
+        'The height must be perpendicular to the base — a slanted side is not the height.'];
+    } else if (kind === 'parallelogram') {
+      area = b * h;
+      labels = { base: String(b), height: String(h) };
+      steps = ['Area of a parallelogram is base times perpendicular height — the same as a rectangle, because you can cut a triangle off one end and slide it to the other.',
+        b + ' \\times ' + h + ' = **' + area + '**.',
+        'Use the perpendicular height, not the slanted side length.'];
+    } else {
+      area = (a + b) * h / 2;
+      labels = { top: String(a), base: String(b), height: String(h) };
+      steps = ['Area of a trapezium is the average of the two parallel sides times the height.',
+        '~\\f{' + a + ' + ' + b + '}{2} \\times ' + h + ' = ' + MC.fmt((a + b) / 2, 2) + ' \\times ' + h + '~.',
+        '= **' + MC.fmt(area, 2) + '**.'];
+    }
+    return num('Find the area of this ' + kind + '. All lengths are in cm, so answer in cm².', area,
+      steps, { figure: FIG.areaShape(kind, labels), tol: 0.005 });
+  });
+
+  g('composite-area', function (R, d) {
+    var mode = R.pick(['lshape', 'subtract']);
+    if (mode === 'lshape') {
+      var W = R.int(8, 20), H = R.int(6, 16), w = R.int(2, W - 3), h = R.int(2, H - 3);
+      var area = W * H - w * h;
+      return num('An L-shape is made by cutting a ' + w + ' cm by ' + h + ' cm rectangle out of the corner of a ' +
+        W + ' cm by ' + H + ' cm rectangle. What is the remaining area, in cm²?', area,
+        ['Work out the whole rectangle: ' + W + ' \\times ' + H + ' = ' + (W * H) + ' cm².',
+         'Subtract the cut-out piece: ' + w + ' \\times ' + h + ' = ' + (w * h) + ' cm².',
+         (W * H) + ' - ' + (w * h) + ' = **' + MC.commas(area) + '** cm².',
+         'Composite areas are always add-or-subtract. Splitting into rectangles you recognise beats trying to find one clever formula.'],
+        { figure: FIG.areaShape('composite', { W: W, H: H, w: w, h: h, top: String(W - w), notchW: String(w),
+          notchH: String(h), base: String(W), height: String(H) }) });
+    }
+    var side = R.int(8, 24), rad = R.int(2, Math.floor(side / 2) - 1);
+    var shaded = side * side - Math.PI * rad * rad;
+    return num('A circle of radius ' + rad + ' cm is cut from the middle of a square of side ' + side +
+      ' cm. What area of the square is left, in cm²? Round to 2 decimal places.',
+      Math.round(shaded * 100) / 100,
+      ['Square: ' + side + '^{2} = ' + (side * side) + ' cm².',
+       'Circle: ~\\pi r^{2} = \\pi \\times ' + rad + '^{2} = ' + MC.fmt(Math.PI * rad * rad, 3) + '~ cm².',
+       (side * side) + ' - ' + MC.fmt(Math.PI * rad * rad, 3) + ' = **' + MC.fmt(shaded, 2) + '** cm².',
+       'Keep ~\\pi~ exact until the final step, or rounding early will shift the answer.'],
+      { tol: 0.02 });
+  });
+
+  g('perimeter-problems', function (R, d) {
+    var mode = R.pick(['backwards', 'fencing', 'circumferenceMix']);
+    if (mode === 'backwards') {
+      var w = R.int(3, 20), extra = R.int(1, 10);
+      var per = 2 * w + 2 * (w + extra);
+      return num('A rectangle has perimeter ' + per + ' cm and is ' + extra +
+        ' cm longer than it is wide. How wide is it, in cm?', w,
+        ['Let the width be ~x~; the length is ~x + ' + extra + '~.',
+         '~2x + 2(x + ' + extra + ') = ' + per + '~, so ~4x + ' + (2 * extra) + ' = ' + per + '~.',
+         '~x = ~**' + w + '** cm, with length ' + (w + extra) + ' cm.',
+         'Check: ' + w + ' + ' + (w + extra) + ' + ' + w + ' + ' + (w + extra) + ' = ' + per + '.'],
+        { tol: 0.005 });
+    }
+    if (mode === 'fencing') {
+      var len = R.int(5, 30), wid = R.int(5, 30);
+      var sides = 2 * len + wid;
+      return num('A rectangular yard ' + len + ' m by ' + wid +
+        ' m is fenced on three sides only, with one of the ' + wid +
+        ' m sides left open against a wall. How many metres of fence are needed?', sides,
+        ['Fence both ' + len + ' m sides and one ' + wid + ' m side.',
+         '2 \\times ' + len + ' + ' + wid + ' = **' + sides + '** m.',
+         'Read which side is left open. Using the full perimeter is the usual error, and it overstates the cost.']);
+    }
+    var r2 = R.int(2, 15);
+    var per2 = Math.PI * r2 + 2 * r2;
+    return num('A semicircle has radius ' + r2 +
+      ' cm. What is its perimeter, in cm? Round to 2 decimal places.',
+      Math.round(per2 * 100) / 100,
+      ['The curved part is half a circumference: ~\\f{1}{2} \\times 2\\pi r = \\pi \\times ' + r2 + ' = ' +
+        MC.fmt(Math.PI * r2, 3) + '~ cm.',
+       'The flat part is the diameter: ~2 \\times ' + r2 + ' = ' + (2 * r2) + '~ cm.',
+       'Total: **' + MC.fmt(per2, 2) + '** cm.',
+       'Forgetting the straight edge is the standard mistake — perimeter means all the way round, including the cut.'],
+      { tol: 0.02 });
+  });
+
+  g('circle-parts', function (R, d) {
+    var items = [
+      { part: 'radius', def: 'a segment from the centre to the edge', fig: ['radius'] },
+      { part: 'diameter', def: 'a segment through the centre with both ends on the circle', fig: ['diameter'] },
+      { part: 'chord', def: 'a segment joining two points on the circle, not through the centre', fig: ['chord'] },
+      { part: 'tangent', def: 'a line touching the circle at exactly one point', fig: ['tangent'] },
+      { part: 'sector', def: 'the region between two radii and the arc between them', fig: ['sector'] }
+    ];
+    var it = R.pick(items);
+    var all = items.map(function (x) { return x.part; });
+    if (R.bool(0.55)) {
+      var sh = choiceSet(R, it.part, all.filter(function (o) { return o !== it.part; }));
+      return mc('In a circle, what is ' + it.def + ' called?', sh.choices, sh.answer,
+        ['These names appear in every circle theorem, so they are worth being exact about.',
+         'This is a **' + it.part + '**.',
+         'A diameter is a chord — the longest one — which is why a theorem about chords also applies to it.'],
+        { figure: FIG.circleFig(it.fig, {}) });
+    }
+    var r = R.int(2, 20);
+    if (R.bool()) {
+      return num('A circle has radius ' + r + ' cm. How long is its diameter, in cm?', 2 * r,
+        ['The diameter is twice the radius.', '2 \\times ' + r + ' = **' + (2 * r) + '** cm.'],
+        { figure: FIG.circleFig(['radius'], { radius: r + ' cm' }) });
+    }
+    return num('A circle has diameter ' + (2 * r) + ' cm. How long is its radius, in cm?', r,
+      ['The radius is half the diameter.', (2 * r) + ' \\div 2 = **' + r + '** cm.',
+       'Formulas use ~r~ far more often than ~d~, so converting first saves mistakes.'],
+      { figure: FIG.circleFig(['diameter'], { diameter: (2 * r) + ' cm' }) });
+  });
+
+  g('circumference-area', function (R, d) {
+    var r = R.int(2, 20);
+    var mode = R.pick(['circ', 'area', 'backwardsCirc', 'backwardsArea']);
+    if (mode === 'circ') {
+      var c = 2 * Math.PI * r;
+      return num('A circle has radius ' + r + ' cm. What is its circumference, in cm? Round to 2 decimal places.',
+        Math.round(c * 100) / 100,
+        ['~C = 2\\pi r~.', '~2 \\times \\pi \\times ' + r + ' = ' + MC.fmt(c, 4) + '~.',
+         '**' + MC.fmt(c, 2) + '** cm.'],
+        { figure: FIG.circleFig(['radius'], { radius: r + ' cm' }), tol: 0.02 });
+    }
+    if (mode === 'area') {
+      var a = Math.PI * r * r;
+      return num('A circle has radius ' + r + ' cm. What is its area, in cm²? Round to 2 decimal places.',
+        Math.round(a * 100) / 100,
+        ['~A = \\pi r^{2}~ — square the radius first, then multiply by ~\\pi~.',
+         '~\\pi \\times ' + r + '^{2} = \\pi \\times ' + (r * r) + ' = ' + MC.fmt(a, 4) + '~.',
+         '**' + MC.fmt(a, 2) + '** cm².',
+         'Squaring the whole of ~\\pi r~ is a common slip. Only the radius is squared.'],
+        { figure: FIG.circleFig(['radius'], { radius: r + ' cm' }), tol: 0.02 });
+    }
+    if (mode === 'backwardsCirc') {
+      var cc = Math.round(2 * Math.PI * r * 100) / 100;
+      return num('A circle has circumference ' + cc + ' cm. What is its radius, in cm? Round to 2 decimal places.',
+        r,
+        ['Rearrange ~C = 2\\pi r~ to ~r = \\f{C}{2\\pi}~.',
+         '~\\f{' + cc + '}{2\\pi} = ~**' + r + '** cm.'], { tol: 0.02 });
+    }
+    var aa = Math.round(Math.PI * r * r * 100) / 100;
+    return num('A circle has area ' + aa + ' cm². What is its radius, in cm? Round to 2 decimal places.', r,
+      ['Rearrange ~A = \\pi r^{2}~ to ~r = sqrt{\\f{A}{\\pi}}~.',
+       '~\\f{' + aa + '}{\\pi} = ' + MC.fmt(aa / Math.PI, 3) + '~, and its square root is **' + r + '** cm.',
+       'Divide by ~\\pi~ *before* taking the root. Doing it the other way round is wrong.'], { tol: 0.02 });
+  });
+
+  g('arcs-sectors', function (R, d) {
+    var r = R.int(3, 18), deg = R.pick([30, 45, 60, 72, 90, 120, 135, 150, 180, 240, 270]);
+    var mode = R.pick(['arc', 'sector', 'radians']);
+    if (mode === 'arc') {
+      var arcLen = deg / 360 * 2 * Math.PI * r;
+      return num('A circle of radius ' + r + ' cm has a sector with a ' + deg +
+        '-degree angle at the centre. How long is the arc, in cm? Round to 2 decimal places.',
+        Math.round(arcLen * 100) / 100,
+        ['An arc is a fraction of the whole circumference, and the fraction is ~\\f{' + deg + '}{360}~.',
+         'Full circumference: ~2\\pi \\times ' + r + ' = ' + MC.fmt(2 * Math.PI * r, 3) + '~ cm.',
+         '~\\f{' + deg + '}{360} \\times ' + MC.fmt(2 * Math.PI * r, 3) + ' = ~**' + MC.fmt(arcLen, 2) + '** cm.'],
+        { figure: FIG.circleFig(['sector'], { sectorAngle: deg }), tol: 0.02 });
+    }
+    if (mode === 'sector') {
+      var secA = deg / 360 * Math.PI * r * r;
+      return num('A sector of a circle of radius ' + r + ' cm has a ' + deg +
+        '-degree angle. What is its area, in cm²? Round to 2 decimal places.',
+        Math.round(secA * 100) / 100,
+        ['A sector is the same fraction of the whole area: ~\\f{' + deg + '}{360}~.',
+         'Full area: ~\\pi \\times ' + r + '^{2} = ' + MC.fmt(Math.PI * r * r, 3) + '~ cm².',
+         '~\\f{' + deg + '}{360} \\times ' + MC.fmt(Math.PI * r * r, 3) + ' = ~**' + MC.fmt(secA, 2) + '** cm².',
+         'Arc length uses the circumference; sector area uses the area. The fraction is the same, the thing it multiplies is not.'],
+        { figure: FIG.circleFig(['sector'], { sectorAngle: deg }), tol: 0.02 });
+    }
+    var rad = deg * Math.PI / 180;
+    var arcR = rad * r;
+    return num('In a circle of radius ' + r + ' cm, a sector has a central angle of ' + deg +
+      ' degrees. Converting to radians, the arc length is ~r\\theta~. What is the arc length, in cm? ' +
+      'Round to 2 decimal places.', Math.round(arcR * 100) / 100,
+      ['Convert the angle: ~' + deg + '\\deg \\times \\f{\\pi}{180} = ' + MC.fmt(rad, 5) + '~ radians.',
+       'Then arc length is simply ~r\\theta = ' + r + ' \\times ' + MC.fmt(rad, 5) + '~.',
+       '**' + MC.fmt(arcR, 2) + '** cm.',
+       'This is why radians exist: in radians the arc length formula has no fractions or 360s in it at all.'],
+      { tol: 0.02 });
+  });
+
+  g('circle-angles', function (R, d) {
+    var mode = R.pick(['central-inscribed', 'semicircle', 'sameArc']);
+    if (mode === 'central-inscribed') {
+      var central = R.pick([40, 50, 60, 70, 80, 100, 110, 120, 140, 160]);
+      return num('A central angle stands on an arc and measures ' + central +
+        ' degrees. How many degrees is the inscribed angle standing on the same arc?', central / 2,
+        ['An inscribed angle is always half the central angle on the same arc.',
+         '~\\f{' + central + '}{2} = ~**' + (central / 2) + '** degrees.',
+         'The reason is that the radius to the inscribed vertex creates isosceles triangles, and their base angles force the halving.'],
+        { figure: FIG.circleFig(['central', 'inscribed'], { angle: central }), unit: 'degrees' });
+    }
+    if (mode === 'semicircle') {
+      var other = R.int(20, 70);
+      return num('A triangle is drawn in a circle with one side as the diameter. One of its other angles is ' +
+        other + ' degrees. How many degrees is the third angle?', 90 - other,
+        ['An angle inscribed in a semicircle is always a right angle — that is Thales theorem.',
+         'So the three angles are 90, ' + other + ' and the unknown.',
+         '180 - 90 - ' + other + ' = **' + (90 - other) + '** degrees.',
+         'Spotting the diameter is the whole trick here. It hands you a right angle for free.'],
+        { unit: 'degrees' });
+    }
+    var ang = R.int(20, 80);
+    var sh = choiceSet(R, 'It is also ' + ang + ' degrees',
+      ['It is ' + (2 * ang) + ' degrees', 'It is ' + (90 - ang) + ' degrees', 'It cannot be determined']);
+    return mc('Two inscribed angles stand on the same arc of a circle. One is ' + ang +
+      ' degrees. What about the other?', sh.choices, sh.answer,
+      ['Every inscribed angle on the same arc is half the same central angle.',
+       'So they must all be equal: **it is also ' + ang + ' degrees**.',
+       'This is why a point can move around the circle and the angle it subtends on a fixed chord never changes.']);
+  });
+
+  g('chords-tangents', function (R, d) {
+    var mode = R.pick(['tangentRadius', 'twoTangents', 'chordProduct']);
+    if (mode === 'tangentRadius') {
+      var sh = choiceSet(R, '90 degrees', ['45 degrees', '180 degrees', 'It varies with the circle']);
+      return mc('What is the angle between a tangent and the radius drawn to the point where it touches?',
+        sh.choices, sh.answer,
+        ['A tangent touches at exactly one point, and the radius to that point is the shortest route from the centre to the line.',
+         'The shortest distance from a point to a line is always perpendicular.',
+         'So the angle is **90 degrees**.',
+         'This single fact turns most tangent problems into right-triangle problems.'],
+        { figure: FIG.circleFig(['tangent', 'radius'], {}) });
+    }
+    if (mode === 'twoTangents') {
+      var r = R.int(3, 12), dist = r + R.int(2, 15);
+      var tanLen = Math.sqrt(dist * dist - r * r);
+      return num('From a point ' + dist + ' cm from the centre of a circle of radius ' + r +
+        ' cm, a tangent is drawn. How long is the tangent, from the external point to the point of contact? ' +
+        'Round to 2 decimal places.', Math.round(tanLen * 100) / 100,
+        ['The tangent meets the radius at a right angle, so the radius, the tangent and the line to the centre form a right triangle.',
+         'The hypotenuse is the ' + dist + ' cm distance to the centre: ~' + dist + '^{2} = ' + r + '^{2} + t^{2}~.',
+         '~t = sqrt{' + (dist * dist) + ' - ' + (r * r) + '} = sqrt{' + (dist * dist - r * r) + '} = ~**' +
+           MC.fmt(tanLen, 2) + '** cm.',
+         'The distance to the centre is the hypotenuse, never a leg. Drawing the right angle first prevents mixing them up.'],
+        { tol: 0.02 });
+    }
+    var a = R.int(2, 12), b = R.int(2, 12), c = R.int(2, 12);
+    var dd = a * b / c;
+    return num('Two chords cross inside a circle. One is cut into pieces of ' + a + ' and ' + b +
+      '; the other has one piece of ' + c + '. How long is the fourth piece? Round to 2 decimal places.',
+      Math.round(dd * 100) / 100,
+      ['When two chords cross, the products of the two pieces of each chord are equal.',
+       '~' + a + ' \\times ' + b + ' = ' + c + ' \\times x~, so ~' + (a * b) + ' = ' + c + 'x~.',
+       '~x = \\f{' + (a * b) + '}{' + c + '} = ~**' + MC.fmt(dd, 2) + '**.',
+       'Multiply the two pieces of the *same* chord together. Pairing pieces from different chords is the usual error.'],
+      { tol: 0.02 });
+  });
+
+  g('circle-equation', function (R, d) {
+    var h = R.nonzero(-8, 8), k = R.nonzero(-8, 8), r = R.int(1, 10);
+    var mode = R.pick(['readOff', 'build', 'onCircle']);
+    if (mode === 'readOff') {
+      return multi('For the circle ~(x ' + (h < 0 ? '+ ' + Math.abs(h) : '- ' + h) + ')^{2} + (y ' +
+        (k < 0 ? '+ ' + Math.abs(k) : '- ' + k) + ')^{2} = ' + (r * r) +
+        '~, give the centre and the radius.',
+        [{ label: 'Centre x', answer: h }, { label: 'Centre y', answer: k }, { label: 'Radius', answer: r }],
+        ['The standard form is ~(x - h)^{2} + (y - k)^{2} = r^{2}~, with centre ~(h, k)~ and radius ~r~.',
+         'The brackets read ~x ' + (h < 0 ? '+ ' + Math.abs(h) : '- ' + h) + '~ and ~y ' +
+           (k < 0 ? '+ ' + Math.abs(k) : '- ' + k) + '~, so ~h = ' + h + '~ and ~k = ' + k + '~.',
+         'The right-hand side is ~r^{2} = ' + (r * r) + '~, so ~r = ' + r + '~.',
+         'Centre **(' + h + ', ' + k + ')**, radius **' + r + '**. Note the signs flip and the radius is a square root.']);
+    }
+    if (mode === 'build') {
+      return num('A circle has centre ~(' + h + ', ' + k + ')~ and radius ' + r +
+        '. In the equation ~(x - h)^{2} + (y - k)^{2} = c~, what is ~c~?', r * r,
+        ['The right-hand side is the radius *squared*.',
+         r + '^{2} = **' + (r * r) + '**.',
+         'Writing the radius itself there is the standard slip.']);
+    }
+    var px = h + r, py = k;
+    var sh = shuffleChoices(R, ['Yes, it is on the circle', 'No, it is not'], 0);
+    return mc('Is the point ~(' + px + ', ' + py + ')~ on the circle ~(x ' +
+      (h < 0 ? '+ ' + Math.abs(h) : '- ' + h) + ')^{2} + (y ' + (k < 0 ? '+ ' + Math.abs(k) : '- ' + k) +
+      ')^{2} = ' + (r * r) + '~?', sh.choices, sh.answer,
+      ['Substitute the point and see whether the equation balances.',
+       '~(' + px + ' - (' + h + '))^{2} + (' + py + ' - (' + k + '))^{2} = ' + (r * r) + ' + 0 = ' + (r * r) + '~.',
+       'That matches the right-hand side, so **yes** — the point sits exactly ' + r + ' from the centre.',
+       'A point inside gives a smaller total; outside gives a larger one. The equation is really just the distance formula squared.']);
+  });
+
+  g('volume-prisms-cylinders', function (R, d) {
+    var mode = R.pick(['cuboid', 'cylinder', 'surfaceCuboid', 'backwards']);
+    var l = R.int(2, 15), w = R.int(2, 15), h = R.int(2, 15), r = R.int(2, 10);
+    if (mode === 'cuboid') {
+      return num('A cuboid is ' + l + ' cm by ' + w + ' cm by ' + h +
+        ' cm. What is its volume, in cm³?', l * w * h,
+        ['Volume of any prism is the area of the base times the height.',
+         'Base area: ' + l + ' \\times ' + w + ' = ' + (l * w) + ' cm². Times the height: \\times ' + h + '.',
+         '**' + MC.commas(l * w * h) + '** cm³.'],
+        { figure: FIG.solid('cuboid', { length: l + ' cm', width: w + ' cm', height: h + ' cm' }) });
+    }
+    if (mode === 'cylinder') {
+      var v = Math.PI * r * r * h;
+      return num('A cylinder has radius ' + r + ' cm and height ' + h +
+        ' cm. What is its volume, in cm³? Round to 2 decimal places.', Math.round(v * 100) / 100,
+        ['A cylinder is a prism with a circular base, so volume is base area times height.',
+         'Base area: ~\\pi \\times ' + r + '^{2} = ' + MC.fmt(Math.PI * r * r, 3) + '~ cm².',
+         'Times the height: ~' + MC.fmt(Math.PI * r * r, 3) + ' \\times ' + h + ' = ~**' + MC.fmt(v, 2) + '** cm³.'],
+        { figure: FIG.solid('cylinder', { radius: r + ' cm', height: h + ' cm' }), tol: 0.02 });
+    }
+    if (mode === 'surfaceCuboid') {
+      var sa = 2 * (l * w + l * h + w * h);
+      return num('A cuboid is ' + l + ' cm by ' + w + ' cm by ' + h +
+        ' cm. What is its total surface area, in cm²?', sa,
+        ['Six faces in three matching pairs.',
+         '~2(' + l + '\\times' + w + ') + 2(' + l + '\\times' + h + ') + 2(' + w + '\\times' + h + ')~',
+         '= ' + (2 * l * w) + ' + ' + (2 * l * h) + ' + ' + (2 * w * h) + ' = **' + MC.commas(sa) + '** cm².',
+         'Surface area is in square units and volume in cubic ones — the units tell you which you have computed.'],
+        { figure: FIG.solid('cuboid', { length: l + ' cm', width: w + ' cm', height: h + ' cm' }) });
+    }
+    var vol = l * w * h;
+    return num('A cuboid has volume ' + MC.commas(vol) + ' cm³, with a base ' + l + ' cm by ' + w +
+      ' cm. How tall is it, in cm?', h,
+      ['Volume is base area times height, so height is volume divided by base area.',
+       'Base area: ' + l + ' \\times ' + w + ' = ' + (l * w) + ' cm².',
+       MC.commas(vol) + ' \\div ' + (l * w) + ' = **' + h + '** cm.'], { tol: 0.005 });
+  });
+
+  g('volume-pyramids-cones', function (R, d) {
+    var r = R.int(2, 12), h = R.int(3, 18), s = R.int(2, 14);
+    var mode = R.pick(['cone', 'pyramid', 'compare']);
+    if (mode === 'cone') {
+      var v = Math.PI * r * r * h / 3;
+      return num('A cone has radius ' + r + ' cm and height ' + h +
+        ' cm. What is its volume, in cm³? Round to 2 decimal places.', Math.round(v * 100) / 100,
+        ['A cone is one third of the cylinder with the same base and height.',
+         '~V = \\f{1}{3}\\pi r^{2}h = \\f{1}{3} \\times \\pi \\times ' + (r * r) + ' \\times ' + h + '~.',
+         '**' + MC.fmt(v, 2) + '** cm³.',
+         'The height is the perpendicular height, not the slant. The slant side is longer and belongs to surface area.'],
+        { figure: FIG.solid('cone', { radius: r + ' cm', height: h + ' cm' }), tol: 0.02 });
+    }
+    if (mode === 'pyramid') {
+      var v2 = s * s * h / 3;
+      return num('A pyramid has a square base of side ' + s + ' cm and height ' + h +
+        ' cm. What is its volume, in cm³? Round to 2 decimal places.', Math.round(v2 * 100) / 100,
+        ['Volume of a pyramid is one third of the base area times the height.',
+         'Base area: ' + s + '^{2} = ' + (s * s) + ' cm².',
+         '~\\f{1}{3} \\times ' + (s * s) + ' \\times ' + h + ' = ~**' + MC.fmt(v2, 2) + '** cm³.'],
+        { figure: FIG.solid('pyramid', { base: s + ' cm', height: h + ' cm' }), tol: 0.02 });
+    }
+    var sh = choiceSet(R, 'The cylinder holds three times as much',
+      ['They hold the same', 'The cylinder holds twice as much', 'The cone holds more']);
+    return mc('A cone and a cylinder have the same radius and the same height. How do their volumes compare?',
+      sh.choices, sh.answer,
+      ['The cone formula is the cylinder formula with a factor of one third.',
+       '~\\f{1}{3}\\pi r^{2}h~ against ~\\pi r^{2}h~.',
+       'So **the cylinder holds three times as much**.',
+       'The same one-third relationship holds between any pyramid and the prism on the same base.']);
+  });
+
+  g('volume-spheres', function (R, d) {
+    var r = R.int(2, 12);
+    var mode = R.pick(['volume', 'surface', 'hemisphere']);
+    if (mode === 'volume') {
+      var v = 4 / 3 * Math.PI * r * r * r;
+      return num('A sphere has radius ' + r + ' cm. What is its volume, in cm³? Round to 2 decimal places.',
+        Math.round(v * 100) / 100,
+        ['~V = \\f{4}{3}\\pi r^{3}~ — cube the radius.',
+         '~' + r + '^{3} = ' + (r * r * r) + '~, so ~V = \\f{4}{3} \\times \\pi \\times ' + (r * r * r) + '~.',
+         '**' + MC.fmt(v, 2) + '** cm³.'],
+        { figure: FIG.solid('sphere', { radius: r + ' cm' }), tol: 0.02 });
+    }
+    if (mode === 'surface') {
+      var sa = 4 * Math.PI * r * r;
+      return num('A sphere has radius ' + r + ' cm. What is its surface area, in cm²? Round to 2 decimal places.',
+        Math.round(sa * 100) / 100,
+        ['~A = 4\\pi r^{2}~ — square the radius for area, cube it for volume.',
+         '~4 \\times \\pi \\times ' + (r * r) + ' = ~**' + MC.fmt(sa, 2) + '** cm².',
+         'Mixing up the two sphere formulas is easy. The one with the cube is the volume, because volume is three-dimensional.'],
+        { figure: FIG.solid('sphere', { radius: r + ' cm' }), tol: 0.02 });
+    }
+    var vh = 2 / 3 * Math.PI * r * r * r;
+    return num('A hemisphere has radius ' + r + ' cm. What is its volume, in cm³? Round to 2 decimal places.',
+      Math.round(vh * 100) / 100,
+      ['A hemisphere is half a sphere, so halve the sphere formula: ~\\f{2}{3}\\pi r^{3}~.',
+       '~\\f{2}{3} \\times \\pi \\times ' + (r * r * r) + ' = ~**' + MC.fmt(vh, 2) + '** cm³.',
+       'Its *surface* area is not half the sphere’s, because the flat circular face has to be added.'],
+      { tol: 0.02 });
+  });
+
+  g('cross-sections', function (R, d) {
+    var cases = [
+      { s: 'a cylinder sliced horizontally, parallel to its base', ans: 'A circle' },
+      { s: 'a cylinder sliced vertically through its axis', ans: 'A rectangle' },
+      { s: 'a cone sliced horizontally, parallel to its base', ans: 'A circle' },
+      { s: 'a cone sliced vertically through its apex', ans: 'A triangle' },
+      { s: 'a sphere sliced in any direction', ans: 'A circle' },
+      { s: 'a square-based pyramid sliced horizontally', ans: 'A square' },
+      { s: 'a cube sliced parallel to one face', ans: 'A square' }
+    ];
+    var c = R.pick(cases);
+    var all = ['A circle', 'A rectangle', 'A triangle', 'A square'];
+    var sh = choiceSet(R, c.ans, all.filter(function (o) { return o !== c.ans; }));
+    if (R.bool(0.3)) {
+      var sh2 = choiceSet(R, 'A circle', ['A cylinder', 'A rectangle', 'A sphere']);
+      return mc('A rectangle is spun about one of its sides. What shape does the cross-section ' +
+        'perpendicular to that axis make?', sh2.choices, sh2.answer,
+        ['Spinning a rectangle about one side sweeps out a cylinder.',
+         'Slicing that cylinder perpendicular to the axis of rotation gives **a circle**.',
+         'Rotating a flat shape one dimension up is how cylinders, cones and spheres are generated — and how volumes of revolution work in calculus later.']);
+    }
+    return mc('What shape is the cross-section of ' + c.s + '?', sh.choices, sh.answer,
+      ['Picture the cut face itself, not the solid around it.',
+       'For ' + c.s + ' the cut face is **' + c.ans.toLowerCase() + '**.',
+       'The same solid gives different cross-sections depending on the direction of the cut — a cone can give a circle, a triangle, or an ellipse.']);
+  });
+
+  g('density-volume-problems', function (R, d) {
+    var mode = R.pick(['mass', 'density', 'capacity']);
+    var l = R.int(2, 12), w = R.int(2, 12), h = R.int(2, 12);
+    var dens = R.pick([0.5, 0.8, 1, 2.5, 2.7, 7.8, 8.9, 11.3]);
+    if (mode === 'mass') {
+      var v = l * w * h, m = v * dens;
+      return num('A metal block measures ' + l + ' cm by ' + w + ' cm by ' + h +
+        ' cm and has density ' + dens + ' g/cm³. What is its mass, in grams? Round to 2 decimal places.',
+        Math.round(m * 100) / 100,
+        ['Volume first: ' + l + ' \\times ' + w + ' \\times ' + h + ' = ' + v + ' cm³.',
+         'Density is mass per unit volume, so mass = density \\times volume.',
+         dens + ' \\times ' + v + ' = **' + MC.fmt(m, 2) + '** g.',
+         'The units tell you the arrangement: g/cm³ times cm³ leaves grams.'],
+        { tol: 0.02 });
+    }
+    if (mode === 'density') {
+      var v2 = l * w * h, m2 = Math.round(v2 * dens * 100) / 100;
+      return num('A block of volume ' + v2 + ' cm³ has mass ' + m2 +
+        ' g. What is its density, in g/cm³? Round to 2 decimal places.', dens,
+        ['Density is mass divided by volume.',
+         m2 + ' \\div ' + v2 + ' = **' + MC.fmt(dens, 2) + '** g/cm³.',
+         'Water is about 1 g/cm³, so anything denser than that sinks — a useful sanity check.'],
+        { tol: 0.02 });
+    }
+    var r = R.int(3, 15), hh = R.int(5, 30);
+    var litres = Math.PI * r * r * hh / 1000;
+    return num('A cylindrical tank has radius ' + r + ' cm and height ' + hh +
+      ' cm. How many litres does it hold? (1 litre = 1000 cm³.) Round to 2 decimal places.',
+      Math.round(litres * 100) / 100,
+      ['Volume: ~\\pi \\times ' + r + '^{2} \\times ' + hh + ' = ' + MC.fmt(Math.PI * r * r * hh, 2) + '~ cm³.',
+       'Convert: divide by 1000.',
+       '**' + MC.fmt(litres, 2) + '** litres.',
+       'Capacity questions almost always need a unit conversion at the end, and it is the step most often forgotten.'],
+      { tol: 0.02 });
+  });
+
+  /* ---------- coordinate-geometry and transformation helpers ---------- */
+  function d2(p, q) { var dx = p[0] - q[0], dy = p[1] - q[1]; return dx * dx + dy * dy; }
+  function ptStr(p) { return '(' + p[0] + ', ' + p[1] + ')'; }
+  function named(pts, names) {
+    return pts.map(function (p, i) { return [p[0], p[1], names[i]]; });
+  }
+  function spanFor(pts, floor) {
+    var m = floor || 6;
+    pts.forEach(function (p) { m = Math.max(m, Math.abs(p[0]) + 1, Math.abs(p[1]) + 1); });
+    return m;
+  }
+  function cross3(a, b, c) { return (b[0] - a[0]) * (c[1] - a[1]) - (c[0] - a[0]) * (b[1] - a[1]); }
+  function bracketed(n) { return n < 0 ? '(' + n + ')' : String(n); }
+  function shoelace(pts) {
+    var s1 = 0, s2 = 0, t1 = [], t2 = [];
+    pts.forEach(function (p, i) {
+      var q = pts[(i + 1) % pts.length];
+      s1 += p[0] * q[1]; s2 += p[1] * q[0];
+      t1.push(bracketed(p[0]) + '\\times' + bracketed(q[1]));
+      t2.push(bracketed(p[1]) + '\\times' + bracketed(q[0]));
+    });
+    return { s1: s1, s2: s2, t1: t1, t2: t2, area: Math.abs(s1 - s2) / 2 };
+  }
+  function samePoints(a, b) {
+    function key(pts) { return pts.map(function (p) { return p[0] + ',' + p[1]; }).sort().join('|'); }
+    return key(a) === key(b);
+  }
+  function reflectPt(p, axis) {
+    if (axis === 'x') return [p[0], -p[1]];
+    if (axis === 'y') return [-p[0], p[1]];
+    if (axis === 'y=x') return [p[1], p[0]];
+    return [-p[1], -p[0]];                                  /* y = -x */
+  }
+  var AXIS_NAME = { x: 'the x-axis', y: 'the y-axis', 'y=x': 'the line y = x', 'y=-x': 'the line y = -x' };
+  var AXIS_RULE = { x: '(x, y) \\to (x, -y)', y: '(x, y) \\to (-x, y)',
+                    'y=x': '(x, y) \\to (y, x)', 'y=-x': '(x, y) \\to (-y, -x)' };
+  /* counterclockwise rotation by a multiple of 90 degrees about centre c */
+  function rotPt(p, c, deg) {
+    var x = p[0] - c[0], y = p[1] - c[1], rx = x, ry = y;
+    deg = ((deg % 360) + 360) % 360;
+    if (deg === 90) { rx = -y; ry = x; }
+    else if (deg === 180) { rx = -x; ry = -y; }
+    else if (deg === 270) { rx = y; ry = -x; }
+    return [c[0] + rx + 0, c[1] + ry + 0];
+  }
+  function moveWords(v) {
+    var parts = [];
+    if (v[0] !== 0) parts.push(Math.abs(v[0]) + ' unit' + (Math.abs(v[0]) === 1 ? '' : 's') + (v[0] > 0 ? ' right' : ' left'));
+    if (v[1] !== 0) parts.push(Math.abs(v[1]) + ' unit' + (Math.abs(v[1]) === 1 ? '' : 's') + (v[1] > 0 ? ' up' : ' down'));
+    return parts.join(' and ');
+  }
+  /* a random triangle with all vertices inside +-limit, not degenerate */
+  function randomTriangle(R, limit) {
+    var t, guard = 0;
+    do {
+      t = [[R.int(-limit, limit), R.int(-limit, limit)], [R.int(-limit, limit), R.int(-limit, limit)],
+           [R.int(-limit, limit), R.int(-limit, limit)]];
+    } while (cross3(t[0], t[1], t[2]) === 0 && guard++ < 50);
+    if (cross3(t[0], t[1], t[2]) === 0) t = [[1, 1], [3, 1], [1, 4]];
+    return t;
+  }
+
+  g('coord-distance-midpoint', function (R, d) {
+    var mode = R.pick(['classify', 'otherEndpoint', 'perimeter']);
+    if (mode === 'classify') {
+      var want = R.pick(['Isosceles', 'Right', 'Scalene']);
+      var A, B, C, tries = 0, found = false;
+      while (tries++ < 600 && !found) {
+        A = [R.int(-5, 5), R.int(-5, 5)]; B = [R.int(-5, 5), R.int(-5, 5)]; C = [R.int(-5, 5), R.int(-5, 5)];
+        if (cross3(A, B, C) === 0) continue;
+        var ab = d2(A, B), bc = d2(B, C), ca = d2(C, A);
+        var iso = ab === bc || bc === ca || ca === ab;
+        var rt = ab + bc === ca || bc + ca === ab || ca + ab === bc;
+        var kind = iso && rt ? 'both' : iso ? 'Isosceles' : rt ? 'Right' : 'Scalene';
+        if (kind === want) found = true;
+      }
+      if (!found) { A = [0, 0]; B = [4, 0]; C = [0, 3]; want = 'Right'; }
+      var s1 = d2(A, B), s2 = d2(B, C), s3 = d2(C, A);
+      var sh = choiceSet(R, want, ['Isosceles', 'Right', 'Scalene'].filter(function (o) { return o !== want; }));
+      return mc('A triangle has vertices A' + ptStr(A) + ', B' + ptStr(B) + ' and C' + ptStr(C) +
+        '. Using the distance formula, is it isosceles, right-angled, or scalene (neither of the others)?',
+        sh.choices, sh.answer,
+        ['Square each side length, to avoid square roots: ~d^{2} = (\\Delta x)^{2} + (\\Delta y)^{2}~.',
+         '~AB^{2} = ' + s1 + '~, ~BC^{2} = ' + s2 + '~, ~CA^{2} = ' + s3 + '~.',
+         want === 'Isosceles' ? 'Two of those are equal, so two sides are equal: **isosceles**.'
+           : want === 'Right' ? 'The two smaller add to the largest: ' + [s1, s2, s3].sort(function (x, y) { return x - y; })
+               .slice(0, 2).join(' + ') + ' = ' + Math.max(s1, s2, s3) + '. By the converse of Pythagoras it is **right-angled**.'
+           : 'No two are equal and the two smaller do not sum to the largest, so it is **scalene** with no right angle.',
+         'Comparing squared lengths is exact. Taking roots first only adds rounding to a question that has none.'],
+        { figure: FIG.grid({ span: spanFor([A, B, C]), shapes: [{ points: [A, B, C] }],
+          points: named([A, B, C], ['A', 'B', 'C']) }) });
+    }
+    if (mode === 'otherEndpoint') {
+      var P = [R.int(-5, 5), R.int(-5, 5)], M = [R.int(-4, 4), R.int(-4, 4)];
+      var Q = [2 * M[0] - P[0], 2 * M[1] - P[1]];
+      return multi('The midpoint of segment ~PQ~ is ~' + ptStr(M) + '~ and one endpoint is ~P' + ptStr(P) +
+        '~. Find the other endpoint ~Q~.',
+        [{ label: 'x of Q', answer: Q[0] }, { label: 'y of Q', answer: Q[1] }],
+        ['The midpoint is the average of the endpoints, so work backwards: ~M = \\f{P + Q}{2}~, giving ~Q = 2M - P~.',
+         '~x: 2(' + M[0] + ') - (' + P[0] + ') = ' + Q[0] + '~.',
+         '~y: 2(' + M[1] + ') - (' + P[1] + ') = ' + Q[1] + '~.',
+         'Q is **' + ptStr(Q) + '**. Check: the average of ' + P[0] + ' and ' + Q[0] + ' is ' + M[0] + '.']);
+    }
+    var triples = [[3, 4, 5], [6, 8, 10], [5, 12, 13]];
+    var tr = R.pick(triples);
+    var x0 = R.int(-5, 0), y0 = R.int(-5, 0);
+    var P1 = [x0, y0], P2 = [x0 + tr[0], y0], P3 = [x0, y0 + tr[1]];
+    return num('A right triangle has vertices ' + ptStr(P1) + ', ' + ptStr(P2) + ' and ' + ptStr(P3) +
+      '. What is its perimeter?', tr[0] + tr[1] + tr[2],
+      ['Two sides run along the grid lines, so count them: ' + tr[0] + ' across and ' + tr[1] + ' up.',
+       'The slanted side by the distance formula: ~sqrt{' + tr[0] + '^{2} + ' + tr[1] + '^{2}} = sqrt{' +
+         (tr[2] * tr[2]) + '} = ' + tr[2] + '~.',
+       'Perimeter: ' + tr[0] + ' + ' + tr[1] + ' + ' + tr[2] + ' = **' + (tr[0] + tr[1] + tr[2]) + '**.'],
+      { figure: FIG.grid({ span: spanFor([P1, P2, P3]), shapes: [{ points: [P1, P2, P3] }],
+        points: named([P1, P2, P3], ['', '', '']) }) });
+  });
+
+  g('coord-prove-shapes', function (R, d) {
+    var kind = R.pick(['Parallelogram', 'Rectangle', 'Rhombus', 'Square']);
+    var P, Q;
+    if (kind === 'Square') {
+      P = R.pick([[2, 1], [3, 1], [1, 2], [2, 3], [3, 2], [1, 1], [2, 2]]); Q = [-P[1], P[0]];
+    } else if (kind === 'Rectangle') {
+      var b = R.pick([[1, 1], [2, 1], [1, 2], [3, 0], [0, 3], [1, 3]]); P = b; Q = [-2 * b[1], 2 * b[0]];
+    } else if (kind === 'Rhombus') {
+      var vecs = [[5, 0], [3, 4], [4, 3], [0, 5], [-3, 4], [-4, 3], [3, -4], [4, -3]];
+      var tries = 0;
+      do { P = R.pick(vecs); Q = R.pick(vecs); tries++; }
+      while ((P[0] * Q[0] + P[1] * Q[1] === 0 || P[0] * Q[1] - P[1] * Q[0] === 0) && tries < 200);
+      if (P[0] * Q[0] + P[1] * Q[1] === 0 || P[0] * Q[1] - P[1] * Q[0] === 0) { P = [5, 0]; Q = [3, 4]; }
+    } else {
+      var t2 = 0;
+      do { P = [R.int(1, 4), R.int(-2, 2)]; Q = [R.int(-2, 3), R.int(1, 4)]; t2++; }
+      while ((P[0] * Q[0] + P[1] * Q[1] === 0 || P[0] * Q[1] - P[1] * Q[0] === 0 ||
+              P[0] * P[0] + P[1] * P[1] === Q[0] * Q[0] + Q[1] * Q[1]) && t2 < 200);
+      if (P[0] * Q[0] + P[1] * Q[1] === 0 || P[0] * Q[1] - P[1] * Q[0] === 0 ||
+          P[0] * P[0] + P[1] * P[1] === Q[0] * Q[0] + Q[1] * Q[1]) { P = [3, 1]; Q = [1, 2]; }
+    }
+    var sx = R.int(-2, 2), sy = R.int(-2, 2);
+    var Av = [sx, sy], Bv = [sx + P[0], sy + P[1]], Cv = [sx + P[0] + Q[0], sy + P[1] + Q[1]], Dv = [sx + Q[0], sy + Q[1]];
+    /* decide the answer from the coordinates themselves, not from the recipe */
+    var isPar = Av[0] + Cv[0] === Bv[0] + Dv[0] && Av[1] + Cv[1] === Bv[1] + Dv[1];
+    var sidesEq = d2(Av, Bv) === d2(Bv, Cv) && d2(Bv, Cv) === d2(Cv, Dv) && d2(Cv, Dv) === d2(Dv, Av);
+    var diagEq = d2(Av, Cv) === d2(Bv, Dv);
+    var truth = !isPar ? 'Parallelogram' : sidesEq && diagEq ? 'Square' : sidesEq ? 'Rhombus' : diagEq ? 'Rectangle' : 'Parallelogram';
+    var all = ['Parallelogram', 'Rectangle', 'Rhombus', 'Square'];
+    var sh = choiceSet(R, truth, all.filter(function (o) { return o !== truth; }));
+    var mAC = [(Av[0] + Cv[0]) / 2, (Av[1] + Cv[1]) / 2], mBD = [(Bv[0] + Dv[0]) / 2, (Bv[1] + Dv[1]) / 2];
+    return mc('Quadrilateral ABCD has vertices A' + ptStr(Av) + ', B' + ptStr(Bv) + ', C' + ptStr(Cv) + ' and D' +
+      ptStr(Dv) + '. What is the most specific name you can prove for it?', sh.choices, sh.answer,
+      ['Start with the diagonals. AC has midpoint ' + ptStr(mAC) + ' and BD has midpoint ' + ptStr(mBD) +
+        ', so the diagonals bisect each other and it is at least a **parallelogram**.',
+       'Sides squared: AB² = ' + d2(Av, Bv) + ', BC² = ' + d2(Bv, Cv) + ', CD² = ' + d2(Cv, Dv) + ', DA² = ' +
+         d2(Dv, Av) + (sidesEq ? ' — all four equal, so a rhombus.' : ' — not all equal, so not a rhombus.'),
+       'Diagonals squared: AC² = ' + d2(Av, Cv) + ', BD² = ' + d2(Bv, Dv) +
+         (diagEq ? ' — equal, so the angles are right angles and it is a rectangle.' : ' — unequal, so not a rectangle.'),
+       'Most specific name: **' + truth.toLowerCase() + '**.',
+       'Claiming more than the evidence supports is the usual error. Equal sides and equal diagonals together are what make a square.'],
+      { figure: FIG.grid({ span: spanFor([Av, Bv, Cv, Dv]), shapes: [{ points: [Av, Bv, Cv, Dv] }],
+        points: named([Av, Bv, Cv, Dv], ['A', 'B', 'C', 'D']) }) });
+  });
+
+  g('coord-partition', function (R, d) {
+    var m = R.int(1, 4), n = R.int(1, 4);
+    var A = [R.int(-5, 5), R.int(-5, 5)];
+    var v = [R.int(-2, 2), R.int(-2, 2)];
+    if (v[0] === 0 && v[1] === 0) v = [1, 1];
+    var B = [A[0] + (m + n) * v[0], A[1] + (m + n) * v[1]];
+    var Pp = [A[0] + m * v[0], A[1] + m * v[1]];
+    var span = spanFor([A, B]);
+    return multi('Find the point ~P~ on segment ~AB~ with ~A' + ptStr(A) + '~ and ~B' + ptStr(B) +
+      '~ so that ~AP : PB = ' + m + ' : ' + n + '~.',
+      [{ label: 'x of P', answer: Pp[0] }, { label: 'y of P', answer: Pp[1] }],
+      ['The ratio ' + m + ' : ' + n + ' splits the segment into ' + (m + n) + ' equal parts, and ~P~ is ' + m +
+        ' of them from ~A~: a fraction ~\\f{' + m + '}{' + (m + n) + '}~ of the way.',
+       '~x: ' + A[0] + ' + \\f{' + m + '}{' + (m + n) + '}(' + B[0] + ' - ' + bracketed(A[0]) + ') = ' + Pp[0] + '~.',
+       '~y: ' + A[1] + ' + \\f{' + m + '}{' + (m + n) + '}(' + B[1] + ' - ' + bracketed(A[1]) + ') = ' + Pp[1] + '~.',
+       'P is **' + ptStr(Pp) + '**.',
+       'The fraction uses the *whole* ' + (m + n) + ', not ' + n + '. Dividing by the second number alone is the classic slip.'],
+      span <= 10 ? { figure: FIG.grid({ span: span, segments: [[A, B]], points: named([A, B], ['A', 'B']) }) } : {});
+  });
+
+  g('coord-area', function (R, d) {
+    var mode = R.pick(['triangle', 'quad', 'axisTriangle']);
+    if (mode === 'axisTriangle') {
+      var a = R.int(-5, -1), b = R.int(1, 5), h = R.nonzero(-5, 5);
+      var tri = [[a, 0], [b, 0], [R.int(a, b), h]];
+      var area = (b - a) * Math.abs(h) / 2;
+      return num('A triangle has vertices ' + ptStr(tri[0]) + ', ' + ptStr(tri[1]) + ' and ' + ptStr(tri[2]) +
+        '. What is its area? Give a decimal if needed.', area,
+        ['Two vertices sit on the x-axis, so that segment is the base: ' + b + ' - (' + a + ') = ' + (b - a) + '.',
+         'The height is the vertical distance to the third vertex: ' + Math.abs(h) + '.',
+         '~\\f{1}{2} \\times ' + (b - a) + ' \\times ' + Math.abs(h) + ' = ~**' + MC.fmt(area, 2) + '**.',
+         'Look for a horizontal or vertical side first. It turns the whole problem into base times height.'],
+        { figure: FIG.grid({ span: spanFor(tri), shapes: [{ points: tri }], points: named(tri, ['', '', '']) }),
+          tol: 0.005 });
+    }
+    var pts;
+    if (mode === 'triangle') pts = randomTriangle(R, 5);
+    else {
+      var guard = 0, ok = false;
+      while (guard++ < 300 && !ok) {
+        var raw = [[R.int(-5, 5), R.int(-5, 5)], [R.int(-5, 5), R.int(-5, 5)],
+                   [R.int(-5, 5), R.int(-5, 5)], [R.int(-5, 5), R.int(-5, 5)]];
+        var cx = raw.reduce(function (s, p) { return s + p[0]; }, 0) / 4;
+        var cy = raw.reduce(function (s, p) { return s + p[1]; }, 0) / 4;
+        raw.sort(function (p, q) { return Math.atan2(p[1] - cy, p[0] - cx) - Math.atan2(q[1] - cy, q[0] - cx); });
+        var angles = raw.map(function (p) { return Math.atan2(p[1] - cy, p[0] - cx); });
+        var distinct = angles.every(function (an, i) { return angles.every(function (bn, j) { return i === j || Math.abs(an - bn) > 1e-9; }); });
+        var noThree = cross3(raw[0], raw[1], raw[2]) !== 0 && cross3(raw[1], raw[2], raw[3]) !== 0 &&
+                      cross3(raw[2], raw[3], raw[0]) !== 0 && cross3(raw[3], raw[0], raw[1]) !== 0;
+        if (distinct && noThree) { pts = raw; ok = true; }
+      }
+      if (!ok) pts = [[0, 0], [4, 0], [4, 3], [0, 3]];
+    }
+    var sl = shoelace(pts), names = ['A', 'B', 'C', 'D'].slice(0, pts.length);
+    return num('A ' + (pts.length === 3 ? 'triangle' : 'quadrilateral') + ' has vertices, in order, ' +
+      pts.map(function (p, i) { return names[i] + ptStr(p); }).join(', ') +
+      '. Use the shoelace formula to find its area. Give a decimal if needed.', sl.area,
+      ['Multiply each x by the next y, and each y by the next x, going round and returning to the start.',
+       '~\\sum x_{i}y_{i+1} = ' + sl.t1.join(' + ') + ' = ' + sl.s1 + '~.',
+       '~\\sum y_{i}x_{i+1} = ' + sl.t2.join(' + ') + ' = ' + sl.s2 + '~.',
+       'Area is half the absolute difference: ~\\f{|' + sl.s1 + ' - ' + bracketed(sl.s2) + '|}{2} = ~**' + MC.fmt(sl.area, 2) + '**.',
+       'List the vertices in order round the shape — clockwise or anticlockwise both work, but jumping across it gives nonsense.'],
+      { figure: FIG.grid({ span: spanFor(pts), shapes: [{ points: pts }], points: named(pts, names) }), tol: 0.005 });
+  });
+
+  g('translations-reflections', function (R, d) {
+    var mode = R.pick(['translate', 'reflect', 'identify']);
+    if (mode === 'translate') {
+      var P = [R.int(-6, 6), R.int(-6, 6)], v = [R.nonzero(-6, 6), R.nonzero(-6, 6)];
+      var Q = [P[0] + v[0], P[1] + v[1]];
+      return multi('The point ~' + ptStr(P) + '~ is translated ' + moveWords(v) + '. Find its image.',
+        [{ label: 'x', answer: Q[0] }, { label: 'y', answer: Q[1] }],
+        ['A translation slides every point the same way. Right and up are positive; left and down are negative.',
+         'Horizontal move ' + v[0] + ': ~' + P[0] + ' + ' + bracketed(v[0]) + ' = ' + Q[0] + '~.',
+         'Vertical move ' + v[1] + ': ~' + P[1] + ' + ' + bracketed(v[1]) + ' = ' + Q[1] + '~.',
+         'Image **' + ptStr(Q) + '**.']);
+    }
+    if (mode === 'reflect') {
+      var axes = d === 1 ? ['x', 'y', 'y=x'] : ['x', 'y', 'y=x', 'y=-x'];
+      var axis = R.pick(axes);
+      var P2 = [R.nonzero(-6, 6), R.nonzero(-6, 6)];
+      while (axis === 'y=x' && P2[0] === P2[1]) P2 = [R.nonzero(-6, 6), R.nonzero(-6, 6)];
+      var Q2 = reflectPt(P2, axis);
+      return multi('The point ~' + ptStr(P2) + '~ is reflected over ' + AXIS_NAME[axis] + '. Find its image.',
+        [{ label: 'x', answer: Q2[0] + 0 }, { label: 'y', answer: Q2[1] + 0 }],
+        ['The rule for reflecting over ' + AXIS_NAME[axis] + ' is ~' + AXIS_RULE[axis] + '~.',
+         'Applied to ~' + ptStr(P2) + '~ it gives **' + ptStr(Q2) + '**.',
+         axis === 'x' || axis === 'y' ? 'Reflecting over an axis flips the sign of the coordinate that axis does *not* measure. Over the x-axis, y changes sign.'
+           : 'Reflecting over a diagonal line swaps the coordinates, with signs reversed as well for ~y = -x~.',
+         'A reflected point is the same distance from the mirror line, on the other side.']);
+    }
+    var tries = 0, V, ok = false, img, truthLabel, labels, trueIdx;
+    while (tries++ < 80 && !ok) {
+      V = randomTriangle(R, 4);
+      var vec = [R.nonzero(-2, 2), R.nonzero(-2, 2)];
+      var cands = [
+        { label: 'A reflection over the x-axis', img: V.map(function (p) { return reflectPt(p, 'x'); }) },
+        { label: 'A reflection over the y-axis', img: V.map(function (p) { return reflectPt(p, 'y'); }) },
+        { label: 'A reflection over the line y = x', img: V.map(function (p) { return reflectPt(p, 'y=x'); }) },
+        { label: 'A translation of ' + moveWords(vec), img: V.map(function (p) { return [p[0] + vec[0], p[1] + vec[1]]; }) }
+      ];
+      var distinct = true;
+      for (var i = 0; i < cands.length && distinct; i++) {
+        for (var j = i + 1; j < cands.length; j++) if (samePoints(cands[i].img, cands[j].img)) distinct = false;
+        if (samePoints(cands[i].img, V)) distinct = false;
+      }
+      if (distinct) { ok = true; trueIdx = R.int(0, 3); img = cands[trueIdx].img; truthLabel = cands[trueIdx].label; labels = cands.map(function (c) { return c.label; }); }
+    }
+    if (!ok) {
+      V = [[1, 1], [3, 1], [1, 4]];
+      img = V.map(function (p) { return reflectPt(p, 'x'); }); truthLabel = 'A reflection over the x-axis';
+      labels = ['A reflection over the x-axis', 'A reflection over the y-axis', 'A reflection over the line y = x', 'A translation of 2 units right'];
+    }
+    var sh = choiceSet(R, truthLabel, labels.filter(function (l) { return l !== truthLabel; }));
+    return mc('The black triangle is mapped onto the blue one. Which transformation does it?', sh.choices, sh.answer,
+      ['Follow vertex A: ' + ptStr(V[0]) + ' goes to A′ at ' + ptStr(img[0]) + '.',
+       'Follow vertex B to be sure: ' + ptStr(V[1]) + ' goes to B′ at ' + ptStr(img[1]) + '.',
+       'The pattern in those coordinates is **' + truthLabel.charAt(0).toLowerCase() + truthLabel.slice(1) + '**.',
+       'Check two vertices, never one: a single point can be moved to its image by several different transformations.'],
+      { figure: FIG.transform('', V, img) });
+  });
+
+  g('rotations', function (R, d) {
+    var mode = R.pick(['origin', 'centre', 'identify']);
+    var specs = [
+      { ccw: 90, words: '90 degrees counterclockwise', rule: '(x, y) \\to (-y, x)' },
+      { ccw: 180, words: '180 degrees', rule: '(x, y) \\to (-x, -y)' },
+      { ccw: 270, words: '90 degrees clockwise', rule: '(x, y) \\to (y, -x)' }
+    ];
+    var spec = R.pick(specs);
+    if (mode === 'origin') {
+      var P = [R.nonzero(-6, 6), R.nonzero(-6, 6)];
+      var Q = rotPt(P, [0, 0], spec.ccw);
+      return multi('Rotate the point ~' + ptStr(P) + '~ ' + spec.words + ' about the origin. Find its image.',
+        [{ label: 'x', answer: Q[0] }, { label: 'y', answer: Q[1] }],
+        ['The rule for this rotation about the origin is ~' + spec.rule + '~.',
+         'Applied to ~' + ptStr(P) + '~ it gives **' + ptStr(Q) + '**.',
+         'A quick check: rotation preserves distance from the centre, so ' + P[0] + '² + ' + P[1] + '² must equal ' +
+           Q[0] + '² + ' + Q[1] + '² (' + (P[0] * P[0] + P[1] * P[1]) + ' in both).',
+         '90 clockwise and 270 counterclockwise are the same turn, so they share a rule.']);
+    }
+    if (mode === 'centre') {
+      var C = [R.int(-3, 3), R.int(-3, 3)];
+      var rel = [R.nonzero(-4, 4), R.nonzero(-4, 4)];
+      var P2 = [C[0] + rel[0], C[1] + rel[1]];
+      var Q2 = rotPt(P2, C, spec.ccw);
+      var relQ = [Q2[0] - C[0], Q2[1] - C[1]];
+      return multi('Rotate the point ~' + ptStr(P2) + '~ ' + spec.words + ' about the point ~' + ptStr(C) +
+        '~. Find its image.', [{ label: 'x', answer: Q2[0] }, { label: 'y', answer: Q2[1] }],
+        ['Treat the centre as the origin: subtract it. ~' + ptStr(P2) + ' - ' + ptStr(C) + ' = ' + ptStr(rel) + '~.',
+         'Rotate that: ~' + ptStr(rel) + ' \\to ' + ptStr(relQ) + '~ using ~' + spec.rule + '~.',
+         'Add the centre back: ~' + ptStr(relQ) + ' + ' + ptStr(C) + ' = ~**' + ptStr(Q2) + '**.',
+         'Subtract the centre, rotate, add it back. Skipping the first or last step is the standard mistake.'],
+        { figure: FIG.grid({ span: spanFor([P2, C, Q2]), points: [[C[0], C[1], 'centre'], [P2[0], P2[1], 'P']] }) });
+    }
+    var tries = 0, V, imgs, ok = false;
+    while (tries++ < 80 && !ok) {
+      V = randomTriangle(R, 4);
+      imgs = { r90: V.map(function (p) { return rotPt(p, [0, 0], 90); }),
+               r180: V.map(function (p) { return rotPt(p, [0, 0], 180); }),
+               r270: V.map(function (p) { return rotPt(p, [0, 0], 270); }),
+               refl: V.map(function (p) { return reflectPt(p, 'y'); }) };
+      var keys = Object.keys(imgs);
+      ok = true;
+      keys.forEach(function (k) { if (samePoints(imgs[k], V)) ok = false; });
+      for (var i = 0; i < keys.length; i++) for (var j = i + 1; j < keys.length; j++)
+        if (samePoints(imgs[keys[i]], imgs[keys[j]])) ok = false;
+    }
+    if (!ok) { V = [[1, 1], [3, 1], [1, 4]]; imgs = { r90: V.map(function (p) { return rotPt(p, [0, 0], 90); }),
+      r180: V.map(function (p) { return rotPt(p, [0, 0], 180); }), r270: V.map(function (p) { return rotPt(p, [0, 0], 270); }),
+      refl: V.map(function (p) { return reflectPt(p, 'y'); }) }; }
+    var map = { 90: ['r90', '90 degrees counterclockwise'], 180: ['r180', '180 degrees'], 270: ['r270', '90 degrees clockwise'] };
+    var chosen = map[spec.ccw];
+    var allLabels = ['90 degrees counterclockwise', '180 degrees', '90 degrees clockwise', 'A reflection over the y-axis, not a rotation'];
+    var sh = choiceSet(R, chosen[1], allLabels.filter(function (l) { return l !== chosen[1]; }));
+    var im = imgs[chosen[0]];
+    return mc('The black triangle is turned about the origin onto the blue one. Which describes the turn?',
+      sh.choices, sh.answer,
+      ['Track vertex A: ' + ptStr(V[0]) + ' goes to A′ at ' + ptStr(im[0]) + '.',
+       'The rule ~' + spec.rule + '~ gives exactly that, so the turn is **' + chosen[1] + '**.',
+       'Rotations keep the shape facing the same way round; a reflection would reverse its orientation.'],
+      { figure: FIG.transform('', V, im) });
+  });
+
+  g('dilations', function (R, d) {
+    var mode = R.pick(['origin', 'centre', 'factor', 'length']);
+    if (mode === 'origin') {
+      var k = R.pick(d === 1 ? [2, 3] : [2, 3, 0.5]);
+      var P = k < 1 ? [2 * R.nonzero(-3, 3), 2 * R.nonzero(-3, 3)] : [R.nonzero(-4, 4), R.nonzero(-4, 4)];
+      var Q = [P[0] * k, P[1] * k];
+      return multi('Dilate the point ~' + ptStr(P) + '~ about the origin with scale factor ~' + (k === 0.5 ? '\\f{1}{2}' : k) +
+        '~. Find its image.', [{ label: 'x', answer: Q[0] }, { label: 'y', answer: Q[1] }],
+        ['A dilation about the origin multiplies both coordinates by the scale factor.',
+         '~' + ptStr(P) + ' \\to (' + P[0] + ' \\times ' + (k === 0.5 ? '\\f{1}{2}' : k) + ', ' + P[1] + ' \\times ' +
+           (k === 0.5 ? '\\f{1}{2}' : k) + ') = ' + ptStr(Q) + '~.',
+         'Image **' + ptStr(Q) + '**.',
+         k > 1 ? 'A factor above 1 enlarges: the image is further from the centre.' :
+                 'A factor between 0 and 1 shrinks: the image is closer to the centre.']);
+    }
+    if (mode === 'centre') {
+      var kc = R.pick([2, 3]);
+      var C = [R.int(-3, 3), R.int(-3, 3)], rel = [R.nonzero(-2, 2), R.nonzero(-2, 2)];
+      var P2 = [C[0] + rel[0], C[1] + rel[1]];
+      var Q2 = [C[0] + kc * rel[0], C[1] + kc * rel[1]];
+      return multi('Dilate the point ~' + ptStr(P2) + '~ about the centre ~' + ptStr(C) + '~ with scale factor ~' + kc +
+        '~. Find its image.', [{ label: 'x', answer: Q2[0] }, { label: 'y', answer: Q2[1] }],
+        ['Measure from the centre, not the origin: ~' + ptStr(P2) + ' - ' + ptStr(C) + ' = ' + ptStr(rel) + '~.',
+         'Scale that by ' + kc + ': ~' + ptStr([kc * rel[0], kc * rel[1]]) + '~.',
+         'Add the centre back: **' + ptStr(Q2) + '**.',
+         'Only a dilation centred at the origin multiplies the raw coordinates. Anywhere else, go via the centre.']);
+    }
+    if (mode === 'factor') {
+      var kf = R.pick([2, 3, 0.5]);
+      var V = kf < 1 ? randomTriangle(R, 3).map(function (p) { return [2 * p[0], 2 * p[1]]; }) : randomTriangle(R, 2);
+      var im = V.map(function (p) { return [p[0] * kf, p[1] * kf]; });
+      var allIn = V.concat(im).every(function (p) { return Math.abs(p[0]) <= 6 && Math.abs(p[1]) <= 6; });
+      if (!allIn) { V = [[1, 1], [2, 1], [1, 2]]; kf = 3; im = V.map(function (p) { return [p[0] * 3, p[1] * 3]; }); }
+      return num('The black triangle is dilated about the origin to give the blue one. What is the scale factor?',
+        kf,
+        ['Compare vertex A with its image A′: ' + ptStr(V[0]) + ' goes to ' + ptStr(im[0]) + '.',
+         'The factor is the image coordinate divided by the original: ' + MC.fmt(V[0][0] === 0 ? im[0][1] : im[0][0], 3) + ' \\div ' +
+           (V[0][0] === 0 ? V[0][1] : V[0][0]) + ' = **' + MC.fmt(kf, 3) + '**.',
+         kf < 1 ? 'The image is smaller, so the factor is between 0 and 1.' : 'The image is larger, so the factor is above 1.'],
+        { figure: FIG.transform('', V, im), tol: 0.005 });
+    }
+    var kk = R.pick([2, 3, 4, 0.5, 1.5]), L = kk < 1 ? 2 * R.int(2, 10) : R.int(2, 12);
+    return num('A segment of length ' + L + ' cm is dilated with scale factor ' + kk +
+      '. How long is the image, in cm?', L * kk,
+      ['Every length is multiplied by the scale factor.',
+       L + ' \\times ' + kk + ' = **' + MC.fmt(L * kk, 3) + '** cm.',
+       'Lengths scale by the factor, areas by its square, volumes by its cube — and angles do not change at all.'],
+      { tol: 0.005 });
+  });
+
+  g('compositions-symmetry', function (R, d) {
+    var mode = R.pick(['compose', 'lines', 'order']);
+    if (mode === 'compose') {
+      var vec = [R.nonzero(-3, 3), R.nonzero(-3, 3)];
+      var steps = [
+        { label: 'reflected over the x-axis', f: function (p) { return reflectPt(p, 'x'); } },
+        { label: 'reflected over the y-axis', f: function (p) { return reflectPt(p, 'y'); } },
+        { label: 'rotated 90 degrees counterclockwise about the origin', f: function (p) { return rotPt(p, [0, 0], 90); } },
+        { label: 'rotated 180 degrees about the origin', f: function (p) { return rotPt(p, [0, 0], 180); } },
+        { label: 'translated ' + moveWords(vec), f: function (p) { return [p[0] + vec[0], p[1] + vec[1]]; } }
+      ];
+      var i1 = R.int(0, 4), i2 = R.int(0, 4);
+      while (i2 === i1) i2 = R.int(0, 4);
+      var P = [R.nonzero(-5, 5), R.nonzero(-5, 5)];
+      var mid = steps[i1].f(P), Q = steps[i2].f(mid);
+      var swapped = steps[i1].f(steps[i2].f(P));
+      return multi('The point ~' + ptStr(P) + '~ is first ' + steps[i1].label + ', and then ' + steps[i2].label +
+        '. Find its final position.', [{ label: 'x', answer: Q[0] }, { label: 'y', answer: Q[1] }],
+        ['Apply the transformations in the order given, one at a time.',
+         'After the first: ~' + ptStr(P) + ' \\to ' + ptStr(mid) + '~.',
+         'After the second: ~' + ptStr(mid) + ' \\to ' + ptStr(Q) + '~.',
+         'Final position **' + ptStr(Q) + '**.',
+         samePoints([swapped], [Q]) ? 'In this case swapping the order happens to give the same point, but that is not true in general.'
+           : 'Order matters: doing them the other way round would end at ' + ptStr(swapped) + ', a different point.']);
+    }
+    var shapes = [
+      { name: 'an equilateral triangle', lines: 3, order: 3 }, { name: 'a square', lines: 4, order: 4 },
+      { name: 'a rectangle that is not a square', lines: 2, order: 2 },
+      { name: 'a rhombus that is not a square', lines: 2, order: 2 },
+      { name: 'a parallelogram that is not a rectangle or a rhombus', lines: 0, order: 2 },
+      { name: 'an isosceles triangle that is not equilateral', lines: 1, order: 1 },
+      { name: 'a regular pentagon', lines: 5, order: 5 }, { name: 'a regular hexagon', lines: 6, order: 6 },
+      { name: 'a kite that is not a rhombus', lines: 1, order: 1 }
+    ];
+    var sp = R.pick(shapes);
+    if (mode === 'lines') {
+      return num('How many lines of symmetry does ' + sp.name + ' have?', sp.lines,
+        ['A line of symmetry splits the shape into two mirror-image halves.',
+         sp.lines === 0 ? 'A parallelogram that is neither a rectangle nor a rhombus has no mirror line at all — a surprise worth remembering.'
+           : /regular/.test(sp.name) || /equilateral|square/.test(sp.name) ? 'A regular polygon with ~n~ sides has exactly ~n~ lines of symmetry.'
+           : 'Count the mirror lines: ' + sp.lines + '.',
+         '**' + sp.lines + '**.']);
+    }
+    return num('What is the order of rotational symmetry of ' + sp.name +
+      '? (The number of times it fits onto itself in one full turn; a shape with none other than the full turn has order 1.)',
+      sp.order,
+      ['Rotate the shape about its centre and count how many positions look identical, including the starting one.',
+       sp.order === 1 ? 'Only the full turn brings it back, so the order is 1 — it has no rotational symmetry to speak of.'
+         : sp.name.indexOf('parallelogram') > -1 ? 'A half-turn lands a parallelogram on itself, and nothing smaller does: order 2.'
+         : 'A regular ~n~-gon has order ~n~.',
+       '**' + sp.order + '**.',
+       'A shape can have rotational symmetry without any lines of symmetry. The parallelogram is the standard example.']);
+  });
+
+  g('rigid-motion-congruence', function (R, d) {
+    var mode = R.pick(['notRigid', 'factor', 'property']);
+    if (mode === 'notRigid') {
+      var all = ['A translation', 'A reflection', 'A rotation', 'A dilation with scale factor 2'];
+      var sh = choiceSet(R, 'A dilation with scale factor 2', all.filter(function (o) { return o !== 'A dilation with scale factor 2'; }));
+      return mc('Which of these is NOT a rigid motion?', sh.choices, sh.answer,
+        ['A rigid motion preserves every length and every angle: it moves a figure without stretching it.',
+         'Translations, reflections and rotations all do that.',
+         'A dilation with factor 2 doubles every length, so the image is not congruent to the original. It is **a dilation with scale factor 2**.',
+         'Congruent means there is a rigid motion taking one figure onto the other. Similar adds dilations to the allowed moves.']);
+    }
+    if (mode === 'factor') {
+      var k = R.pick([1, 2, 3, 0.5, -1]);
+      var congr = Math.abs(k) === 1;
+      var sh2 = shuffleChoices(R, ['Yes, congruent', 'No, similar but not congruent'], congr ? 0 : 1);
+      return mc('A figure is dilated by scale factor ' + k + '. Is the image congruent to the original?',
+        sh2.choices, sh2.answer,
+        ['Congruent figures have identical lengths, so every length must be preserved.',
+         Math.abs(k) === 1 ? 'A factor of ' + k + ' leaves every length unchanged' + (k < 0 ? ' (the shape is turned through the centre)' : '') +
+           ', so **yes**.'
+           : 'A factor of ' + k + ' changes every length by that factor, so the image is the same shape at a different size: **similar, not congruent**.',
+         'Angles never change under a dilation; only sizes do. That is exactly the difference between similar and congruent.']);
+    }
+    var props = [
+      { q: 'a reflection', ans: 'Orientation (clockwise order of the vertices)', why: 'A reflection reverses it — the image is a mirror image.' },
+      { q: 'a rotation', ans: 'Nothing about its size or shape', why: 'Rotations are rigid motions, so size, shape and orientation all survive.' },
+      { q: 'a translation', ans: 'Nothing about its size or shape', why: 'Sliding a figure changes only its position.' }
+    ];
+    var pr = R.pick(props);
+    var sh3 = choiceSet(R, pr.ans, ['Side lengths', 'Angle measures', 'Orientation (clockwise order of the vertices)',
+      'Nothing about its size or shape'].filter(function (o) { return o !== pr.ans; }).slice(0, 3));
+    return mc('What does ' + pr.q + ' change about a figure?', sh3.choices, sh3.answer,
+      ['A rigid motion keeps side lengths and angle measures. The only thing that can differ is position and, for reflections, handedness.',
+       pr.why,
+       'So the answer is **' + pr.ans.toLowerCase() + '**.']);
+  });
+
+  var CONDS = [
+    { p: 'a number is divisible by 6', np: 'a number is not divisible by 6', q: 'it is divisible by 3',
+      nq: 'it is not divisible by 3', conv: false, counter: 'the number 9 is divisible by 3 but not by 6' },
+    { p: 'a shape is a square', np: 'a shape is not a square', q: 'it is a rectangle', nq: 'it is not a rectangle',
+      conv: false, counter: 'a 2 by 5 rectangle is a rectangle but not a square' },
+    { p: 'an animal is a dog', np: 'an animal is not a dog', q: 'it is a mammal', nq: 'it is not a mammal',
+      conv: false, counter: 'a cat is a mammal but not a dog' },
+    { p: 'a number equals 4', np: 'a number does not equal 4', q: 'its square is 16', nq: 'its square is not 16',
+      conv: false, counter: 'the number -4 has square 16 but does not equal 4' },
+    { p: 'a triangle is equilateral', np: 'a triangle is not equilateral', q: 'it is isosceles', nq: 'it is not isosceles',
+      conv: false, counter: 'a triangle with sides 5, 5, 7 is isosceles but not equilateral' },
+    { p: 'two angles are vertical angles', np: 'two angles are not vertical angles', q: 'they are equal',
+      nq: 'they are not equal', conv: false, counter: 'two right angles are equal without being vertical angles' },
+    { p: 'a number is even', np: 'a number is not even', q: 'it is divisible by 2', nq: 'it is not divisible by 2',
+      conv: true, counter: null },
+    { p: 'a polygon is a triangle', np: 'a polygon is not a triangle', q: 'it has exactly three sides',
+      nq: 'it does not have exactly three sides', conv: true, counter: null }
+  ];
+  function ifThen(a, b) { return 'If ' + a + ', then ' + b + '.'; }
+
+  g('conditional-statements', function (R, d) {
+    var c = R.pick(CONDS);
+    var orig = ifThen(c.p, c.q);
+    var forms = {
+      converse: ifThen(c.q, c.p), inverse: ifThen(c.np, c.nq), contrapositive: ifThen(c.nq, c.np)
+    };
+    var mode = R.pick(['name', 'equivalent', 'converseTruth']);
+    if (mode === 'name') {
+      var which = R.pick(['converse', 'inverse', 'contrapositive']);
+      var wrongs = ['converse', 'inverse', 'contrapositive'].filter(function (k) { return k !== which; })
+        .map(function (k) { return forms[k]; });
+      wrongs.push(ifThen(c.p, c.nq));
+      var sh = choiceSet(R, forms[which], wrongs);
+      return mc('Which of these is the ' + which + ' of: "' + orig + '"?', sh.choices, sh.answer,
+        ['Converse swaps the two parts. Inverse negates both. Contrapositive does both: swap *and* negate.',
+         which === 'converse' ? 'Swapping gives **' + forms.converse + '**.'
+           : which === 'inverse' ? 'Negating both parts, in place, gives **' + forms.inverse + '**.'
+           : 'Swapping and negating gives **' + forms.contrapositive + '**.',
+         'Only the contrapositive is guaranteed to have the same truth value as the original statement.']);
+    }
+    if (mode === 'equivalent') {
+      var sh2 = choiceSet(R, forms.contrapositive, [forms.converse, forms.inverse, c.p.charAt(0).toUpperCase() + c.p.slice(1) + ' and ' + c.nq + '.']);
+      return mc('Which statement is logically equivalent to: "' + orig + '"?', sh2.choices, sh2.answer,
+        ['A statement and its contrapositive are always true or false together.',
+         'The contrapositive here is **' + forms.contrapositive + '**',
+         'The converse and inverse are *not* automatically equivalent to the original, even though they look similar. They are equivalent to each other, though.',
+         'This is why proving the contrapositive is a legitimate way of proving the original.']);
+    }
+    var sh3 = shuffleChoices(R, ['True', 'False'], c.conv ? 0 : 1);
+    return mc('The statement "' + orig + '" is true. Is its converse, "' + forms.converse + '", also true?',
+      sh3.choices, sh3.answer,
+      ['The converse swaps the two parts. A true statement does not guarantee a true converse.',
+       c.conv ? 'Here it does hold: the two conditions amount to the same thing, so the converse is **true**.'
+              : 'It fails: ' + c.counter + '. One counterexample is enough, so the converse is **false**.',
+       'This is the most common reasoning error there is. "All dogs are mammals" does not mean "all mammals are dogs".']);
+  });
+
+  var CHAINS = [
+    ['it rains', 'the ground gets wet', 'the grass grows'],
+    ['a shape is a square', 'it is a rectangle', 'its angles add to 360 degrees'],
+    ['you study', 'you understand the material', 'you pass the test'],
+    ['a number is divisible by 12', 'it is divisible by 6', 'it is divisible by 3'],
+    ['a figure is a rhombus', 'it is a parallelogram', 'its opposite sides are parallel']
+  ];
+  function notTrue(x) { return 'It is not true that ' + x + '.'; }
+  function capital(x) { return x.charAt(0).toUpperCase() + x.slice(1) + '.'; }
+
+  g('deductive-reasoning', function (R, d) {
+    var ch = R.pick(CHAINS), a = ch[0], b = ch[1], c = ch[2];
+    var mode = R.pick(['syllogism', 'detach', 'tollens', 'fallacy']);
+    if (mode === 'syllogism') {
+      var sh = choiceSet(R, ifThen(a, c), [ifThen(c, a), ifThen(b, a), ifThen('it is not true that ' + a, 'it is not true that ' + c)]);
+      return mc('Given: "' + ifThen(a, b) + '" and "' + ifThen(b, c) + '" What follows?', sh.choices, sh.answer,
+        ['The conclusion of the first statement is the condition of the second, so they chain together.',
+         'That gives **' + ifThen(a, c) + '**',
+         'This is the law of syllogism. The chain only runs in the direction the arrows point; reversing it is not allowed.']);
+    }
+    if (mode === 'detach') {
+      var sh2 = choiceSet(R, capital(b), [notTrue(b), 'Nothing can be concluded.', notTrue(a)]);
+      return mc('Given: "' + ifThen(a, b) + '" and it is known that ' + a + '. What can you conclude?', sh2.choices, sh2.answer,
+        ['The condition is met, so the result must hold: this is modus ponens, the most basic valid argument.',
+         'Conclusion: **' + capital(b) + '**',
+         'The condition being true is what triggers the conclusion.']);
+    }
+    if (mode === 'tollens') {
+      var sh3 = choiceSet(R, notTrue(a), [capital(a), 'Nothing can be concluded.', capital(b)]);
+      return mc('Given: "' + ifThen(a, b) + '" and it is known that it is NOT true that ' + b + '. What can you conclude?',
+        sh3.choices, sh3.answer,
+        ['If the condition were true the result would have to follow. The result is false, so the condition cannot be true.',
+         'This is modus tollens, the contrapositive in action: **' + notTrue(a) + '**',
+         'Reasoning backwards from a false result is just as valid as reasoning forwards from a true condition.']);
+    }
+    var sh4 = choiceSet(R, 'Nothing definite follows about whether ' + a + '.',
+      [capital(a), notTrue(a), 'It must have been caused by something else.']);
+    return mc('Given: "' + ifThen(a, b) + '" and it is known that ' + b + '. What can you conclude about whether ' + a + '?',
+      sh4.choices, sh4.answer,
+      ['The statement says ' + a + ' is *enough* for ' + b + ', not that it is the *only* way to get there.',
+       'Something else might produce the same result, so you cannot work backwards from a true result.',
+       '**Nothing definite follows.** This mistake is called affirming the consequent.',
+       'It is the same error as thinking the converse of a true statement must be true.']);
+  });
+
+  g('two-column-proof', function (R, d) {
+    var mode = R.pick(['reason', 'nextStep', 'solve']);
+    if (mode === 'reason') {
+      var bank = [
+        { s: 'AB = CD and CD = EF, so AB = EF', ans: 'Transitive property of equality' },
+        { s: 'M is the midpoint of AB, so AM = MB', ans: 'Definition of midpoint' },
+        { s: '∠1 and ∠2 are vertical angles, so ∠1 = ∠2', ans: 'Vertical angles theorem' },
+        { s: 'BD bisects ∠ABC, so ∠ABD = ∠DBC', ans: 'Definition of angle bisector' },
+        { s: 'a = b, so b = a', ans: 'Symmetric property of equality' },
+        { s: 'AB = AB', ans: 'Reflexive property of equality' },
+        { s: '∠1 and ∠2 form a linear pair, so ∠1 + ∠2 = 180°', ans: 'Linear pair postulate' },
+        { s: '△ABC ≅ △DEF, so AB = DE', ans: 'CPCTC' },
+        { s: 'Lines a and b are parallel, so corresponding angles are equal', ans: 'Corresponding angles postulate' }
+      ];
+      var it = R.pick(bank);
+      var allA = bank.map(function (x) { return x.ans; });
+      var sh = choiceSet(R, it.ans, R.shuffle(allA.filter(function (o) { return o !== it.ans; })).slice(0, 3));
+      return mc('In a two-column proof, one line reads: "' + it.s + '". What is the reason?', sh.choices, sh.answer,
+        ['The reason names the rule that licenses the statement — a definition, a postulate, a property or a proved theorem.',
+         'Here it is **' + it.ans + '**.',
+         'Every line of a proof needs a reason, and "it looks true on the diagram" is never one.']);
+    }
+    if (mode === 'nextStep') {
+      var n = R.int(3, 20);
+      var sh2 = choiceSet(R, 'AM = MB, by the definition of a midpoint',
+        ['AB = ' + n + ', by the definition of a midpoint', 'MB = ' + (2 * n) + ', by substitution',
+         'AM = 2MB, by the definition of a midpoint']);
+      return mc('Given: M is the midpoint of AB and AM = ' + n + '. Which is the correct next line of a proof that AB = ' +
+        (2 * n) + '?', sh2.choices, sh2.answer,
+        ['Start from what the given gives you directly. A midpoint makes the two halves equal.',
+         'So the next line is **AM = MB**, by the definition of a midpoint.',
+         'After that: MB = ' + n + ' by substitution, then AB = AM + MB by segment addition, then AB = ' + (2 * n) +
+           '. Each step uses only what came before it.']);
+    }
+    var x = R.int(3, 15), a = R.int(2, 4), c = R.int(1, 3);
+    /* AM = a x + c, MB = (a+1) x - ... choose so equal at x */
+    var amExpr = [a, c], mbCoef = a + 1, mbConst = a * x + c - mbCoef * x;
+    var am = a * x + c;
+    return num('M is the midpoint of ~AB~, with ~AM = ' + poly([[a, 'x'], [c, '']]) + '~ and ~MB = ' +
+      poly([[mbCoef, 'x'], [mbConst, '']]) + '~. How long is ~AB~?', 2 * am,
+      ['A midpoint makes the two halves equal, so set them equal: ~' + poly([[a, 'x'], [c, '']]) + ' = ' +
+        poly([[mbCoef, 'x'], [mbConst, '']]) + '~.',
+       'Solve: ~x = ' + x + '~. Then ~AM = ' + a + '(' + x + ') + ' + c + ' = ' + am + '~ and ~MB = ' + am + '~.',
+       'Segment addition: ~AB = AM + MB = ' + am + ' + ' + am + ' = ~**' + (2 * am) + '**.',
+       'Finding ~x~ is only the middle step. The question asks for the length, which is a different number.'],
+      { tol: 0.005 });
+  });
+
+  g('counterexamples', function (R, d) {
+    var claims = [
+      { claim: '~n^{2} + n + 41~ is prime for every positive integer ~n~', cands: [1, 2, 3, 5, 8, 12, 20, 30, 40, 41],
+        isCounter: function (n) { return !MC.isPrime(n * n + n + 41); },
+        show: function (n) { return String(n); },
+        why: function (n) { return 'n = ' + n + ' gives ' + (n * n + n + 41) + ' = ' + MC.primeFactors(n * n + n + 41).join(' \\times ') + ', which is not prime.'; } },
+      { claim: '~x^{2} > x~ for every real number ~x~', cands: [-3, -1, 0, 0.5, 1, 2, 3],
+        isCounter: function (x) { return !(x * x > x); },
+        show: function (x) { return String(x); },
+        why: function (x) { return 'x = ' + x + ' gives ' + MC.fmt(x * x, 3) + ' > ' + x + ', which is false.'; } },
+      { claim: 'If a number is divisible by both 4 and 6, then it is divisible by 24',
+        cands: [12, 24, 36, 48, 60, 72, 120],
+        isCounter: function (n) { return n % 4 === 0 && n % 6 === 0 && n % 24 !== 0; },
+        show: function (n) { return String(n); },
+        why: function (n) { return n + ' is divisible by 4 and by 6 but not by 24, so the claim fails.'; } },
+      { claim: 'The sum of two prime numbers is always even',
+        cands: [[3, 5], [7, 11], [2, 3], [13, 17], [2, 7], [11, 19], [2, 13]],
+        isCounter: function (p) { return (p[0] + p[1]) % 2 === 1; },
+        show: function (p) { return p[0] + ' and ' + p[1]; },
+        why: function (p) { return p[0] + ' + ' + p[1] + ' = ' + (p[0] + p[1]) + ', which is odd. Every counterexample must include 2, the only even prime.'; } },
+      { claim: 'If a number is divisible by 9, then it is divisible by 18',
+        cands: [18, 36, 54, 9, 27, 45, 72],
+        isCounter: function (n) { return n % 9 === 0 && n % 18 !== 0; },
+        show: function (n) { return String(n); },
+        why: function (n) { return n + ' is divisible by 9 but is odd, so it cannot be divisible by 18.'; } }
+    ];
+    var mode = R.pick(['find', 'find', 'principle']);
+    if (mode === 'principle') {
+      var facts = [
+        { q: 'Checking that a claim works for 10 different examples proves it is true for all cases.', ans: 'False' },
+        { q: 'One single counterexample is enough to prove a general claim false.', ans: 'True' },
+        { q: 'A counterexample must satisfy the conditions of the claim but fail its conclusion.', ans: 'True' },
+        { q: 'If a claim is true for the first 1000 numbers, it must be true for all numbers.', ans: 'False' }
+      ];
+      var f = R.pick(facts);
+      var shp = shuffleChoices(R, ['True', 'False'], f.ans === 'True' ? 0 : 1);
+      return mc('True or false: ' + f.q, shp.choices, shp.answer,
+        ['Examples can support a claim but never prove it; a single failure can disprove it.',
+         'So the statement is **' + f.ans.toLowerCase() + '**.',
+         'The expression ~n^{2} + n + 41~ is prime for every ~n~ from 0 to 39 and fails at 40 — a case where forty examples were not enough.']);
+    }
+    var cl = R.pick(claims);
+    var good = cl.cands.filter(cl.isCounter), bad = cl.cands.filter(function (v) { return !cl.isCounter(v); });
+    var right = R.pick(good);
+    var wrongs = R.shuffle(bad).slice(0, 3).map(cl.show);
+    var sh = choiceSet(R, cl.show(right), wrongs);
+    return mc('Claim: ' + cl.claim + '. Which of these is a counterexample to it?', sh.choices, sh.answer,
+      ['A counterexample must meet the claim\'s conditions and still break its conclusion.',
+       cl.why(right),
+       'So **' + cl.show(right) + '** is a counterexample.',
+       'The other choices all satisfy the claim, so they fail to disprove it. One failure is enough; no number of successes is.']);
+  });
+
   root.GENERATORS = GEN;
   if (typeof module !== 'undefined' && module.exports) module.exports = GEN;
 })(typeof window !== 'undefined' ? window : globalThis);

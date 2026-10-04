@@ -1,0 +1,53 @@
+{
+ "module": "M5.4",
+ "skills": {
+  "pythagoras": {
+   "why": "In a right triangle the squares on the two shorter sides add up to the square on the longest: ~a^{2} + b^{2} = c^{2}~. It is the single most used fact in geometry, and it is the distance formula in disguise. The hypotenuse is always opposite the right angle and is always the longest side.",
+   "traps": [
+    "To find a leg, *subtract*: ~b^{2} = c^{2} - a^{2}~. Adding when you should subtract is the standard error.",
+    "Identify the hypotenuse first. The formula only works with ~c~ on the hypotenuse."
+   ],
+   "code": {
+    "body": "import math\ndef distance(p, q):\n    return math.hypot(q[0] - p[0], q[1] - p[1])\n\ndistance((0, 0), (3, 4))   # 5.0",
+    "note": "Every distance calculation in graphics, games, mapping and machine learning is Pythagoras. math.hypot does it without overflowing on very large numbers."
+   }
+  },
+  "pythagoras-converse": {
+   "why": "The theorem runs backwards too. If the squares of two sides add up to exactly the square of the third, the triangle has a right angle. If the sum is bigger the angle is acute, and if smaller it is obtuse. It is how builders check a corner is square: the 3-4-5 rope.",
+   "traps": [
+    "Always square the *longest* side on its own, and compare it with the sum of the other two squares. Putting the wrong side on the wrong side reverses the test."
+   ]
+  },
+  "special-right-triangles": {
+   "why": "Two right triangles have sides in exact ratios you can write down without a calculator. The 45-45-90 triangle has sides in the ratio ~1 : 1 : sqrt{2}~, and the 30-60-90 triangle has ~1 : sqrt{3} : 2~. They are half a square and half an equilateral triangle, which is where the ratios come from.",
+   "traps": [
+    "In a 30-60-90 triangle the shortest side is opposite the 30-degree angle. Anchor the ratio there before reading off anything else."
+   ]
+  },
+  "trig-ratios": {
+   "why": "Sine, cosine and tangent are ratios of sides in a right triangle, and they depend only on the angle, not the size of the triangle. SOH CAH TOA records which ratio is which. They are how you measure things you cannot reach: heights, distances, slopes.",
+   "traps": [
+    "Opposite and adjacent are relative to the angle you chose. Switch to the other acute angle and they swap; only the hypotenuse stays put.",
+    "Your calculator must be in degrees, not radians, for these problems."
+   ],
+   "code": {
+    "body": "import math\nmath.sin(math.radians(30))   # 0.5 (up to rounding)",
+    "note": "Programming languages work in radians, so you convert from degrees first. Forgetting that gives answers that look reasonable and are completely wrong."
+   }
+  },
+  "inverse-trig-angles": {
+   "why": "Trig ratios take an angle and give a ratio. To go the other way — from the ratio to the angle — use the inverse function: ~\\sin^{-1}~, ~\\cos^{-1}~, ~\\tan^{-1}~. The notation is unfortunate: ~\\sin^{-1}~ is *not* one over sine.",
+   "traps": [
+    "~\\sin^{-1}(x)~ is the inverse function, not the reciprocal ~\\f{1}{\\sin x}~.",
+    "Pick the ratio from the two sides you actually know. Tangent uses opposite and adjacent, with no hypotenuse needed."
+   ]
+  },
+  "elevation-depression": {
+   "why": "Real height and distance problems are right triangles with an angle measured from the horizontal. An angle of elevation looks up from the horizontal; an angle of depression looks down from it. Between the same two points they are equal, because they are alternate angles.",
+   "traps": [
+    "Draw the picture first and mark the horizontal. Putting the angle of depression at the wrong vertex is the usual error.",
+    "Measure from your eye, not from the ground, if the question says how tall the observer is."
+   ]
+  }
+ }
+}

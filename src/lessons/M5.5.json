@@ -1,0 +1,25 @@
+{
+ "module": "M5.5",
+ "skills": {
+  "polygon-angles": {
+   "why": "Any polygon with ~n~ sides splits into ~n - 2~ triangles from one vertex, so its interior angles total ~(n - 2) \\times 180~ degrees. The exterior angles, one at each vertex, always total 360 degrees however many sides there are, because walking round the shape turns you through one full circle.",
+   "traps": [
+    "Dividing the total by ~n~ only gives each angle for a *regular* polygon. An irregular one shares the same total unevenly.",
+    "The exterior route is usually quicker: each exterior angle of a regular polygon is ~\\f{360}{n}~."
+   ]
+  },
+  "quadrilateral-properties": {
+   "why": "The quadrilaterals form a family tree, not a list. A square is a rectangle and a rhombus; rectangles, rhombuses and parallelograms are all parallelograms. Knowing the hierarchy tells you at once which properties a shape inherits.",
+   "traps": [
+    "Every square is a rectangle, but not every rectangle is a square. The arrows in the hierarchy only point one way.",
+    "A trapezium has exactly one pair of parallel sides in the definition used here. Some books say *at least* one, so check which your course uses."
+   ]
+  },
+  "quadrilateral-proofs": {
+   "why": "To prove a shape is a particular quadrilateral, you need a *sufficient* set of facts, not all of them. Both pairs of opposite sides equal makes a parallelogram. Add a right angle and it is a rectangle; add equal adjacent sides and it is a rhombus.",
+   "traps": [
+    "Claim only what the evidence supports. A parallelogram with equal diagonals is a rectangle, not necessarily a square."
+   ]
+  }
+ }
+}

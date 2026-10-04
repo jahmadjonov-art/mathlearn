@@ -12,11 +12,11 @@ devices)
 | | |
 |---|---|
 | Curriculum map | 13 levels, 111 modules, **589 skills** — the whole route, written out |
-| Practice built | **187 skills** (levels 0–4: counting → algebra I), unlimited generated questions |
-| Lesson prose | 187 written lessons, about 12,200 words |
-| Checks | 67,000+ generated questions validated per run, plus a real Chromium run |
+| Practice built | **236 skills** (levels 0–5: counting → geometry), unlimited generated questions |
+| Lesson prose | 236 written lessons, about 16,300 words |
+| Checks | 85,000+ generated questions and 1,500+ diagrams validated per run, plus a real Chromium run |
 
-Levels 5–12 are mapped in full and listed in the app as being written. Progress
+Levels 6–12 are mapped in full and listed in the app as being written. Progress
 is stored per skill id, so adding a level never disturbs existing progress.
 
 ## The route
@@ -45,6 +45,7 @@ src/
   index.html      the page: title, design tokens, both themes, script tags
   mathcore.js     fractions, integers, an expression parser, maths typesetting
   curriculum.js   the whole map — levels, modules, skills, stable skill ids
+  figures.js      geometry diagrams, drawn as SVG from the same numbers a question uses
   generators.js   one problem generator per skill
   grade.js        decides whether a typed answer is right
   engine.js       mastery levels, spaced review, unlocking, session building
@@ -58,6 +59,31 @@ tests/
 No build step and no dependencies in the page itself: `src/` is plain HTML and
 JavaScript, served as published files. The test suite uses Playwright with the
 Chromium already present in the build environment.
+
+## Diagrams
+
+A question may carry a `figure`: an SVG string built by `figures.js` from the same
+numbers the question is asked with. Three rules, each learned the hard way:
+
+**A diagram is drawn to its numbers.** Early drafts drew every triangle from one
+fixed template, so a triangle labelled with a 134-degree apex appeared acute, and a
+70-degree central angle was drawn at 140. Use `triangleAngles`, `rightTriangle`,
+`elevation` and the like, which compute the geometry from the labels. Where a
+figure is only schematic (`areaShape`, `solid`) it says *not to scale* on itself.
+
+**A diagram must fit its canvas.** Anything drawn outside the viewBox is silently
+cut off. `tests/t-figures.js` measures every figure any generator produces, and
+parses the drawn shapes to confirm angles, leg ratios and lines of sight match
+what is written beside them.
+
+**A diagram is markup, not text.** It is inserted unescaped, so only `figures.js`
+may build one and nothing a learner types may reach it. The same test fails on
+any scriptable content.
+
+Not every skill has a diagram yet. In level 5, those that would most benefit and
+lack one are `triangle-inequality`, `special-right-triangles`,
+`similar-side-lengths`, `polygon-angles`, `congruence-criteria` and
+`circle-equation`; the logic and proof module is text by nature.
 
 ## How the teaching works
 
@@ -98,6 +124,11 @@ difficulty tier (1–3). Shape:
 throughout and `$12.50` has to survive as text. Inside a segment: `\f{a}{b}` for
 a stacked fraction, `^{}` and `_{}`, `sqrt{}`, and backslash words such as
 `\in`, `\le`, `\sum` for symbols that would otherwise collide with English.
+
+**The tests check what the learner sees, not just what the code produced.** Every
+string is rendered and the suite fails if a backslash command or a stray math
+delimiter survives into the output. That rule exists because raw `\times` once
+reached the screen in 92 skills while every other check passed.
 
 **Every generator is exercised 360 times before it ships** — `tests/run.sh`
 round-trips each one's own stated answer through the real grader and rejects

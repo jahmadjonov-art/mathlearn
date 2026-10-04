@@ -1,0 +1,44 @@
+{
+ "module": "M5.9",
+ "skills": {
+  "coord-distance-midpoint": {
+   "why": "Coordinates let you do geometry with algebra. The distance formula is Pythagoras on the horizontal and vertical gaps, and the midpoint is the average of each coordinate. With those two tools you can classify any triangle without drawing it.",
+   "traps": [
+    "Compare *squared* distances to test for equal or perpendicular sides. It is exact and avoids needless square roots.",
+    "To go backwards from a midpoint, use ~Q = 2M - P~."
+   ],
+   "code": {
+    "body": "def midpoint(p, q):\n    return ((p[0] + q[0]) / 2, (p[1] + q[1]) / 2)\n\ndef dist2(p, q):\n    return (p[0]-q[0])**2 + (p[1]-q[1])**2   # squared: exact for integers",
+    "note": "Comparing squared distances is standard practice in code too. It avoids a square root, which is slow and introduces rounding where the integers were exact."
+   }
+  },
+  "coord-prove-shapes": {
+   "why": "To prove a quadrilateral is a rectangle, rhombus or square from its coordinates, you compute: do the diagonals bisect each other, are the sides equal, are the diagonals equal. The coordinates settle the question exactly, with no reliance on how the figure looks.",
+   "traps": [
+    "Equal diagonals give a rectangle; equal sides give a rhombus; both together give a square. Claiming a square from only one of them is the usual overreach."
+   ]
+  },
+  "coord-partition": {
+   "why": "A point dividing a segment in the ratio ~m : n~ lies ~\\f{m}{m+n}~ of the way from the first end to the second. That fraction applied to each coordinate gives the point. It is the same linear interpolation used to blend colours and animate movement.",
+   "traps": [
+    "The fraction uses the *whole* ~m + n~, not just ~n~.",
+    "The ratio ~AP : PB~ is measured from the first point. Reversing the order of the points reverses the answer."
+   ],
+   "code": {
+    "body": "def lerp(a, b, t):\n    return a + t * (b - a)      # t = 0 gives a, t = 1 gives b\n\nlerp(2, 10, 0.25)   # 4.0",
+    "note": "This one line is called linear interpolation, and it is everywhere in graphics and animation. The ratio m : n is the same as t = m / (m + n)."
+   }
+  },
+  "coord-area": {
+   "why": "The shoelace formula finds the area of any polygon straight from its vertices, in order: sum each x times the next y, subtract each y times the next x, and halve the absolute value. It looks magical and is really just adding up signed trapezoids under each edge.",
+   "traps": [
+    "List the vertices in order round the shape. Jumping across it gives nonsense.",
+    "Look for a horizontal or vertical side first: it turns the problem into base times height."
+   ],
+   "code": {
+    "body": "def polygon_area(pts):\n    s = 0\n    for i in range(len(pts)):\n        x1, y1 = pts[i]\n        x2, y2 = pts[(i + 1) % len(pts)]\n        s += x1 * y2 - x2 * y1\n    return abs(s) / 2",
+    "note": "The modulo wraps the last vertex round to the first. The same wrap-around idea turns up whenever you process a closed loop of data."
+   }
+  }
+ }
+}

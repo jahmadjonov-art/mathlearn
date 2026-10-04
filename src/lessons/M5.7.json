@@ -1,0 +1,47 @@
+{
+ "module": "M5.7",
+ "skills": {
+  "circle-parts": {
+   "why": "A circle is every point at a fixed distance from a centre, and its parts have exact names that every circle theorem uses: radius, diameter, chord, tangent, secant, arc, sector. Being precise about the words is what lets you read a theorem.",
+   "traps": [
+    "A diameter is a chord — the longest one — so any fact about chords applies to it too.",
+    "A tangent touches the circle at exactly one point. A secant crosses it at two."
+   ]
+  },
+  "circumference-area": {
+   "why": "The circumference is ~2\\pi r~ and the area is ~\\pi r^{2}~. The number ~\\pi~ is just the ratio of any circle's circumference to its diameter, which is the same for every circle — a fact about circles, not about any particular one.",
+   "traps": [
+    "Only the radius is squared in ~\\pi r^{2}~. Squaring ~\\pi r~ is a common slip.",
+    "When going backwards from an area, divide by ~\\pi~ *before* taking the square root."
+   ]
+  },
+  "arcs-sectors": {
+   "why": "An arc and a sector are fractions of the circumference and area. The fraction is the angle over 360. In radians the arc length formula becomes simply ~r\\theta~, which is why mathematicians prefer radians.",
+   "traps": [
+    "Arc length uses the circumference and sector area uses the area. The fraction is the same; what it multiplies is not.",
+    "Check whether the angle is in degrees or radians before choosing a formula."
+   ]
+  },
+  "circle-angles": {
+   "why": "Angles in circles obey a few precise rules. An inscribed angle is half the central angle on the same arc. All inscribed angles on the same arc are equal. An angle in a semicircle is a right angle. These all follow from isosceles triangles formed by radii.",
+   "traps": [
+    "The inscribed angle is *half* the central angle, never the same size or double.",
+    "Spotting a diameter is the trick that unlocks a right angle for free."
+   ]
+  },
+  "chords-tangents": {
+   "why": "A tangent meets the radius at a right angle, so tangent problems become right-triangle problems. Two chords that cross split each other so that the products of their pieces are equal. Each fact gives you one equation to solve.",
+   "traps": [
+    "The distance from an outside point to the centre is the *hypotenuse* of the tangent triangle.",
+    "In the crossing-chords rule, multiply the two pieces of the *same* chord together."
+   ]
+  },
+  "circle-equation": {
+   "why": "A circle with centre ~(h, k)~ and radius ~r~ has equation ~(x - h)^{2} + (y - k)^{2} = r^{2}~. It is nothing more than the distance formula saying 'every point is exactly ~r~ from the centre', squared to remove the root.",
+   "traps": [
+    "The signs inside the brackets flip: ~(x + 3)^{2}~ means a centre at ~x = -3~.",
+    "The right-hand side is the radius *squared*, so the radius is its square root."
+   ]
+  }
+ }
+}

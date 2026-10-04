@@ -1,0 +1,44 @@
+{
+ "module": "M5.10",
+ "skills": {
+  "translations-reflections": {
+   "why": "A transformation moves a whole figure. A translation slides every point the same way. A reflection flips the figure over a line, so each point ends up the same distance from the line on the other side. Both are described exactly by what they do to the coordinates.",
+   "traps": [
+    "Reflecting over the x-axis changes the sign of ~y~, not ~x~. The axis you reflect over is the one that stays fixed.",
+    "Check at least two vertices when identifying a transformation. One point can often be reached several ways."
+   ]
+  },
+  "rotations": {
+   "why": "A rotation turns a figure about a centre. About the origin, a quarter turn counterclockwise sends ~(x, y)~ to ~(-y, x)~, a half turn to ~(-x, -y)~. About any other centre, subtract the centre, rotate, then add it back.",
+   "traps": [
+    "A 90-degree clockwise turn and a 270-degree counterclockwise turn are the same thing, so they share a rule.",
+    "About a centre that is not the origin, skipping the subtract-and-add-back steps is the standard mistake."
+   ],
+   "code": {
+    "body": "def rotate90(p):\n    x, y = p\n    return (-y, x)      # quarter turn counterclockwise about the origin",
+    "note": "Graphics code stores every rotation as a small matrix, which is what linear algebra later makes systematic. These quarter-turn rules are the simplest cases."
+   }
+  },
+  "dilations": {
+   "why": "A dilation enlarges or shrinks a figure from a centre by a scale factor. Lengths multiply by the factor, areas by its square, and angles do not change at all. That makes the image similar to the original but not congruent, unless the factor is 1.",
+   "traps": [
+    "Only a dilation centred at the origin multiplies the raw coordinates. Anywhere else, measure from the centre first.",
+    "A factor between 0 and 1 shrinks the figure."
+   ]
+  },
+  "compositions-symmetry": {
+   "why": "Doing one transformation after another is a composition, and the order matters: reflecting then translating usually differs from translating then reflecting. Symmetry is the opposite idea: a transformation that leaves the figure looking exactly the same.",
+   "traps": [
+    "Apply the transformations in the order given, one step at a time, writing down the point after each.",
+    "A shape can have rotational symmetry with no lines of symmetry. A parallelogram is the standard example."
+   ]
+  },
+  "rigid-motion-congruence": {
+   "why": "A rigid motion — a translation, reflection or rotation — preserves every length and angle. Two figures are congruent exactly when some rigid motion carries one onto the other. This turns the idea of 'identical' into something you can state precisely, and it gives a second route to every congruence proof.",
+   "traps": [
+    "A dilation is not a rigid motion unless the factor is 1 or -1. It produces a similar figure, not a congruent one.",
+    "A reflection preserves size and shape but reverses orientation, which is why a mirror image is congruent to the original."
+   ]
+  }
+ }
+}

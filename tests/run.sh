@@ -4,6 +4,7 @@ set -e
 cd "$(dirname "$0")/.."
 echo "── maths core ───────────────────────────────"; node tests/t-mathcore.js
 echo "── generators ───────────────────────────────"; node tests/t-generators.js
+echo "── figures ──────────────────────────────────"; node tests/t-figures.js
 echo "── engine ───────────────────────────────────"; node tests/t-engine.js
 echo "── lesson content ───────────────────────────"; node tests/t-content.js
 echo "── browser (Chromium, both themes) ──────────"; node tests/t-browser.js

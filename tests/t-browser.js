@@ -20,6 +20,31 @@ const server = http.createServer((req, res) => {
 });
 let BASE = '';
 
+
+/* Open a geometry skill and report on its diagram as the learner sees it. */
+async function openGeometry(page) {
+  await page.click('[data-tab="map"]');
+  await page.waitForSelector('details.lvl');
+  await page.evaluate(() => {
+    const b = [...document.querySelectorAll('[data-act]')]
+      .find(e => e.getAttribute('data-act') === 'teach:pythagoras');
+    if (b) b.click();
+  });
+  await page.waitForSelector('.steps li', { timeout: 5000 });
+  return page.evaluate(() => {
+    const f = document.querySelector('svg.fig');
+    if (!f) return null;
+    const r = f.getBoundingClientRect();
+    return { w: r.width, h: r.height, right: r.right, vw: window.innerWidth,
+             ink: getComputedStyle(f).color, card: getComputedStyle(f.closest('.card')).backgroundColor };
+  });
+}
+function rgbDiff(a, b) {
+  const p = t => (String(t).match(/[\d.]+/g) || []).slice(0, 3).map(Number);
+  const x = p(a), y = p(b);
+  return Math.abs(x[0] - y[0]) + Math.abs(x[1] - y[1]) + Math.abs(x[2] - y[2]);
+}
+
 (async () => {
   await new Promise(r => server.listen(0, '127.0.0.1', r));
   BASE = 'http://127.0.0.1:' + server.address().port;
@@ -187,11 +212,24 @@ let BASE = '';
         else say('algebra answer accepted without explicit multiplication signs');
       }
 
+      /* a geometry skill: the diagram must render, fit a phone, and appear in practice too */
+      const fig = await openGeometry(page);
+      if (!fig) issues.push('light: a geometry skill showed no diagram in its worked example');
+      else {
+        if (fig.right > fig.vw + 1 || fig.w < 120) issues.push('light: the diagram does not fit the phone width ' + JSON.stringify(fig));
+        else say('light: geometry diagram renders ' + Math.round(fig.w) + 'px wide inside a ' + fig.vw + 'px screen');
+        if (rgbDiff(fig.ink, fig.card) < 250) issues.push('light: diagram lines have too little contrast with their card');
+      }
+      await page.click('text=Your turn');
+      await page.waitForSelector('.qtext');
+      if (!(await page.locator('svg.fig').count())) issues.push('light: a geometry question showed no diagram while practising');
+      else say('light: the diagram also appears while practising');
+
       /* the About page must state the build status without a stale hardcoded range */
       await page.click('[data-tab="about"]');
       await page.waitForTimeout(150);
       const about = await page.locator('#view').innerText();
-      if (!/Levels 0 to 4/.test(about)) issues.push('About page does not report levels 0 to 4 as built: ' +
+      if (!/Levels 0 to 5/.test(about)) issues.push('About page does not report levels 0 to 5 as built: ' +
         (about.match(/Levels[^.]*\./) || ['(no match)'])[0]);
       else say('About page reports the built range correctly');
 
@@ -201,6 +239,14 @@ let BASE = '';
       const after = await page.locator('#chip-today').innerText();
       if (!/[1-9]/.test(after)) issues.push('answer count lost on reload (' + after + ')');
       say('after reload the day counter reads "' + after + '"');
+    }
+    if (scheme === 'dark') {
+      const fig = await openGeometry(page);
+      if (!fig) issues.push('dark: a geometry skill showed no diagram');
+      else {
+        if (rgbDiff(fig.ink, fig.card) < 250) issues.push('dark: diagram lines blend into the card: ink ' + fig.ink + ' on ' + fig.card);
+        else say('dark: diagram contrast is fine (' + fig.ink + ' on ' + fig.card + ')');
+      }
     }
     await ctx.close();
   }

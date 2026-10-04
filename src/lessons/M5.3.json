@@ -1,0 +1,40 @@
+{
+ "module": "M5.3",
+ "skills": {
+  "congruence-criteria": {
+   "why": "You do not need to check every side and angle to know two triangles are identical. Three well-chosen facts are enough: SSS, SAS, ASA, AAS, or HL for right triangles. These are the building blocks of nearly every geometric proof.",
+   "traps": [
+    "SSA does not work, because the unmarked side can swing into two different positions. HL is the special case where a right angle removes the ambiguity.",
+    "AAA does not work either: equal angles fix the shape but not the size."
+   ]
+  },
+  "cpctc": {
+   "why": "Once two triangles are proved congruent, every matching pair of parts is equal: sides, angles, altitudes, anything. CPCTC is just that statement written down as a reason. It is the step that turns 'these triangles match' into the fact you actually wanted.",
+   "traps": [
+    "CPCTC is a conclusion, never a starting point. Prove congruence first, then quote it.",
+    "Match the vertices in the same order when you name the triangles, or you will pair up the wrong parts."
+   ]
+  },
+  "similarity-criteria": {
+   "why": "Similar figures have the same shape but not necessarily the same size. AA is enough to prove similarity, because the third angle is then forced. Similarity is the geometry of scale: maps, models, shadows, and every photograph.",
+   "traps": [
+    "Similar is not congruent. Equal angles with different sizes is exactly the similar case.",
+    "Match corresponding sides in order. The scale factor is the same for every correct pair."
+   ]
+  },
+  "similar-side-lengths": {
+   "why": "Similar triangles turn unreachable lengths into proportions. A pole and its shadow, a person and theirs, a tree and a mirror: if the angles match, the ratios match, and one measurement you can make gives the one you cannot.",
+   "traps": [
+    "Keep the same quantity on top in both fractions. Height over shadow equals height over shadow, never height over shadow equals shadow over height.",
+    "With a line parallel to the base, compare the small triangle to the *whole* triangle, not to the leftover trapezium."
+   ]
+  },
+  "scale-factor-area-volume": {
+   "why": "If every length is multiplied by ~k~, then every area is multiplied by ~k^{2}~ and every volume by ~k^{3}~. Double a box in every direction and it holds eight times as much. This catches almost everyone once, and it governs everything from packaging costs to why large animals need thick legs.",
+   "traps": [
+    "Going backwards means taking roots: a square root from areas, a cube root from volumes.",
+    "A scale factor of 3 does not triple the area. It multiplies it by 9."
+   ]
+  }
+ }
+}

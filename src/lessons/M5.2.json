@@ -1,0 +1,37 @@
+{
+ "module": "M5.2",
+ "skills": {
+  "triangle-angle-sum": {
+   "why": "The three angles of any triangle add to 180 degrees, in flat geometry, for every triangle however stretched it looks. The reason is worth knowing: draw a line through one vertex parallel to the opposite side, and the alternate angles it makes fill out a straight line.",
+   "traps": [
+    "An exterior angle equals the sum of the two opposite interior angles, which is a faster route than going through the interior angle.",
+    "A triangle can have at most one angle of 90 degrees or more."
+   ]
+  },
+  "triangle-classify": {
+   "why": "Triangles are named two ways: by sides (equilateral, isosceles, scalene) and by angles (acute, right, obtuse). Equal sides sit opposite equal angles, so the isosceles case lets you find all three angles from one — which is the fact you will use constantly.",
+   "traps": [
+    "Classify by angles using the *largest* angle only. One angle of 90 or more decides it.",
+    "Equilateral triangles are also isosceles. The definitions nest rather than excluding each other."
+   ]
+  },
+  "triangle-inequality": {
+   "why": "Three lengths only make a triangle if the two shorter ones, laid end to end, are longer than the third. Otherwise they cannot reach across. That one condition is also the reason the shortest route between two points is a straight line.",
+   "traps": [
+    "Only the longest side needs checking against the other two. If the two shorter beat it, every other pair does too.",
+    "Both bounds on a missing side are strict. At exactly the sum the triangle flattens into a line."
+   ],
+   "code": {
+    "body": "def can_form_triangle(a, b, c):\n    x, y, z = sorted([a, b, c])\n    return x + y > z",
+    "note": "Sorting first means you only write the comparison once. The same pattern appears whenever a validity check depends on the largest of several values."
+   }
+  },
+  "triangle-centres": {
+   "why": "Four sets of special lines each meet at a single point: medians at the centroid, altitudes at the orthocentre, angle bisectors at the incentre, perpendicular bisectors at the circumcentre. That they meet at all is a genuine theorem, not an accident of the drawing.",
+   "traps": [
+    "A median goes to the *midpoint* of the opposite side; an altitude meets it at a *right angle*. They are different lines and only coincide in special triangles.",
+    "The centroid is the balance point, two-thirds of the way along each median from the vertex."
+   ]
+  }
+ }
+}

@@ -455,7 +455,10 @@
         return '<i class="' + (k === s.i ? 'now ' : '') + (r === true ? 'ok' : r === false ? 'no' : '') + '"></i>';
       }).join('') + '</span></div>' +
       '<p class="tiny muted" style="margin:-6px 0 10px">' + esc(info.skill.t) + '</p>' +
-      '<div class="qtext">' + rich(q.prompt) + '</div>';
+      '<div class="qtext">' + rich(q.prompt) + '</div>' +
+      /* A figure is SVG this app generated from the question's own numbers, so it is
+         inserted as markup rather than escaped. Nothing a learner types reaches it. */
+      (q.figure ? q.figure : '');
 
     if (q.kind === 'mc') {
       out += '<div class="choices">' + q.choices.map(function (c, k) {
@@ -610,6 +613,7 @@
     /* a worked example, always available whether or not prose exists */
     out += '<div class="card"><div class="eyebrow">Worked example</div>' +
       '<div class="qtext" style="margin-top:6px">' + rich(t.q.prompt) + '</div>' +
+      (t.q.figure ? t.q.figure : '') +
       '<ol class="steps">' + t.q.solution.map(function (stp) { return '<li>' + rich(stp) + '</li>'; }).join('') +
       '</ol>' +
       '<p class="small" style="margin-top:12px">Answer: <strong>' + rich(answerText(t.q)) + '</strong></p>' +

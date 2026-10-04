@@ -1,0 +1,40 @@
+{
+ "module": "M5.8",
+ "skills": {
+  "volume-prisms-cylinders": {
+   "why": "Any prism or cylinder has volume equal to the area of its base times its height. That one idea covers cuboids, triangular prisms and cylinders. It works because you can imagine stacking identical thin slices of the base up to the full height.",
+   "traps": [
+    "Surface area is in square units and volume in cubic units. The unit tells you which you have computed.",
+    "For a prism lying on its side, the 'height' is the length along the prism, not the vertical one."
+   ]
+  },
+  "volume-pyramids-cones": {
+   "why": "A pyramid or a cone holds exactly one third of the prism or cylinder with the same base and height. That factor of one third is not obvious, and it is one of the first results that really needs calculus to explain properly.",
+   "traps": [
+    "Use the perpendicular height, not the slant height. The slanted side is longer and belongs to surface area.",
+    "Don't forget the one third. It is the whole difference from the prism formula."
+   ]
+  },
+  "volume-spheres": {
+   "why": "A sphere has volume ~\\f{4}{3}\\pi r^{3}~ and surface area ~4\\pi r^{2}~. The surface area is exactly four times the area of the circle through its middle, a fact Archimedes proved without calculus and considered his finest result.",
+   "traps": [
+    "Volume has the cube and surface area has the square. Volume is three-dimensional, so it takes the cube.",
+    "A hemisphere's *surface* area is not half the sphere's, because the flat circular face has to be added."
+   ]
+  },
+  "cross-sections": {
+   "why": "A cross-section is the shape you see when you slice a solid with a plane. Different slices of the same solid give different shapes: a cone can give a circle, a triangle, an ellipse or a parabola. This is the geometry behind conic sections, which come back later.",
+   "traps": [
+    "Picture the cut face itself, not the solid around it.",
+    "The direction of the slice matters. Horizontal and vertical cuts of the same solid usually differ."
+   ]
+  },
+  "density-volume-problems": {
+   "why": "Density links volume to mass: mass is density times volume. Real problems chain a volume calculation to a density, then often a unit conversion at the end. The units themselves tell you how to arrange it, because grams per cubic centimetre times cubic centimetres leaves grams.",
+   "traps": [
+    "Convert units at the end for capacity questions: 1000 cm³ is one litre.",
+    "Check the answer is plausible. A cube of water 10 cm on a side weighs a kilogram."
+   ]
+  }
+ }
+}

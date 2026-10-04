@@ -1,0 +1,32 @@
+{
+ "module": "M5.1",
+ "skills": {
+  "angle-basics": {
+   "why": "An angle measures a turn, not a length. 360 degrees is one full turn, 180 is half a turn (a straight line), and 90 is a quarter turn. Naming angles by size — acute, right, obtuse, straight — gives you vocabulary that every later theorem is written in.",
+   "traps": [
+    "Complementary adds to 90 and supplementary to 180. The words are easy to swap, so tie them to a picture: a right angle for complementary, a straight line for supplementary.",
+    "The size of an angle has nothing to do with how long its arms are drawn."
+   ]
+  },
+  "angle-pairs": {
+   "why": "Four relationships cover almost every angle question: complementary (sum 90), supplementary (sum 180), a linear pair (adjacent angles on a straight line, so supplementary), and vertically opposite angles (equal). Each one is a statement you can quote as a *reason*, which is what proof needs.",
+   "traps": [
+    "Vertically opposite angles are equal; adjacent angles on a line are supplementary. Looking at which way the angles face tells you which rule applies."
+   ]
+  },
+  "parallel-transversal": {
+   "why": "When a line crosses two parallel lines, eight angles appear but only two different sizes. Corresponding and alternate angles are equal; co-interior angles add to 180. The whole topic is really one fact — parallel lines make the same angle with any line that crosses them.",
+   "traps": [
+    "All three rules require the lines to be parallel. Without arrows marking them parallel, none of the rules apply.",
+    "Co-interior angles are the odd one out: they *add to 180* rather than being equal."
+   ]
+  },
+  "angle-algebra": {
+   "why": "Angle diagrams turn into equations as soon as a measure contains a letter: set the angles that must add to 180, or 90, or be equal, and solve. It is the first place algebra and geometry meet, and it is how every later geometry proof with unknowns works.",
+   "traps": [
+    "Substitute your answer back to find the actual angle and check it makes sense. A negative or absurd angle means a slip somewhere.",
+    "Decide first which relationship the angles have: equal, complementary or supplementary. Writing the wrong equation is the usual error."
+   ]
+  }
+ }
+}

@@ -124,6 +124,13 @@ code { font-family: var(--mono); font-size: .9em; background: var(--card-2); pad
 .math sup { font-size: .72em; }
 .math sub { font-size: .72em; }
 
+/* ---------- geometry diagrams ---------- */
+.fig {
+  display: block; width: 100%; max-width: 300px; height: auto; margin: 4px auto 14px;
+  color: var(--ink);
+}
+.fig text { font-variant-numeric: tabular-nums; }
+
 /* ---------- buttons ---------- */
 .btn {
   font: inherit; font-weight: 500; cursor: pointer; border-radius: 10px;
@@ -283,6 +290,7 @@ input:focus { outline: none; border-color: var(--accent); }
 </nav>
 
 <script src="mathcore.js"></script>
+<script src="figures.js"></script>
 <script src="curriculum.js"></script>
 <script src="generators.js"></script>
 <script src="grade.js"></script>
