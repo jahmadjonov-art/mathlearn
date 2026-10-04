@@ -65,6 +65,15 @@ for (const id of ids) {
         try { MC.parse(q.answer); } catch (e) { bad(id, 'answer expression unparseable: ' + q.answer); break; }
       }
       if (q.kind === 'multi' && (!Array.isArray(q.fields) || !q.fields.length)) { bad(id, 'no fields', q); break; }
+      /* What the learner SEES, not what the generator wrote. An answer can be right,
+         well-formed and still display as source code if the renderer misses a
+         command — this check exists because exactly that shipped once, in 92 skills. */
+      for (const piece of [q.prompt].concat(q.solution, q.choices || [])) {
+        const shown = MC.rich(String(piece));
+        const leftover = shown.match(/\\[a-zA-Z]+|\\[{}^_%]/);
+        if (leftover) { bad(id, 'raw markup reaches the screen (' + leftover[0] + ') in: ' + String(piece).slice(0, 90)); break; }
+        if (/~/.test(shown)) { bad(id, 'a math delimiter is left in the rendered text: ' + String(piece).slice(0, 90)); break; }
+      }
       /* the round trip */
       const res = GRADE.check(q, correctInput(q));
       if (!res.correct) { bad(id, 'grader rejects its own answer (' + JSON.stringify(correctInput(q)) + ') note=' + res.note, q); break; }

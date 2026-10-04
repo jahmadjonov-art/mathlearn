@@ -468,6 +468,21 @@
     }
     return out;
   }
+  /* Plain text may still contain \f{a}{b} written outside a ~math~ segment. Typeset
+     those in place, and escape everything around them. */
+  function plainWithFractions(raw) {
+    var out = '', i = 0;
+    while (i < raw.length) {
+      var at = raw.indexOf('\\f{', i);
+      if (at === -1) { out += esc(raw.slice(i)); break; }
+      out += esc(raw.slice(i, at));
+      var a = group(raw, at + 2), b = group(raw, a[1]);
+      out += '<span class="math">' + tex('\\f{' + a[0] + '}{' + b[0] + '}') + '</span>';
+      i = b[1];
+    }
+    return out;
+  }
+
   /* Render a whole string. Math is delimited by ~tildes~ rather than dollars,
      because prices are everywhere in this material and "$12.50" must survive as
      text. Also handles **bold**, *italic* and `code`. */
@@ -477,7 +492,13 @@
     var out = '';
     for (var i = 0; i < parts.length; i++) {
       if (i % 2 === 1) { out += '<span class="math">' + tex(parts[i]) + '</span>'; continue; }
-      var t = esc(parts[i]);
+      var t = plainWithFractions(parts[i]);
+      /* Operator words such as \times and \div are written with a backslash in
+         source, and are as likely to appear in running text as inside a formula.
+         Translate them here too, or the learner sees the raw source. */
+      t = t.replace(/\\([a-zA-Z]+)/g, function (m, w) {
+        return Object.prototype.hasOwnProperty.call(WORD_SYMBOLS, w) ? WORD_SYMBOLS[w] : m;
+      });
       t = t.replace(/`([^`]+)`/g, '<code>$1</code>');
       t = t.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
       t = t.replace(/(^|[\s(])\*([^*\n]+)\*/g, '$1<em>$2</em>');

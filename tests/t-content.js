@@ -36,6 +36,8 @@ fs.readdirSync(dir).filter(f => f.endsWith('.json')).forEach(f => {
       try { html = MC.rich(String(t)); } catch (e) { problems.push(f + '/' + id + ': rich() threw — ' + e.message); return; }
       if (!html) problems.push(f + '/' + id + ': rendered to nothing');
       if (/<script/i.test(html)) problems.push(f + '/' + id + ': produced a script tag');
+      const left = html.match(/\\[a-zA-Z]+|\\[{}^_%]/);
+      if (left) problems.push(f + '/' + id + ': raw markup reaches the screen (' + left[0] + ') in "' + String(t).slice(0, 60) + '"');
     });
   });
 });
