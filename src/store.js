@@ -10,6 +10,7 @@
   'use strict';
   var KEY = 'mathacademy.progress.v2';
   var SAVE_DELAY = 1800;
+  var OPEN_TIMEOUT = 6000;   /* how long the page waits for the account before using this browser's copy */
 
   function Store(onStatus) {
     this.db = null;
@@ -40,9 +41,26 @@
 
   /* Resolve the capability and return whatever progress exists. Never rejects:
      a learner with no account still gets a working page. */
-  Store.prototype.open = function () {
+  Store.prototype.open = function (timeoutMs) {
     var self = this;
     var local = self.readLocal();
+    var timer = null;
+    var give_up = new Promise(function (resolve) {
+      timer = setTimeout(function () {
+        self.abandoned = true;      /* a late answer must not attach the account and overwrite newer work */
+        self.setStatus('local', 'This browser only');
+        resolve(local);
+      }, timeoutMs || OPEN_TIMEOUT);
+    });
+    var attempt = self.openAccount(local);
+    return Promise.race([attempt, give_up]).then(function (data) {
+      clearTimeout(timer);
+      return data;
+    });
+  };
+
+  Store.prototype.openAccount = function (local) {
+    var self = this;
     if (!root.claude || typeof root.claude.use !== 'function') {
       self.setStatus('local', 'This browser only');
       return Promise.resolve(local);
@@ -52,10 +70,11 @@
         var db = pair[0], user = pair[1];
         if (!db || !user) { self.setStatus('local', 'This browser only'); return local; }
         return user.id().then(function (uid) {
-          if (!uid) { self.setStatus('local', 'This browser only'); return local; }
+          if (!uid || self.abandoned) { return local; }
           self.db = db; self.uid = uid;
           self.doc = db.doc('data/users/' + uid + '/progress');
           return self.doc.get().then(function (snap) {
+            if (self.abandoned) { self.doc = null; return local; }
             if (snap.exists) {
               var remote = snap.data();
               self.setStatus('synced', 'Saved to your account');
@@ -74,7 +93,7 @@
           });
         });
       })
-      .catch(function () { self.setStatus('local', 'This browser only'); return local; });
+      .catch(function () { if (!self.abandoned) self.setStatus('local', 'This browser only'); return local; });
   };
 
   function countAnswers(p) {

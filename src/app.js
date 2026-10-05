@@ -54,8 +54,9 @@
       if (detail) S.syncNote = detail;
       paintBar();
     });
-    S.store.open().then(function (data) {
-      S.progress = migrate(data) || E.emptyProgress();
+    S.store.open().catch(function () { return null; }).then(function (data) {
+      try { S.progress = migrate(data) || E.emptyProgress(); }
+      catch (e) { S.progress = E.emptyProgress(); }
       render();
       window.addEventListener('visibilitychange', function () {
         if (document.visibilityState === 'hidden' && S.store) S.store.flush();

@@ -3,6 +3,7 @@
 set -e
 cd "$(dirname "$0")/.."
 echo "── maths core ───────────────────────────────"; node tests/t-mathcore.js
+echo "── store (account lookup that hangs) ─────────"; node tests/t-store.js
 echo "── generators ───────────────────────────────"; node tests/t-generators.js
 echo "── figures ──────────────────────────────────"; node tests/t-figures.js
 echo "── engine ───────────────────────────────────"; node tests/t-engine.js
