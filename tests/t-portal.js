@@ -6,7 +6,9 @@ const fs = require('fs');
 /* Serve dist/, the site exactly as it is uploaded (run tools/build-site.sh first). */
 const ROOT = path.resolve(__dirname, '../dist');
 const HAS_ENGLISH = fs.existsSync(path.join(ROOT, 'english/index.html'));
-const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.css': 'text/css' };
+const HAS_SQL = fs.existsSync(path.join(ROOT, 'sql/index.html'));
+const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.css': 'text/css',
+  '.wasm': 'application/wasm', '.sqlite': 'application/octet-stream' };
 const server = http.createServer((req, res) => {
   let rel = decodeURIComponent(req.url.split('?')[0]).replace(/^\/+/, '');
   if (rel === '' || rel.endsWith('/')) rel += 'index.html';
@@ -69,17 +71,31 @@ const server = http.createServer((req, res) => {
     console.log('  (no dist/english: the English course was not found when the site was built, so its checks were skipped)');
   }
 
-  await page.goto(base + '/course.html?course=sql');
-  await page.waitForSelector('.lesson-content');
-  await page.click('[data-answer="1"]');
-  if (!(await page.locator('#quiz-feedback').innerText()).includes('highlighted answer is correct')) throw new Error('SQL incorrect-answer guidance was missing');
-  await page.click('[data-lesson="1"]');
-  await page.click('[data-answer="0"]');
-  if (!(await page.locator('#quiz-feedback').innerText()).includes('WHERE filters rows')) throw new Error('SQL lesson explanation was missing');
-  if (!(await page.locator('.course-progress').innerText()).includes('1 of 2')) throw new Error('SQL lesson completion did not update');
-  await page.reload();
-  await page.waitForSelector('.lesson-content');
-  if (await page.locator('.lesson-pick.is-complete').count() !== 1) throw new Error('SQL lesson progress did not persist');
+  if (HAS_SQL) {
+    const { MODULES } = await import(require('url').pathToFileURL(path.join(ROOT, 'sql/js/curriculum/index.js')).href);
+    const lessons = MODULES.reduce((n, m) => n + m.lessons.length, 0);
+    await page.goto(base + '/');
+    const meta = await page.locator('.course-card[data-course="sql"] .course-meta').innerText();
+    if (!meta.includes(MODULES.length + ' modules') || !meta.includes(lessons + ' lessons'))
+      throw new Error('SQL card says "' + meta.replace(/\s+/g, ' ') + '" but the course has ' + MODULES.length + ' modules and ' + lessons + ' lessons');
+
+    /* The course only opens once the SQLite engine and the practice database have both loaded. */
+    await page.click('.course-card[data-course="sql"] .course-link');
+    await page.waitForSelector('#shell:not([hidden])', { timeout: 20000 });
+    if (!(await page.title()).includes('SQLTRAIN')) throw new Error('The SQL card did not open the full SQL course');
+    if (await page.locator('#sidebar a[href="/"]').count() !== 1) throw new Error('The SQL course has no link back to all classes');
+
+    /* Run a real query: pick a table in the sandbox and wait for its rows. */
+    await page.goto(base + '/sql/index.html#/sandbox');
+    await page.waitForSelector('#tbls button', { timeout: 20000 });
+    await page.locator('#tbls button').first().click();
+    await page.waitForFunction(() => document.querySelectorAll('#view table tr').length > 1, null, { timeout: 10000 });
+
+    await page.goto(base + '/course.html?course=sql');
+    await page.waitForURL(/\/sql\/index\.html/);
+  } else {
+    console.log('  (no dist/sql: the SQL course was not found when the site was built, so its checks were skipped)');
+  }
 
   await page.goto(base + '/src/index.html');
   await page.waitForSelector('.hub-link');
@@ -88,7 +104,7 @@ const server = http.createServer((req, res) => {
   await browser.close();
   server.close();
   if (errors.length) throw new Error('Browser errors: ' + errors.join('; '));
-  console.log('portal browser checks passed: catalog, filters, search, ' + (HAS_ENGLISH ? 'the full English course, ' : '') + 'SQL lessons, progress, and math link');
+  console.log('portal browser checks passed: catalog, filters, search, ' + (HAS_ENGLISH ? 'the full English course, ' : '') + (HAS_SQL ? 'the full SQL course with a live query, ' : '') + 'and the math link');
 })().catch(error => {
   server.close();
   console.error(error.stack || error);

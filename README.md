@@ -1,21 +1,21 @@
 # Open Study
 
-A free learning hub with a self-paced mathematics course, a full English reading
-and writing course, and a starter class in SQL. Learners can browse without
-creating an account; lessons are free and work on phones, tablets, and computers.
+A free learning hub with three full courses: mathematics, English reading and
+writing, and SQL. Learners can browse without creating an account; lessons are
+free and work on phones, tablets, and computers.
 
 The same math course is live in two places, and they remember progress differently:
 
 | | Where | Progress |
 |---|---|---|
-| **Public site** | https://mediumvioletred-lyrebird-185443.hostingersite.com/ | Saved in the browser you use. Another device, or cleared site data, starts again. |
+| **Public site** | https://openstudy.cc/ | Saved in the browser you use. Another device, or cleared site data, starts again. |
 | **Private page** | https://claude.ai/artifact/PvHyJcrAx6Sqa6jVrgtcva | Saved to the owner's claude.ai account, so it follows them between devices. |
 
 The difference is not a setting: the claude.ai page can store data against a
 signed-in account, and a plain static site has no accounts to store it against.
 The math code is identical in both; `store.js` uses the account when one is
-there and the browser otherwise. The English course and the SQL class also
-save progress in the current browser.
+there and the browser otherwise. The English and SQL courses also save progress
+in the current browser.
 
 ## What exists
 
@@ -25,7 +25,7 @@ save progress in the current browser.
 | Practice built | **236 skills** (levels 0–5: counting → geometry), unlimited generated questions |
 | Lesson prose | 236 written lessons, about 16,300 words |
 | English | The full Ascend course: 12 stages, 404 lessons, from the alphabet to law, finance and SAT/ACT (see below) |
-| SQL | A starter class of two interactive lessons |
+| SQL | The full SQLTRAIN course: 12 modules, 43 lessons, every query run on a real 27,000-row database in the browser (see below) |
 | Checks | 85,000+ generated questions and 1,500+ diagrams validated per run, plus a real Chromium run |
 
 Levels 6–12 are mapped in full and listed in the app as being written. Progress
@@ -54,7 +54,7 @@ is stored per skill id, so adding a level never disturbs existing progress.
 
 ```
 index.html      learning hub and course catalog
-course.html     shared lesson page for short classes (SQL)
+course.html     shared lesson page for short classes (none now; redirects old links)
 site.css        responsive hub and lesson styles
 courses.js      course catalog and short-class lesson content
 site.js         search, filters, lesson navigation and browser progress
@@ -73,29 +73,38 @@ tools/
   build-site.sh   assembles the site to upload in dist/ (see below)
 tests/
   run.sh          every suite; run this before publishing
-  t-portal.js     learning hub, the English course, the SQL class, saved progress
+  t-portal.js     learning hub, and the English and SQL courses as built
 ```
 
 There is no runtime dependency: this is a static HTML, CSS, and JavaScript site.
 The browser tests use Playwright and Chromium; the learning pages themselves do not.
 
-## The English course lives in its own folder
+## The English and SQL courses live in their own folders
 
-The English course is Ascend, kept in `../EnglishLearn` and edited there. It is
-**not** copied into this repository. `tools/build-site.sh` copies it into
-`dist/english/` each time the site is built, and adds an "All classes" link
-back to the hub on the way, so the English folder itself is never changed.
+| Course | Folder, edited there | Built into |
+|---|---|---|
+| English (Ascend) | `../EnglishLearn` | `dist/english/` |
+| SQL (SQLTRAIN) | `../SQLTRAIN` | `dist/sql/` |
+
+Neither is copied into this repository. `tools/build-site.sh` copies each into
+`dist/` every time the site is built, and adds an "All classes" link back to
+the hub on the way, so neither folder's own files are changed. For SQL it runs
+that course's own build first (`tools/build-dist.mjs`), which decides which
+files a browser needs: the SQLite engine, the practice database and the lessons,
+but not its tests.
 
 Why a build instead of a copy: a second copy kept here would fall behind the
-moment anyone added a lesson in `EnglishLearn`, and the site would quietly be
+moment anyone added a lesson in either folder, and the site would quietly be
 missing it. Building from the source each time means the site always carries
-whatever the English course has.
+whatever the courses have.
 
-The English card on the hub states the course's stage and lesson counts.
-`tests/t-portal.js` counts them from the course itself and fails if the card is
-out of date, so update `courses.js` when the English course grows. Old links to
-the two-lesson English starter class (`course.html?course=english`) redirect to
-the full course, which teaches both of those lessons and more.
+Each card on the hub states its course's size (stages or modules, and lessons).
+`tests/t-portal.js` counts them from the course itself and fails if a card is
+out of date, so update `courses.js` when a course grows. The test also runs a
+real query in the SQL sandbox, which only works if the engine and the database
+both loaded. Old links to the two-lesson starter classes
+(`course.html?course=english`, `course.html?course=sql`) redirect to the full
+courses, which teach those lessons and more.
 
 ## Publishing the public site
 
@@ -106,8 +115,14 @@ the full course, which teaches both of those lessons and more.
 3. Clear the website cache, then confirm the live files match `dist/`. Without
    the cache clear, Hostinger can go on serving an old `courses.js` for a while.
 
-`dist/` is ignored by git; it is rebuilt from the repository and the English
-folder every time.
+`dist/` is ignored by git; it is rebuilt from the repository and both course
+folders every time. The build also writes `dist/.htaccess`, because without it
+Hostinger serves the SQL engine's `.wasm` file as plain text. Browsers then log
+an error and start the engine a slower way.
+
+The website was first set up on a temporary Hostinger address
+(`…hostingersite.com`). It moved to `openstudy.cc` on 15 October 2026, and the old
+address no longer works.
 
 ## Diagrams
 
