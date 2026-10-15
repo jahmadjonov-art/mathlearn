@@ -1,8 +1,8 @@
 # Open Study
 
-A free learning hub with a self-paced mathematics course and starter classes in
-English and SQL. Learners can browse without creating an account; lessons are
-free and work on phones, tablets, and computers.
+A free learning hub with a self-paced mathematics course, a full English reading
+and writing course, and a starter class in SQL. Learners can browse without
+creating an account; lessons are free and work on phones, tablets, and computers.
 
 The same math course is live in two places, and they remember progress differently:
 
@@ -14,9 +14,8 @@ The same math course is live in two places, and they remember progress different
 The difference is not a setting: the claude.ai page can store data against a
 signed-in account, and a plain static site has no accounts to store it against.
 The math code is identical in both; `store.js` uses the account when one is
-there and the browser otherwise. English and SQL each include introductory
-lessons with practice checks, and their completion is saved in the current
-browser.
+there and the browser otherwise. The English course and the SQL class also
+save progress in the current browser.
 
 ## What exists
 
@@ -25,7 +24,8 @@ browser.
 | Curriculum map | 13 levels, 111 modules, **589 skills** — the whole route, written out |
 | Practice built | **236 skills** (levels 0–5: counting → geometry), unlimited generated questions |
 | Lesson prose | 236 written lessons, about 16,300 words |
-| Other starter classes | English and SQL, with two interactive lessons each |
+| English | The full Ascend course: 12 stages, 404 lessons, from the alphabet to law, finance and SAT/ACT (see below) |
+| SQL | A starter class of two interactive lessons |
 | Checks | 85,000+ generated questions and 1,500+ diagrams validated per run, plus a real Chromium run |
 
 Levels 6–12 are mapped in full and listed in the app as being written. Progress
@@ -54,9 +54,9 @@ is stored per skill id, so adding a level never disturbs existing progress.
 
 ```
 index.html      learning hub and course catalog
-course.html     shared lesson page for English and SQL
+course.html     shared lesson page for short classes (SQL)
 site.css        responsive hub and lesson styles
-courses.js      course catalog and starter lesson content
+courses.js      course catalog and short-class lesson content
 site.js         search, filters, lesson navigation and browser progress
 src/
   index.html      mathematics course page
@@ -69,15 +69,45 @@ src/
   store.js        progress persistence (artifact db, localStorage fallback)
   app.js          views and interaction
   lessons/<module>.json   written lesson prose, keyed by skill id
+tools/
+  build-site.sh   assembles the site to upload in dist/ (see below)
 tests/
   run.sh          every suite; run this before publishing
-  t-portal.js     learning hub, starter lessons, and saved progress
+  t-portal.js     learning hub, the English course, the SQL class, saved progress
 ```
 
-There is no build step and no runtime dependency: this is a static HTML, CSS,
-and JavaScript site. Serve or publish the repository root so the hub is at `/`
-and the complete math course remains at `/src/index.html`. The browser tests use
-Playwright and Chromium; the learning pages themselves do not.
+There is no runtime dependency: this is a static HTML, CSS, and JavaScript site.
+The browser tests use Playwright and Chromium; the learning pages themselves do not.
+
+## The English course lives in its own folder
+
+The English course is Ascend, kept in `../EnglishLearn` and edited there. It is
+**not** copied into this repository. `tools/build-site.sh` copies it into
+`dist/english/` each time the site is built, and adds an "All classes" link
+back to the hub on the way, so the English folder itself is never changed.
+
+Why a build instead of a copy: a second copy kept here would fall behind the
+moment anyone added a lesson in `EnglishLearn`, and the site would quietly be
+missing it. Building from the source each time means the site always carries
+whatever the English course has.
+
+The English card on the hub states the course's stage and lesson counts.
+`tests/t-portal.js` counts them from the course itself and fails if the card is
+out of date, so update `courses.js` when the English course grows. Old links to
+the two-lesson English starter class (`course.html?course=english`) redirect to
+the full course, which teaches both of those lessons and more.
+
+## Publishing the public site
+
+1. Run `tests/run.sh`. It builds `dist/` and tests the built site.
+2. Zip the *contents* of `dist/` (so `index.html` is at the top of the archive)
+   and deploy it to the Hostinger website as a static site archive. A deploy
+   replaces everything on the website, so always deploy the whole `dist/`.
+3. Clear the website cache, then confirm the live files match `dist/`. Without
+   the cache clear, Hostinger can go on serving an old `courses.js` for a while.
+
+`dist/` is ignored by git; it is rebuilt from the repository and the English
+folder every time.
 
 ## Diagrams
 
@@ -163,8 +193,9 @@ lesson page provides navigation, explanations, example code, quick checks, and
 browser-based completion tracking. Use the existing math app for a subject that
 needs generated practice, spaced review, and a larger curriculum.
 
-Run `tests/run.sh` and publish the repository root as a static site. Keep
-`index.html` at the archive root. The site has no build step or backend setup.
+A class that grows into its own course belongs in its own folder, built in the
+way the English course is (see above). Run `tests/run.sh` and publish as
+described under *Publishing the public site*.
 
 ## Adding a math level
 
@@ -177,9 +208,9 @@ Run `tests/run.sh` and publish the repository root as a static site. Keep
 4. Publish to **both** places, or they drift apart. Progress is keyed to stable
    skill ids; never change or reuse an existing id.
 
-   - **Public site:** upload the repository root as a static site to the
-     Hostinger website at the address above. Its account details live in
-     `.hostinger/site.json`, which git ignores because this repository is public.
+   - **Public site:** follow *Publishing the public site* above. The Hostinger
+     account details live in `.hostinger/site.json`, which git ignores because
+     this repository is public.
    - **Private page:** republish the claude.ai artifact to the **same URL** above,
      or its owner loses their saved progress and their link. Pass that URL as the
      Artifact tool's `url`, and pass `generators.js`, any changed source file, and

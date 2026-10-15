@@ -8,7 +8,7 @@ echo "── generators ──────────────────�
 echo "── figures ──────────────────────────────────"; node tests/t-figures.js
 echo "── engine ───────────────────────────────────"; node tests/t-engine.js
 echo "── lesson content ───────────────────────────"; node tests/t-content.js
-echo "── learning portal ──────────────────────────"; node tests/t-portal.js
+echo "── learning portal (builds dist/) ───────────"; bash tools/build-site.sh; node tests/t-portal.js
 echo "── browser (Chromium, both themes) ──────────"; node tests/t-browser.js
 echo
 echo "all suites passed"

@@ -56,6 +56,11 @@
     var course = window.COURSES.filter(function (item) { return item.id === id; })[0];
     var app = document.getElementById('course-app');
     if (!app) return;
+    /* A class that has grown into its own course lives elsewhere; send old links there. */
+    if (course && !data && course.href.indexOf('course.html') !== 0) {
+      window.location.replace(course.href);
+      return;
+    }
     if (!data || !course) {
       document.title = 'Class not found — Open Study';
       app.innerHTML = '<header class="course-header"><a class="brand" href="/" aria-label="Open Study home">' +

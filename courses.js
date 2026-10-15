@@ -18,13 +18,13 @@
       id: 'english',
       category: 'foundations',
       icon: 'Aa',
-      label: '2 starter lessons',
-      title: 'Everyday English',
-      description: 'Make sentences clearer, choose stronger words, and feel more at home with grammar.',
-      meta: ['2 short lessons', 'Beginner friendly'],
-      href: 'course.html?course=english',
+      label: 'Full course',
+      title: 'English, from the first letter',
+      description: 'Learn to read and write, from the alphabet and phonics to essays, the SAT and ACT, and the language of law, finance and accounting.',
+      meta: ['12 stages', '404 lessons'],
+      href: 'english/index.html',
       cta: 'Start learning English',
-      search: 'english writing grammar sentences words reading'
+      search: 'english reading writing grammar phonics sentences words essay vocabulary sat act law finance accounting'
     },
     {
       id: 'sql',
@@ -41,45 +41,6 @@
   ];
 
   root.LESSONS = {
-    english: {
-      title: 'Everyday English',
-      eyebrow: 'English · Writing foundations',
-      intro: 'Small, practical lessons for writing sentences that say exactly what you mean.',
-      lessons: [
-        {
-          title: 'Build a clear sentence',
-          duration: '4 min',
-          paragraphs: [
-            'A sentence is a complete thought. At its simplest, it tells us who or what we are talking about and what that person or thing does.',
-            'The subject names the person, place, or thing. The predicate tells us something about it. Put them together and your reader has a clear idea.'
-          ],
-          example: 'The curious student opened the book.',
-          callout: 'A quick check: ask “who or what?” to find the subject, then ask “did what?” to find the predicate.',
-          quiz: {
-            question: 'In “The curious student opened the book,” which words are the subject?',
-            options: ['opened the book', 'The curious student', 'the book'],
-            answer: 1,
-            explanation: '“The curious student” is who the sentence is about. “Opened the book” tells what that student did.'
-          }
-        },
-        {
-          title: 'Make verbs agree',
-          duration: '5 min',
-          paragraphs: [
-            'A verb should match its subject. A singular subject takes a singular verb; a plural subject takes a plural verb.',
-            'Do not let extra words between the subject and verb distract you. Find the real subject first, then make the verb agree with it.'
-          ],
-          example: 'The list of books is on the desk.\nThe books are on the desk.',
-          callout: 'In the first sentence, the subject is “list,” not “books.” The phrase “of books” adds detail but does not change the subject.',
-          quiz: {
-            question: 'Choose the verb that agrees: “A box of old letters ___ in the attic.”',
-            options: ['are', 'is', 'were'],
-            answer: 1,
-            explanation: '“Box” is the singular subject, so “is” is the matching verb. The plural word “letters” is inside a describing phrase.'
-          }
-        }
-      ]
-    },
     sql: {
       title: 'SQL, made simple',
       eyebrow: 'Technology · Working with data',

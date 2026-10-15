@@ -3,10 +3,13 @@ const path = require('path');
 const http = require('http');
 const fs = require('fs');
 
-const ROOT = path.resolve(__dirname, '..');
+/* Serve dist/, the site exactly as it is uploaded (run tools/build-site.sh first). */
+const ROOT = path.resolve(__dirname, '../dist');
+const HAS_ENGLISH = fs.existsSync(path.join(ROOT, 'english/index.html'));
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.css': 'text/css' };
 const server = http.createServer((req, res) => {
-  const rel = decodeURIComponent(req.url.split('?')[0]).replace(/^\/+/, '') || 'index.html';
+  let rel = decodeURIComponent(req.url.split('?')[0]).replace(/^\/+/, '');
+  if (rel === '' || rel.endsWith('/')) rel += 'index.html';
   const file = path.join(ROOT, rel);
   if (!file.startsWith(ROOT) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) {
     res.writeHead(404); return res.end('not found');
@@ -38,17 +41,33 @@ const server = http.createServer((req, res) => {
   if (await page.locator('.course-card:not([hidden])').count() !== 1) throw new Error('Search did not find the math course');
   await page.fill('#class-search', '');
 
-  await page.click('.course-card[data-course="english"] .course-link');
-  await page.waitForSelector('.lesson-content');
-  if (!(await page.locator('.lesson-content').innerText()).includes('Build a clear sentence')) throw new Error('English starter lesson did not load');
-  await page.click('[data-answer="1"]');
-  if (!(await page.locator('#quiz-feedback').innerText()).includes('The curious student')) throw new Error('English answer feedback was missing');
-  if (!(await page.locator('.course-progress').innerText()).includes('1 of 2')) throw new Error('English lesson completion did not update');
-  await page.click('[data-lesson="1"]');
-  await page.click('[data-answer="1"]');
-  if (!(await page.locator('.course-progress').innerText()).includes('2 of 2')) throw new Error('English course completion did not update');
-  await page.reload();
-  if (await page.locator('.lesson-pick.is-complete').count() !== 2) throw new Error('English lesson progress did not persist');
+  if (HAS_ENGLISH) {
+    /* The card's numbers must match the course it opens, or the hub is telling learners something untrue. */
+    const counts = (() => {
+      let stages = new Set(), lessons = 0;
+      global.ASCEND = { defineCurriculum(c) { c.units.forEach(u => { stages.add(u.stage); lessons += u.lessons.length; }); } };
+      require(path.join(ROOT, 'english/content/curriculum.js'));
+      return { stages: stages.size, lessons };
+    })();
+    const meta = await page.locator('.course-card[data-course="english"] .course-meta').innerText();
+    if (!meta.includes(counts.stages + ' stages') || !meta.includes(counts.lessons + ' lessons'))
+      throw new Error('English card says "' + meta.replace(/\s+/g, ' ') + '" but the course has ' + counts.stages + ' stages and ' + counts.lessons + ' lessons');
+
+    await page.click('.course-card[data-course="english"] .course-link');
+    await page.waitForSelector('#main h1');
+    if (!(await page.title()).includes('Ascend')) throw new Error('The English card did not open the full English course');
+    if (await page.locator('#topbar a[href="/"]').count() !== 1) throw new Error('The English course has no link back to all classes');
+    if (await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth) > 1) throw new Error('The English course overflows on a phone');
+
+    /* A lesson loads its unit file on demand, which only works if the copied paths are right. */
+    await page.goto(base + '/english/index.html#/lesson/s3u03l06');
+    await page.waitForFunction(() => /agree/i.test(document.querySelector('#main').innerText), null, { timeout: 10000 });
+
+    await page.goto(base + '/course.html?course=english');
+    await page.waitForURL(/\/english\/index\.html/);
+  } else {
+    console.log('  (no dist/english: the English course was not found when the site was built, so its checks were skipped)');
+  }
 
   await page.goto(base + '/course.html?course=sql');
   await page.waitForSelector('.lesson-content');
@@ -57,6 +76,10 @@ const server = http.createServer((req, res) => {
   await page.click('[data-lesson="1"]');
   await page.click('[data-answer="0"]');
   if (!(await page.locator('#quiz-feedback').innerText()).includes('WHERE filters rows')) throw new Error('SQL lesson explanation was missing');
+  if (!(await page.locator('.course-progress').innerText()).includes('1 of 2')) throw new Error('SQL lesson completion did not update');
+  await page.reload();
+  await page.waitForSelector('.lesson-content');
+  if (await page.locator('.lesson-pick.is-complete').count() !== 1) throw new Error('SQL lesson progress did not persist');
 
   await page.goto(base + '/src/index.html');
   await page.waitForSelector('.hub-link');
@@ -65,7 +88,7 @@ const server = http.createServer((req, res) => {
   await browser.close();
   server.close();
   if (errors.length) throw new Error('Browser errors: ' + errors.join('; '));
-  console.log('portal browser checks passed: catalog, filters, search, English and SQL lessons, progress, and math link');
+  console.log('portal browser checks passed: catalog, filters, search, ' + (HAS_ENGLISH ? 'the full English course, ' : '') + 'SQL lessons, progress, and math link');
 })().catch(error => {
   server.close();
   console.error(error.stack || error);
