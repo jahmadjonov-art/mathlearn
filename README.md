@@ -1,11 +1,22 @@
-# Zero to Quant
+# Open Study
 
-A self-paced mathematics course that starts at counting and place value and runs
-to the mathematics used in quantitative finance, statistics and computing.
+A free learning hub with a self-paced mathematics course and starter classes in
+English and SQL. Learners can browse without creating an account; lessons are
+free and work on phones, tablets, and computers.
 
-**Live page:** https://claude.ai/artifact/PvHyJcrAx6Sqa6jVrgtcva
-(private; progress is saved against the owner's account and follows him between
-devices)
+The same math course is live in two places, and they remember progress differently:
+
+| | Where | Progress |
+|---|---|---|
+| **Public site** | https://mediumvioletred-lyrebird-185443.hostingersite.com/ | Saved in the browser you use. Another device, or cleared site data, starts again. |
+| **Private page** | https://claude.ai/artifact/PvHyJcrAx6Sqa6jVrgtcva | Saved to the owner's claude.ai account, so it follows them between devices. |
+
+The difference is not a setting: the claude.ai page can store data against a
+signed-in account, and a plain static site has no accounts to store it against.
+The math code is identical in both; `store.js` uses the account when one is
+there and the browser otherwise. English and SQL each include introductory
+lessons with practice checks, and their completion is saved in the current
+browser.
 
 ## What exists
 
@@ -14,6 +25,7 @@ devices)
 | Curriculum map | 13 levels, 111 modules, **589 skills** — the whole route, written out |
 | Practice built | **236 skills** (levels 0–5: counting → geometry), unlimited generated questions |
 | Lesson prose | 236 written lessons, about 16,300 words |
+| Other starter classes | English and SQL, with two interactive lessons each |
 | Checks | 85,000+ generated questions and 1,500+ diagrams validated per run, plus a real Chromium run |
 
 Levels 6–12 are mapped in full and listed in the app as being written. Progress
@@ -38,11 +50,16 @@ is stored per skill id, so adding a level never disturbs existing progress.
 12. Applied tracks — money and accounting (the CPA arithmetic), trading and
     quantitative mathematics, machine learning, optimisation, interview mathematics
 
-## Layout
+## Site layout
 
 ```
+index.html      learning hub and course catalog
+course.html     shared lesson page for English and SQL
+site.css        responsive hub and lesson styles
+courses.js      course catalog and starter lesson content
+site.js         search, filters, lesson navigation and browser progress
 src/
-  index.html      the page: title, design tokens, both themes, script tags
+  index.html      mathematics course page
   mathcore.js     fractions, integers, an expression parser, maths typesetting
   curriculum.js   the whole map — levels, modules, skills, stable skill ids
   figures.js      geometry diagrams, drawn as SVG from the same numbers a question uses
@@ -54,11 +71,13 @@ src/
   lessons/<module>.json   written lesson prose, keyed by skill id
 tests/
   run.sh          every suite; run this before publishing
+  t-portal.js     learning hub, starter lessons, and saved progress
 ```
 
-No build step and no dependencies in the page itself: `src/` is plain HTML and
-JavaScript, served as published files. The test suite uses Playwright with the
-Chromium already present in the build environment.
+There is no build step and no runtime dependency: this is a static HTML, CSS,
+and JavaScript site. Serve or publish the repository root so the hub is at `/`
+and the complete math course remains at `/src/index.html`. The browser tests use
+Playwright and Chromium; the learning pages themselves do not.
 
 ## Diagrams
 
@@ -136,7 +155,18 @@ unbalanced delimiters, duplicate multiple-choice options, missing working, and
 currency that has landed inside maths markup. Two content bugs and four code
 bugs were caught this way during the first build; do not skip it.
 
-## Adding a level
+## Adding a class
+
+Add an entry to `COURSES` in `courses.js` to place a class on the home page. For
+a short self-contained course, add matching lesson data to `LESSONS`; the shared
+lesson page provides navigation, explanations, example code, quick checks, and
+browser-based completion tracking. Use the existing math app for a subject that
+needs generated practice, spaced review, and a larger curriculum.
+
+Run `tests/run.sh` and publish the repository root as a static site. Keep
+`index.html` at the archive root. The site has no build step or backend setup.
+
+## Adding a math level
 
 1. Write the generators in `src/generators.js` under the ids already in
    `src/curriculum.js`. Nothing else needs touching for practice to appear.
@@ -144,17 +174,28 @@ bugs were caught this way during the first build; do not skip it.
    intuition, not the procedure), optional `sections`, `traps`, and `code` where
    a programming parallel genuinely helps.
 3. Run `tests/run.sh`.
-4. Republish the artifact to the **same URL** above, or the owner loses his saved
-   progress and his link. Pass that URL as the Artifact tool's `url`, and pass
-   `generators.js`, any changed source file, and the new `lessons/*.json` in
-   `files`; files you leave out are kept, and omitting `capabilities` carries the
-   stored `db`/`user` declaration forward.
+4. Publish to **both** places, or they drift apart. Progress is keyed to stable
+   skill ids; never change or reuse an existing id.
 
-   **One trap worth knowing:** the Artifact tool only reads paths under the
-   session's working directory or its scratchpad. When this repository is cloned
-   outside that directory, copy `src/` into the scratchpad and publish from there
-   (`diff -r` the copy against `src/` first). The repository stays the source of
-   truth; the copy is only a staging area.
+   - **Public site:** upload the repository root as a static site to the
+     Hostinger website at the address above. Its account details live in
+     `.hostinger/site.json`, which git ignores because this repository is public.
+   - **Private page:** republish the claude.ai artifact to the **same URL** above,
+     or its owner loses their saved progress and their link. Pass that URL as the
+     Artifact tool's `url`, and pass `generators.js`, any changed source file, and
+     the new `lessons/*.json` in `files`; files you leave out are kept, and
+     omitting `capabilities` carries the stored `db`/`user` declaration forward.
+
+   **Two traps worth knowing:**
+   - Do not send `src/index.html` to the claude.ai page unless it really changed.
+     Its "Open Study" and "All classes" links point at `/`, the hub on the public
+     site, and lead nowhere on claude.ai. Leaving the file out keeps the page's
+     own copy.
+   - The Artifact tool only reads paths under the session's working directory or
+     its scratchpad. When this repository is cloned outside that directory, copy
+     `src/` into the scratchpad and publish from there (`diff -r` the copy
+     against `src/` first). The repository stays the source of truth; the copy is
+     only a staging area.
 
 Write for someone who is not a programmer and wants to understand, not be
 impressed: plain English, no unexplained jargon, and say why a rule is true

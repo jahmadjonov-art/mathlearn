@@ -48,7 +48,9 @@ function rgbDiff(a, b) {
 (async () => {
   await new Promise(r => server.listen(0, '127.0.0.1', r));
   BASE = 'http://127.0.0.1:' + server.address().port;
-  const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+  /* The cloud build environment keeps Chromium at a fixed path; elsewhere Playwright finds its own. */
+  const CLOUD_CHROMIUM = '/opt/pw-browsers/chromium';
+  const browser = await chromium.launch(fs.existsSync(CLOUD_CHROMIUM) ? { executablePath: CLOUD_CHROMIUM } : {});
   const issues = [], log = [];
   function say(s) { log.push(s); console.log(s); }
 

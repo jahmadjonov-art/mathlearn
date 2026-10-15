@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Free, friendly lessons in math, English, and SQL. Learn at your own pace, with no sign-up or paywalls.">
+  <meta name="theme-color" content="#f5f4ee">
+  <title>Open Study — Free learning, one lesson at a time</title>
+  <link rel="stylesheet" href="site.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Open Study home">
+      <span class="brand-mark" aria-hidden="true">o</span>
+      <span>open<span class="brand-light">study</span></span>
+    </a>
+    <nav class="main-nav" aria-label="Main navigation">
+      <a href="#classes">Explore classes</a>
+      <a href="#about">How it works</a>
+    </nav>
+    <a class="header-cta" href="#classes">Find a class <span aria-hidden="true">↗</span></a>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="eyebrow-dot"></span> A growing library. Always free.</div>
+        <h1>A little curiosity can take you <em>anywhere.</em></h1>
+        <p class="hero-intro">A welcoming place to learn the things you need — from the first building blocks to skills you can use every day.</p>
+        <div class="hero-actions">
+          <a class="button button-dark" href="#classes">Explore free classes <span aria-hidden="true">↓</span></a>
+          <span class="no-signup"><span aria-hidden="true">✳</span> No sign-up. No paywalls.</span>
+        </div>
+        <div class="hero-facts" aria-label="About the learning library">
+          <div><strong>03</strong><span>subjects to explore</span></div>
+          <div><strong>13</strong><span>math learning levels</span></div>
+          <div><strong>$0</strong><span>to learn, always</span></div>
+        </div>
+      </div>
+      <div class="hero-art" aria-label="Illustration of an open book and a growing path">
+        <div class="art-note note-top"><span class="note-star">✳</span> Start anywhere</div>
+        <div class="art-sun"></div>
+        <div class="art-orbit orbit-one"></div>
+        <div class="art-orbit orbit-two"></div>
+        <div class="art-book">
+          <div class="book-page page-left"><span class="book-rule"></span><span class="book-rule short"></span><span class="book-rule"></span><span class="book-rule medium"></span></div>
+          <div class="book-page page-right"><span class="book-glyph">∑</span><span class="book-rule"></span><span class="book-rule short"></span><span class="book-rule medium"></span></div>
+        </div>
+        <div class="art-note note-bottom"><span class="note-check">✓</span> Your pace, your path</div>
+      </div>
+    </section>
+
+    <section class="classes-section" id="classes">
+      <div class="section-heading">
+        <div>
+          <div class="eyebrow">The class shelf</div>
+          <h2>Where would you like to begin?</h2>
+        </div>
+        <label class="search-box">
+          <span class="search-icon" aria-hidden="true">⌕</span>
+          <span class="sr-only">Search classes</span>
+          <input id="class-search" type="search" placeholder="Search a subject" autocomplete="off">
+          <kbd>/</kbd>
+        </label>
+      </div>
+      <div class="filter-row" role="group" aria-label="Filter classes">
+        <button class="filter-chip is-active" type="button" data-filter="all" aria-pressed="true">All classes <span>03</span></button>
+        <button class="filter-chip" type="button" data-filter="foundations" aria-pressed="false">Foundations</button>
+        <button class="filter-chip" type="button" data-filter="technology" aria-pressed="false">Technology</button>
+      </div>
+      <div class="course-grid" id="course-grid" aria-live="polite"></div>
+      <p class="empty-state" id="empty-state" hidden>No classes match that search yet. Try another subject.</p>
+      <div class="shelf-note">
+        <span class="shelf-note-icon" aria-hidden="true">↗</span>
+        <p><strong>This shelf is still growing.</strong> More subjects are on the way. Have something in mind? New classes can be added without changing how you learn.</p>
+        <span class="shelf-coming">More classes are on the way <span aria-hidden="true">→</span></span>
+      </div>
+    </section>
+
+    <section class="how-section" id="about">
+      <div class="how-heading">
+        <div class="eyebrow">Learning should feel possible</div>
+        <h2>Made for real life,<br><em>not just the classroom.</em></h2>
+      </div>
+      <div class="how-points">
+        <article><span class="point-number">01</span><h3>Pick what matters to you</h3><p>Start with a subject you need today or one you have always been curious about.</p></article>
+        <article><span class="point-number">02</span><h3>Learn in small steps</h3><p>Clear explanations and short practice make it easier to keep going at your pace.</p></article>
+        <article><span class="point-number">03</span><h3>Come back whenever</h3><p>No deadline, no pressure. Your next lesson will be here when you are ready.</p></article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <a class="brand footer-brand" href="/" aria-label="Open Study home"><span class="brand-mark" aria-hidden="true">o</span><span>open<span class="brand-light">study</span></span></a>
+    <span>Free learning, one lesson at a time.</span>
+    <a href="#classes">Back to the classes ↑</a>
+  </footer>
+  <script src="courses.js"></script>
+  <script src="site.js"></script>
+</body>
+</html>
